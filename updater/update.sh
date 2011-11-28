@@ -61,6 +61,8 @@ if [ $(CheckForUpdate) == "1" ] ; then
 		logOut "Updating updater..."
 		cp ${srcroot}updater/update.sh ${scrroot}update.sh > /dev/null 2>&1
 		#Now we need to build and whatnot...
+		logOut "Running post-update tasks..."
+		${srcroot}updater/builder.sh
 	else
 		logOut "Failed to update."
 		exit 0
@@ -69,7 +71,3 @@ else
 	#No update available
 	logOut "Update is not available.  Current version is $(cat ${srcroot}version)"
 fi
-#Now call external script to build/configure as required.
-logOut "Running post-update tasks..."
-${srcroot}updater/builder.sh
-
