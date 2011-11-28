@@ -58,6 +58,8 @@ if [ $(CheckForUpdate) == "1" ] ; then
 	#Check to make sure we have current...
 	if [ $(CheckForUpdate) == "0" ]; then
 		logOut "Updated to version $(cat ${srcroot}version)"
+		logOut "Updating updater..."
+		cp ${srcroot}updater/update.sh ${scrroot}update.sh > /dev/null 2>&1
 		#Now we need to build and whatnot...
 	else
 		logOut "Failed to update."
@@ -67,4 +69,3 @@ else
 	#No update available
 	logOut "Update is not available.  Current version is $(cat ${srcroot}version)"
 fi
-echo $over
