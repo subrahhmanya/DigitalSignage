@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#Build things
 # Static Variables
         logName="[InfoUpdater]"
         verUrl="https://raw.github.com/PaulW/infodisplay/master/version"
