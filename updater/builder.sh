@@ -25,6 +25,7 @@ cd ${srcroot}src
 make
 killall infodisplay
 cp infodisplay ${scrroot}
+rm infodisplay
 
 # Load Application
 env DISPLAY=:0 ${scrroot}infodisplay &
