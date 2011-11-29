@@ -17,8 +17,6 @@
 int	g_window	= 0;
 GLuint g_textureID[10];
 
-FTFont *font;
-
 struct Vertex
 {
 	float tu, tv;
@@ -233,15 +231,11 @@ void drawtextFunc( int x, int y, char *fName, int fsize, char *fTxt )
 	// This will be easy enough, as we will process and draw prior to
 	// glSwapBuffers() call from parent function.
 	// Create a pixmap font from a TrueType file.
-	font = new FTPixmapFont(fName);
+	FTGLPixmapFont font(fName);
 
 	// Set the font size and render a small text.
-	font->FaceSize(fsize);
-	glEnable(GL_TEXTURE_2D);
-	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	glTranslatef( 0.0f, 2.0f, -1.0f );
-	font->Render(fTxt);
-	glDisable(GL_TEXTURE_2D);
+	font.FaceSize(fsize);
+	font.Render(fTxt);
 }
 
 //-----------------------------------------------------------------------------
