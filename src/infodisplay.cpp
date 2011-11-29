@@ -76,14 +76,14 @@ int main( int argc, char **argv )
 void init( void )
 {
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE | GLUT_MULTISAMPLE);
-	glutInitWindowSize( 1280, 720 );
-	g_window = glutCreateWindow( "Information Display" );
+//	glutInitWindowSize( 1280, 720 );
+//	g_window = glutCreateWindow( "Information Display" );
 
 	// 640x480, 16bit pixel depth, 60Hz refresh rate
-//	glutGameModeString( "1280x720:16@60" );
+	glutGameModeString( "1280x720:16@60" );
 
 	// start fullscreen game mode
-//	glutEnterGameMode();
+	glutEnterGameMode();
 
 	glutDisplayFunc( displayFunc );
 	glutKeyboardFunc( keyboardFunc );
