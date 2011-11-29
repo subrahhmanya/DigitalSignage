@@ -23,18 +23,18 @@ logOut "Skipping FTGL Compilation - already installed."
 
 #Compile CutyCapt
 logOut "Compiling CutyCapt..."
-cd ${srcroot}ext-libs/CutyCapt
-qmake
-make
-cp CutyCapt ${scrroot}
-rm CutyCapt
+cd ${srcroot}ext-libs/CutyCapt > /dev/null 2>&1
+qmake > /dev/null 2>&1
+make > /dev/null 2>&1
+cp CutyCapt ${scrroot} > /dev/null 2>&1
+rm CutyCapt > /dev/null 2>&1
 
 #Compile infodisplay
-cd ${srcroot}src
-make
-killall infodisplay
-cp infodisplay ${scrroot}
-rm infodisplay
+cd ${srcroot}src > /dev/null 2>&1
+make > /dev/null 2>&1
+killall infodisplay > /dev/null 2>&1
+cp infodisplay ${scrroot} > /dev/null 2>&1
+rm infodisplay > /dev/null 2>&1
 
 # Load Application
 env DISPLAY=:0 ${scrroot}infodisplay &
