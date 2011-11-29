@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
+#include <FTGL/ftgl.h>
 
 //-----------------------------------------------------------------------------
 // GLOBALS
@@ -172,7 +173,7 @@ void loadTexture( void )
 {
 	BMPImage textureImage;
 	
-    getBitmapImageData( "textures/orblogo.bmp", &textureImage );
+        getBitmapImageData( "textures/orblogo.bmp", &textureImage );
 
 	glGenTextures( 1, &g_textureID );
 	glBindTexture( GL_TEXTURE_2D, g_textureID );
@@ -235,6 +236,13 @@ void displayFunc( void )
     glBindTexture( GL_TEXTURE_2D, g_textureID );
     glInterleavedArrays( GL_T2F_V3F, 0, g_quadVertices );
     glDrawArrays( GL_QUADS, 0, 4 );
+
+    // Create a pixmap font from a TrueType file.
+    FTGLPixmapFont font("/screen/src/infodisplay/src/fonts/cgothic.ttf");
+
+    // Set the font size and render a small text.
+    font.FaceSize(72);
+    font.Render("Hello World!");
 
     glutSwapBuffers();
 }

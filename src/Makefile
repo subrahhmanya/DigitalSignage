@@ -3,7 +3,12 @@ SAMPLE = infodisplay
 CC ?= gcc
 COPTS ?= -g
 
-LIBS = -L/usr/X11R6/lib -lGL -lGLU -lglut -lXext -lX11 -lm
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib64
+includedir=${prefix}/include
+
+LIBS = -L/usr/X11R6/lib -lGL -lGLU -lglut -lXext -lX11 -lm -lfreetype -L${libdir} -lftgl
 
 all : $(SAMPLE)
 
