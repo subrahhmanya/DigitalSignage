@@ -109,4 +109,5 @@ ext-libs/ftgl/src/libftgl_la-FTVectoriser.o
 ext-libs/ftgl/test/.deps/
 ext-libs/ftgl/test/Makefile
 ext-libs/ftgl/test/Makefile.in
-
+src/infodisplay
+src/infodisplay.cpp~
