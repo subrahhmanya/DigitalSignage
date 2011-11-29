@@ -16,11 +16,6 @@
 int    g_window    = 0;
 GLuint g_textureID = 0;
 
-float g_fSpinX           = 0.0f;
-float g_fSpinY           = 0.0f;
-int   g_nLastMousePositX = 0;
-int   g_nLastMousePositY = 0;
-
 struct Vertex
 {
     float tu, tv;
@@ -50,8 +45,6 @@ void init(void);
 void getBitmapImageData(char *pFileName, BMPImage *pImage);
 void loadTexture(void);
 void keyboardFunc(unsigned char key, int x, int y);
-void mouseFunc(int button, int state, int x, int y);
-void motionFunc(int x, int y);
 void idleFunc(void);
 void reshapeFunc(int w, int h);
 void displayFunc(void);
@@ -90,8 +83,6 @@ void init( void )
 
 	glutDisplayFunc( displayFunc );
 	glutKeyboardFunc( keyboardFunc );
-	glutMouseFunc( mouseFunc );
-	glutMotionFunc( motionFunc );
 	glutReshapeFunc( reshapeFunc );
 	glutIdleFunc( idleFunc );
 
@@ -212,32 +203,6 @@ void keyboardFunc( unsigned char key, int x, int y )
 }
 
 //-----------------------------------------------------------------------------
-// Name: mouseFunc()
-// Desc: Called when a mouse button is pressed
-//-----------------------------------------------------------------------------
-void mouseFunc( int button, int state, int x, int y )
-{
-	if( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
-	{
-		g_nLastMousePositX = x;
-        g_nLastMousePositY = y;
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Name: motionFunc()
-// Desc: Called when the mouse moves
-//-----------------------------------------------------------------------------
-void motionFunc( int x, int y )
-{
-	g_fSpinX -= (x - g_nLastMousePositX);
-	g_fSpinY -= (y - g_nLastMousePositY);
-
-	g_nLastMousePositX = x;
-    g_nLastMousePositY = y;
-}
-
-//-----------------------------------------------------------------------------
 // Name: idleFunc()
 // Desc: Called during idle time
 //-----------------------------------------------------------------------------
@@ -265,9 +230,7 @@ void displayFunc( void )
 
 	glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
-	glTranslatef( 0.0f, 0.0f, -5.0f );
-    glRotatef( -g_fSpinY, 1.0f, 0.0f, 0.0f );
-    glRotatef( -g_fSpinX, 0.0f, 1.0f, 0.0f );
+	glTranslatef( -8.0f, 5.5f, -15.0f );
 
     glBindTexture( GL_TEXTURE_2D, g_textureID );
     glInterleavedArrays( GL_T2F_V3F, 0, g_quadVertices );
