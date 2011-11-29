@@ -44,6 +44,7 @@ cp -a textures ${scrroot}
 
 # Load Application
 logOut "Launching InfoDisplay..."
+cd ${scrroot}
 env DISPLAY=:0 ${scrroot}infodisplay &
 
 logOut "Complete!"

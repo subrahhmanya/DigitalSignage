@@ -5,6 +5,7 @@
 
 if [ ! -z "$(w -h screen)" ] ; then
 	if [ ! $(pidof infodisplay) ] ; then
+		cd ${scrroot}
 		env DISPLAY=:0 ${scrroot}infodisplay &
 	fi
 fi
