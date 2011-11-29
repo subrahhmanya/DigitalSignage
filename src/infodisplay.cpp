@@ -17,6 +17,8 @@
 int	g_window	= 0;
 GLuint g_textureID[10];
 
+int	fpsLimit	= 1;
+
 struct Vertex
 {
 	float tu, tv;
@@ -46,7 +48,7 @@ void init(void);
 void getBitmapImageData(char *pFileName, BMPImage *pImage);
 void loadTexture(int texid, char *fName);
 void keyboardFunc(unsigned char key, int x, int y);
-void idleFunc(void);
+void timerFunc(int);
 void reshapeFunc(int w, int h);
 void drawtextFunc(int x, int y, char *fName, int fsize, char *fTxt);
 void displayFunc(void);
@@ -86,7 +88,8 @@ void init( void )
 	glutDisplayFunc( displayFunc );
 	glutKeyboardFunc( keyboardFunc );
 	glutReshapeFunc( reshapeFunc );
-	glutIdleFunc( idleFunc );
+//	glutIdleFunc( idleFunc );
+	glutTimerFunc(1000/fpsLimit, timerFunc, 0);
 
 	glEnable (GL_LINE_SMOOTH);
 	glEnable (GL_BLEND);
@@ -204,12 +207,13 @@ void keyboardFunc( unsigned char key, int x, int y )
 }
 
 //-----------------------------------------------------------------------------
-// Name: idleFunc()
-// Desc: Called during idle time
+// Name: timerFunc()
+// Desc: Called during specified time
 //-----------------------------------------------------------------------------
-void idleFunc( void )
+void timerFunc( int )
 {
 	glutPostRedisplay();
+	glutTimerFunc(1000/fpsLimit, timerFunc, 0);
 }
 
 //-----------------------------------------------------------------------------
