@@ -24,8 +24,7 @@ sudo make install > /dev/null 2>&1
 cd ${srcroot}src
 make
 killall infodisplay
-rm ${scroot}infodisplay
-mv infodisplay ${scrroot}
+cp infodisplay ${scrroot}
 
 # Load Application
 env DISPLAY=:0 ${scrroot}infodisplay &
