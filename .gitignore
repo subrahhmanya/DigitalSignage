@@ -1,4 +1,9 @@
 .gitignore~
+ext-libs/CutyCapt/CutyCapt
+ext-libs/CutyCapt/CutyCapt.o
+ext-libs/CutyCapt/Makefile
+ext-libs/CutyCapt/moc_CutyCapt.cpp
+ext-libs/CutyCapt/moc_CutyCapt.o
 ext-libs/ftgl/.auto/
 ext-libs/ftgl/Makefile
 ext-libs/ftgl/Makefile.in
