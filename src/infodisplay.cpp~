@@ -99,6 +99,8 @@ void init( void )
 	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
 	glEnable( GL_TEXTURE_2D );
 
+	glutSetCursor(GLUT_CURSOR_NONE); 
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective( 45.0f, 1280.0f / 720.0f, 0.1f, 100.0f);
