@@ -3,8 +3,6 @@
 # Static Variables
         scrroot="/screen/"
 
-if [ ! -z "$(w -h screen)" ] ; then
-	if [ ! $(pidof infodisplay) ] ; then
-		env DISPLAY=:0 ${scrroot}infodisplay &
-	fi
+if [ ! $(pidof infodisplay) ] ; then
+	env DISPLAY=:0 ${scrroot}infodisplay &
 fi
