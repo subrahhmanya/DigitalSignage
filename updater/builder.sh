@@ -20,5 +20,10 @@ cd ${srcroot}ext-libs/ftgl > /dev/null 2>&1
 make > /dev/null 2>&1
 sudo make install > /dev/null 2>&1
 
-# To call new screen:
-# env DISPLAY=:0 command &
+#Compile infodisplay
+cd ${srcroot}src
+make
+cp infodisplay ${scrroot}
+
+# Load Application
+env DISPLAY=:0 ${scrroot}infodisplay &
