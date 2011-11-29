@@ -233,7 +233,7 @@ void drawtextFunc( int x, int y, char *fName, int fsize, char *fTxt )
 	// This will be easy enough, as we will process and draw prior to
 	// glSwapBuffers() call from parent function.
 	// Create a pixmap font from a TrueType file.
-	font = new FTTextureFont(fName);
+	font = new FTPixmapFont(fName);
 
 	// Set the font size and render a small text.
 	font->FaceSize(fsize);
@@ -265,7 +265,10 @@ void displayFunc( void )
 	glPopMatrix();
 
 	glPushMatrix();
-	drawtextFunc( 0, 0, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
+glPixelTransferf(GL_RED_BIAS, -1.0f);
+glPixelTransferf(GL_GREEN_BIAS, -1.0f);
+glPixelTransferf(GL_BLUE_BIAS, -1.0f);
+	drawtextFunc( 0, 0, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 148, "Welcome to Orbital");
 	glPopMatrix();
 
 	glutSwapBuffers();
