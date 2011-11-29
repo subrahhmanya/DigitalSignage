@@ -3,7 +3,7 @@ SAMPLE = infodisplay
 CC ?= gcc
 COPTS ?= -g
 
-LIBS = -L/usr/X11R6/lib -lGL -lGLU -lglut -lXmu -lXext -lX11 -lm
+LIBS = -L/usr/X11R6/lib -lGL -lGLU -lglut -lXext -lX11 -lm
 
 all : $(SAMPLE)
 
