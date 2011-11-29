@@ -97,7 +97,7 @@ void init( void )
 
 	loadTexture(0, "textures/orblogo.bmp");
 
-	glClearColor( 1.0f, 0.0f, 1.0f, 1.0f );
+	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
 
 	glutSetCursor(GLUT_CURSOR_NONE); 
 
@@ -265,10 +265,10 @@ void displayFunc( void )
 	glPopMatrix();
 
 	glPushMatrix();
-glPixelTransferf(GL_RED_BIAS, -1.0f);
-glPixelTransferf(GL_GREEN_BIAS, -1.0f);
-glPixelTransferf(GL_BLUE_BIAS, -1.0f);
-	drawtextFunc( 0, 0, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 148, "Welcome to Orbital");
+	glPixelTransferf(GL_RED_BIAS, -1.0f);
+	glPixelTransferf(GL_GREEN_BIAS, -1.0f);
+	glPixelTransferf(GL_BLUE_BIAS, -1.0f);
+	drawtextFunc( 0, 0, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
 	glPopMatrix();
 
 	glutSwapBuffers();
