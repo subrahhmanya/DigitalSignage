@@ -89,6 +89,11 @@ void init( void )
 	glutReshapeFunc( reshapeFunc );
 	glutIdleFunc( idleFunc );
 
+	glEnable (GL_LINE_SMOOTH);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+
 	loadTexture();
 
 	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
