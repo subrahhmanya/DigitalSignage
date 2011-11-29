@@ -21,6 +21,14 @@ function logOut {
 #sudo make install > /dev/null 2>&1
 logOut "Skipping FTGL Compilation - already installed."
 
+#Compile CutyCapt
+logOut "Compiling CutyCapt..."
+cd ${srcroot}ext-libs/CutyCapt
+qmake
+make
+cp CutyCapt ${scrroot}
+rm CutyCapt
+
 #Compile infodisplay
 cd ${srcroot}src
 make
