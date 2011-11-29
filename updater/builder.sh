@@ -23,6 +23,7 @@ sudo make install > /dev/null 2>&1
 #Compile infodisplay
 cd ${srcroot}src
 make
+killall infodisplay
 cp infodisplay ${scrroot}
 
 # Load Application
