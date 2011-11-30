@@ -269,7 +269,7 @@ void displayFunc( void )
 	glDisable( GL_TEXTURE_2D );
 	glPopMatrix();
 
-	drawtextFunc( -1.0f, 0.0f, -1.0f, 20, 20, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
+//	drawtextFunc( -1.0f, 0.0f, -1.0f, 20, 20, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
 
 	glutSwapBuffers();
 }
