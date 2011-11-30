@@ -17,6 +17,8 @@
 int	g_window	= 0;
 GLuint g_textureID[10];
 
+FTFont *font;
+
 int	fpsLimit	= 1;
 
 struct Vertex
@@ -50,7 +52,7 @@ void loadTexture(int texid, char *fName);
 void keyboardFunc(unsigned char key, int x, int y);
 void timerFunc(int);
 void reshapeFunc(int w, int h);
-void drawtextFunc(float r, float g, float b, int x, int y, char *fName, int fsize, char *fTxt);
+void drawtextFunc(float r, float g, float b, int x, int y, char *fName, int fSize, char *fTxt);
 void displayFunc(void);
 
 //-----------------------------------------------------------------------------
@@ -76,14 +78,14 @@ int main( int argc, char **argv )
 void init( void )
 {
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE | GLUT_MULTISAMPLE);
-	glutInitWindowSize( 1280, 720 );
-	g_window = glutCreateWindow( "Information Display" );
+//	glutInitWindowSize( 1280, 720 );
+//	g_window = glutCreateWindow( "Information Display" );
 
 	// 640x480, 16bit pixel depth, 60Hz refresh rate
-//	glutGameModeString( "1280x720:16@60" );
+	glutGameModeString( "1280x720:16@60" );
 
 	// start fullscreen game mode
-//	glutEnterGameMode();
+	glutEnterGameMode();
 
 	glutDisplayFunc( displayFunc );
 	glutKeyboardFunc( keyboardFunc );
@@ -229,22 +231,21 @@ void reshapeFunc( int w, int h )
 // Name: drawtextFunc()
 // Desc: Called when we want to display informative text at a specific location
 //-----------------------------------------------------------------------------
-void drawtextFunc( float r, float g, float b, int x, int y, char *fName, int fsize, char *fTxt )
+void drawtextFunc( float r, float g, float b, int x, int y, char *fName, int fSize, char *fTxt )
 {
 	// We need to add in creation and drawing to current buffer.
 	// This will be easy enough, as we will process and draw prior to
 	// glSwapBuffers() call from parent function.
 	// Create a pixmap font from a TrueType file.
 	glPushMatrix();
-//	glRasterPos2i(x, y);
+	glRasterPos2i(x, y);
 
 	glPixelTransferf(GL_RED_BIAS, r);
 	glPixelTransferf(GL_GREEN_BIAS, g);
 	glPixelTransferf(GL_BLUE_BIAS, b);
 
-	FTGLPixmapFont font(fName);
 	// Set the font size and render a small text.
-	font.FaceSize(fsize);
+	font.FaceSize(fSize);
 	font.Render(fTxt);
 	glPopMatrix();
 }
@@ -269,7 +270,7 @@ void displayFunc( void )
 	glDisable( GL_TEXTURE_2D );
 	glPopMatrix();
 
-//	drawtextFunc( -1.0f, 0.0f, -1.0f, 20, 20, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
+	drawtextFunc( -1.0f, -1.0f, -1.0f, 20, 20, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
 
 	glutSwapBuffers();
 }
