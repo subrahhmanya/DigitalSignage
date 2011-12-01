@@ -99,14 +99,17 @@ void drawText(const char *text,
 	w = nextpoweroftwo(initial->w);
 	h = nextpoweroftwo(initial->h);
 	
+	/* We need to allocate some memory now for out buffer */
 	unsigned char *pixels;
 	pixels = (unsigned char*) malloc(4 * w * h);
 
+	/* Let's grab a section of the backbuffer into memory */
 	glPixelStorei( GL_PACK_ROW_LENGTH, 0 ) ;
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 ) ;
 	glReadBuffer( GL_BACK );
 	glReadPixels( location->x, location->y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
+	/* Create new SDL Surface where text is layed on top of the backbuffer we just grabbed */
 	intermediary = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
 	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		0x000000FF, 0x0000FF00, 0x00FF0000, 0
@@ -119,6 +122,7 @@ void drawText(const char *text,
 		memcpy(((char *) intermediary->pixels) + intermediary->pitch * i, pixels + 4 * w * (h-i - 1), w*4);
 	free(pixels);
 
+	/* Blit text on top of new texture */
 	SDL_BlitSurface(initial, 0, intermediary, 0);
 
 	/* Tell GL about our new texture */
