@@ -69,7 +69,7 @@ void render() {
 	iro.g = 20;
 	iro.b = 20;
 	position.x = 200;
-	position.y = 50;
+	position.y = 15;
 	drawText("Welcome to\nOrbital", fntCGothic, iro, &position);
  
 	SDL_GL_SwapBuffers();
@@ -189,7 +189,7 @@ bool init() {
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
  
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_OPENGL);
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 	if(screen == NULL) {
 		fprintf( stderr, "Video mode set failed: %s\n",
 		SDL_GetError( ) );
