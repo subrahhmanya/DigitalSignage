@@ -18,7 +18,7 @@
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
-const int SCREEN_BPP = 16;
+const int SCREEN_BPP = 24;
  
 SDL_Surface* screen = NULL;
 TTF_Font *fntCGothic;
