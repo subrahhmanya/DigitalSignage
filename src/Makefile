@@ -1,6 +1,6 @@
 SAMPLE = infodisplay
 
-CC ?= gcc
+CC ?= g++
 COPTS ?= -g
 
 prefix=/usr
@@ -8,7 +8,7 @@ exec_prefix=${prefix}
 libdir=/usr/lib64
 includedir=${prefix}/include
 
-LIBS = -L/usr/X11R6/lib -lGL -lGLU -lglut -lXext -lX11 -lm -lfreetype -L${libdir} -lftgl
+LIBS = -L/usr/X11R6/lib -lGL -lSDL -lSDL_ttf -lXext -lX11 -lm -lfreetype -L${libdir} -lstdc++
 
 all : $(SAMPLE)
 

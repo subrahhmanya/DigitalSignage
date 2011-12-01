@@ -1,275 +1,241 @@
 //-----------------------------------------------------------------------------
-//	     Name: infodisplay.cpp
+//		 Name: infodisplay.cpp
 //	   Author: Paul Wollaston
-//  Last Modified: 29/11/11
-//    Description:  Base framework for Information Display
+//  Last Modified: 01/12/11
+//	Description:  Base framework for Information Display
 //-----------------------------------------------------------------------------
 
-#include <stdlib.h>
+#include <math.h>
+
+// include SDL libraries
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengl.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_mixer.h>
+#include <SDL/SDL_ttf.h>
 #include <stdio.h>
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <FTGL/ftgl.h>
+#include <string.h>
 
-//-----------------------------------------------------------------------------
-// GLOBALS
-//-----------------------------------------------------------------------------
-int	g_window	= 0;
-GLuint g_textureID[10];
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
+const int SCREEN_BPP = 16;
+ 
+SDL_Surface* screen = NULL;
+TTF_Font *fntCGothic;
 
-int	fpsLimit	= 1;
+typedef unsigned char byte;
 
-struct Vertex
+void drawText(const char *text, 
+                      TTF_Font *font,
+                      SDL_Color color,
+                      SDL_Rect *location);
+int netpowerof(int x);
+void render();
+bool init();
+
+SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 {
-	float tu, tv;
-	float x, y, z;
-};
-
-Vertex g_quadVertices[] =
-{
-	{ 0.0f,0.0f, -3.0f,-0.575f, 0.0f },
-	{ 1.0f,0.0f,  3.0f,-0.575f, 0.0f },
-	{ 1.0f,1.0f,  3.0f, 0.575f, 0.0f },
-	{ 0.0f,1.0f, -3.0f, 0.575f, 0.0f }
-};
-
-struct BMPImage 
-{
-	int   width;
-	int   height;
-	char *data;
-};
-
-//-----------------------------------------------------------------------------
-// PROTOTYPES
-//-----------------------------------------------------------------------------
-int main(int argc, char **argv);
-void init(void);
-void getBitmapImageData(char *pFileName, BMPImage *pImage);
-void loadTexture(int texid, char *fName);
-void keyboardFunc(unsigned char key, int x, int y);
-void timerFunc(int);
-void reshapeFunc(int w, int h);
-void drawtextFunc(float r, float g, float b, int x, int y, char *fName, int fsize, char *fTxt);
-void displayFunc(void);
-
-//-----------------------------------------------------------------------------
-// Name: main()
-// Desc: 
-//-----------------------------------------------------------------------------
-int main( int argc, char **argv )
-{
-	glutInit( &argc, argv );
-
-	init();
-
-	glutSwapBuffers();
-	glutMainLoop();
-
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-// Name: init()
-// Desc: 
-//-----------------------------------------------------------------------------
-void init( void )
-{
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE | GLUT_MULTISAMPLE);
-//	glutInitWindowSize( 1280, 720 );
-//	g_window = glutCreateWindow( "Information Display" );
-
-	// 640x480, 16bit pixel depth, 60Hz refresh rate
-	glutGameModeString( "1280x720:16@60" );
-
-	// start fullscreen game mode
-	glutEnterGameMode();
-
-	glutDisplayFunc( displayFunc );
-	glutKeyboardFunc( keyboardFunc );
-	glutReshapeFunc( reshapeFunc );
-//	glutIdleFunc( idleFunc );
-	glutTimerFunc(1000/fpsLimit, timerFunc, 0);
-
-	glEnable (GL_LINE_SMOOTH);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-
-	loadTexture(0, "textures/orblogo.bmp");
-
-	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
-
-	glutSetCursor(GLUT_CURSOR_NONE); 
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective( 45.0f, 1280.0f / 720.0f, 0.1f, 100.0f);
-}
-
-//-----------------------------------------------------------------------------
-// Name: getBitmapImageData()
-// Desc: Simply image loader for 24 bit BMP files.
-//-----------------------------------------------------------------------------
-void getBitmapImageData( char *pFileName, BMPImage *pImage )
-{
-	FILE *pFile = NULL;
-	unsigned short nNumPlanes;
-	unsigned short nNumBPP;
-	int i;
-
-	if( (pFile = fopen(pFileName, "rb") ) == NULL )
-		printf("ERROR: getBitmapImageData - %s not found\n",pFileName);
-
-	// Seek forward to width and height info
-	fseek( pFile, 18, SEEK_CUR );
-
-	if( (i = fread(&pImage->width, 4, 1, pFile) ) != 1 )
-		printf("ERROR: getBitmapImageData - Couldn't read width from %s.\n", pFileName);
-
-	if( (i = fread(&pImage->height, 4, 1, pFile) ) != 1 )
-		printf("ERROR: getBitmapImageData - Couldn't read height from %s.\n", pFileName);
-
-	if( (fread(&nNumPlanes, 2, 1, pFile) ) != 1 )
-		printf("ERROR: getBitmapImageData - Couldn't read plane count from %s.\n", pFileName);
-	
-	if( nNumPlanes != 1 )
-		printf( "ERROR: getBitmapImageData - Plane count from %s is not 1: %u\n", pFileName, nNumPlanes );
-
-	if( (i = fread(&nNumBPP, 2, 1, pFile)) != 1 )
-		printf( "ERROR: getBitmapImageData - Couldn't read BPP from %s.\n", pFileName );
-	
-	if( nNumBPP != 24 )
-		printf( "ERROR: getBitmapImageData - BPP from %s is not 24: %u\n", pFileName, nNumBPP );
-
-	// Seek forward to image data
-	fseek( pFile, 24, SEEK_CUR );
-
-	// Calculate the image's total size in bytes. Note how we multiply the 
-	// result of (width * height) by 3. This is becuase a 24 bit color BMP 
-	// file will give you 3 bytes per pixel.
-	int nTotalImagesize = (pImage->width * pImage->height) * 3;
-
-	pImage->data = (char*) malloc( nTotalImagesize );
-	
-	if( (i = fread(pImage->data, nTotalImagesize, 1, pFile) ) != 1 )
-		printf("ERROR: getBitmapImageData - Couldn't read image data from %s.\n", pFileName);
-
-	//
-	// Finally, rearrange BGR to RGB
-	//
-	
-	char charTemp;
-	for( i = 0; i < nTotalImagesize; i += 3 )
-	{ 
-		charTemp = pImage->data[i];
-		pImage->data[i] = pImage->data[i+2];
-		pImage->data[i+2] = charTemp;
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Name: loadTexture()
-// Desc: 
-//-----------------------------------------------------------------------------
-void loadTexture( int texid, char *fName )	
-{
-	BMPImage textureImage;
-	
-		getBitmapImageData( fName, &textureImage );
-
-	glGenTextures( 1, &g_textureID[texid] );
-	glBindTexture( GL_TEXTURE_2D, g_textureID[texid] );
-
-	// select modulate to mix texture with color for shading
-	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-	glTexImage2D( GL_TEXTURE_2D, 0, 3, textureImage.width, textureImage.height, 
-				   0, GL_RGB, GL_UNSIGNED_BYTE, textureImage.data );
-}
-
-//-----------------------------------------------------------------------------
-// Name: keyboardFunc()
-// Desc: Called when a keyboard key is pressed
-//-----------------------------------------------------------------------------
-void keyboardFunc( unsigned char key, int x, int y ) 
-{
-	switch( key )
+    maskColor |= 0xff000000u;
+    Uint32* surfacepixels = (Uint32*) s->pixels;
+    SDL_LockSurface(s);
+    for(int y = 0; y < s->h; y++)
 	{
-		case 27:
-			glutDestroyWindow( g_window );
-			exit(0);
-			break;
+	    for(int x = 0; x < s->w; x++)
+		{
+		    Uint32* p = &(surfacepixels[y * s->pitch / 4  + x]);
+		    if(*p == maskColor) *p = 0x00000000u;
+		}
 	}
+    SDL_UnlockSurface(s);
+    return s;
 }
 
-//-----------------------------------------------------------------------------
-// Name: timerFunc()
-// Desc: Called during specified time
-//-----------------------------------------------------------------------------
-void timerFunc( int )
-{
-	glutPostRedisplay();
-	glutTimerFunc(1000/fpsLimit, timerFunc, 0);
-}
-
-//-----------------------------------------------------------------------------
-// Name: reshapeFunc()
-// Desc: Called when the window size has been changed by the user
-//-----------------------------------------------------------------------------
-void reshapeFunc( int w, int h )
-{
-	glViewport( 0, 0, w, h );
-}
-
-//-----------------------------------------------------------------------------
-// Name: drawtextFunc()
-// Desc: Called when we want to display informative text at a specific location
-//-----------------------------------------------------------------------------
-void drawtextFunc( float r, float g, float b, int x, int y, char *fName, int fsize, char *fTxt )
-{
-	// We need to add in creation and drawing to current buffer.
-	// This will be easy enough, as we will process and draw prior to
-	// glSwapBuffers() call from parent function.
-	// Create a pixmap font from a TrueType file.
-	glPushMatrix();
-//	glRasterPos2i(x, y);
-
-	glPixelTransferf(GL_RED_BIAS, r);
-	glPixelTransferf(GL_GREEN_BIAS, g);
-	glPixelTransferf(GL_BLUE_BIAS, b);
-
-	FTGLPixmapFont font(fName);
-	// Set the font size and render a small text.
-	font.FaceSize(fsize);
-	font.Render(fTxt);
-	glPopMatrix();
-}
-
-//-----------------------------------------------------------------------------
-// Name: displayFunc()
-// Desc: Called when GLUT is ready to render
-//-----------------------------------------------------------------------------
-void displayFunc( void )
-{
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-	glMatrixMode( GL_MODELVIEW );
+void render() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+	SDL_Color iro;
+	SDL_Rect position;
+
+	iro.r = 254;
+	iro.g = 0;
+	iro.b = 254;
+  
+	position.x = 0;
+	position.y = 0;
+	drawText("Welcome to Orbital", fntCGothic, iro, &position);
+
+
+	iro.r = 20;
+	iro.g = 20;
+	iro.b = 20;
+	position.x = 200;
+	position.y = 50;
+	drawText("Welcome to\nOrbital", fntCGothic, iro, &position);
+ 
+	SDL_GL_SwapBuffers();
+}
+
+int nextpoweroftwo(int x)
+{
+	double logbase2 = log(x) / log(2);
+	return round(pow(2,ceil(logbase2)));
+}
+
+void drawText(const char *text, 
+                      TTF_Font *font,
+                      SDL_Color color,
+                      SDL_Rect *location)
+{
+	SDL_Surface *initial;
+	SDL_Surface *intermediary;
+	SDL_Rect rect;
+	int w,h;
+	GLuint texture;
+	
+	/* Use SDL_TTF to render our text */
+	initial = TTF_RenderUTF8_Blended(font, text, color);
+	
+	/* Convert the rendered text to a known format */
+	w = nextpoweroftwo(initial->w);
+	h = nextpoweroftwo(initial->h);
+	
+	unsigned char *pixels;
+	pixels = (unsigned char*) malloc(4 * w * h);
+
+	glPixelStorei( GL_PACK_ROW_LENGTH, 0 ) ;
+	glPixelStorei( GL_PACK_ALIGNMENT, 1 ) ;
+	glReadBuffer( GL_BACK );
+	glReadPixels( location->x, location->y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+
+	intermediary = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+		0x000000FF, 0x0000FF00, 0x00FF0000, 0
+	#else
+		0x00FF0000, 0x0000FF00, 0x000000FF, 0
+	#endif
+	);
+
+	for (int i = 0 ; i < h ; i++)
+		memcpy(((char *) intermediary->pixels) + intermediary->pitch * i, pixels + 4 * w * (h-i - 1), w*4);
+	free(pixels);
+
+	SDL_BlitSurface(initial, 0, intermediary, 0);
+
+	/* Tell GL about our new texture */
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, 
+			GL_UNSIGNED_BYTE, intermediary->pixels );
+	
+	/* GL_NEAREST looks horrible, if scaled... */
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	
+
+	/* prepare to render our texture */
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	/* Draw a quad at location */
+	glBegin(GL_QUADS);
+		/* Recall that the origin is in the lower-left corner
+		   That is why the TexCoords specify different corners
+		   than the Vertex coors seem to. */
+		glTexCoord2f(0.0f, 1.0f); 
+			glVertex2f(location->x    , location->y);
+		glTexCoord2f(1.0f, 1.0f); 
+			glVertex2f(location->x + w, location->y);
+		glTexCoord2f(1.0f, 0.0f); 
+			glVertex2f(location->x + w, location->y + h);
+		glTexCoord2f(0.0f, 0.0f); 
+			glVertex2f(location->x    , location->y + h);
+	glEnd();
+	/* Bad things happen if we delete the texture before it finishes */
+	glFinish();
+	
+	/* return the deltas in the unused w,h part of the rect */
+	location->w = initial->w;
+	location->h = initial->h;
+	
+	/* Clean up */
+	SDL_FreeSurface(initial);
+	SDL_FreeSurface(intermediary);
+	glDeleteTextures(1, &texture);
+}
+
+bool init() {
+	SDL_Init(SDL_INIT_EVERYTHING);
+	TTF_Init();
+ 
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+ 
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,  16);
+	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+ 
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,   8);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,  8);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
+ 
+//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+ 
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_OPENGL);
+	if(screen == NULL) {
+		fprintf( stderr, "Video mode set failed: %s\n",
+		SDL_GetError( ) );
+		return false;
+	}
+ 
+	glClearColor(1, 1, 1, 1);
+	glClearDepth(1.0f);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
-	glTranslatef( -8.0f, 5.5f, -15.0f );
-	glEnable( GL_TEXTURE_2D );
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	glBindTexture( GL_TEXTURE_2D, g_textureID[0] );
-	glInterleavedArrays( GL_T2F_V3F, 0, g_quadVertices );
-	glDrawArrays( GL_QUADS, 0, 4 );
-	glDisable( GL_TEXTURE_2D );
-	glPopMatrix();
+	glLoadIdentity();
+	glOrtho(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
 
-	drawtextFunc( -1.0f, 0.0f, -1.0f, 20, 20, "/screen/src/infodisplay/src/fonts/cgothic.ttf", 48, "Welcome to Orbital");
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glPushMatrix();
+	glLoadIdentity();
+ 
+	SDL_WM_SetCaption("drawText", NULL);
+ 
+	fntCGothic = TTF_OpenFont( "/screen/fonts/cgothic.ttf", 48 );
+	if(fntCGothic == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		return false;
+	}
+ 
+	return true;
+}
+ 
+int main( int argc, char* argv[] ) {
+	if(init() == false) {
+		return 1;
+	}
+ 
+	render();
+ 
+	system("sleep 5");
+ 
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();   
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();	
 
-	glutSwapBuffers();
+	SDL_FreeSurface(screen);
+	TTF_CloseFont(fntCGothic);
+	TTF_Quit();
+	SDL_Quit();
+	return 0;
 }
