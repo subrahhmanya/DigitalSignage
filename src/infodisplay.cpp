@@ -18,7 +18,7 @@
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
-const int SCREEN_BPP = 32;
+const int SCREEN_BPP = 24;
  
 SDL_Surface* screen = NULL;
 TTF_Font *fntCGothic;
@@ -187,9 +187,9 @@ bool init() {
 //	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 //	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
 
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
- 
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_OPENGL);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+	SDL_putenv("SDL_VIDEO_WINDOW_POS=0,0");
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_NOFRAME | SDL_HWSURFACE | SDL_OPENGL);
 	if(screen == NULL) {
 		fprintf( stderr, "Video mode set failed: %s\n",
 		SDL_GetError( ) );
