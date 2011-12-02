@@ -282,7 +282,7 @@ void doDisplay() {
 	date = asctime(localtime(&timer));
 
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
-	drawText(date, fntCGothic48, 2, 0, 0, 0, 1426, 0);
+	drawText(date, fntCGothic48, 2, 0, 0, 0, 1428, 0);
 
 	SDL_GL_SwapBuffers();
 }
