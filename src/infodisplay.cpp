@@ -240,11 +240,17 @@ void doDisplay() {
 	position.y = 0;
 	drawText(date, fntCGothic, iro, &position, 1);
 
-	position.x = 2000;
+	iro.r = 254;
+	iro.g = 0;
+	iro.b = 0;
+	position.x = 200;
 	position.y = 100;
 	drawText(date, fntCGothic, iro, &position, 2);
 
-	position.x = 2000;
+	iro.r = 0;
+	iro.g = 254;
+	iro.b = 0;
+	position.x = 200;
 	position.y = 200;
 	drawText(date, fntCGothic, iro, &position, 3);
 
