@@ -52,8 +52,9 @@ SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 
 int nextpoweroftwo(int x)
 {
-	double logbase2 = log(x) / log(2);
-	return round(pow(2,ceil(logbase2)));
+//	double logbase2 = log(x) / log(2);
+//	return round(pow(2,ceil(logbase2)));
+	return x
 }
 
 void drawText(const char *text,
