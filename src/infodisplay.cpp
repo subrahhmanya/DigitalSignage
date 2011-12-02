@@ -189,12 +189,14 @@ bool init() {
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
 	SDL_putenv("SDL_VIDEO_WINDOW_POS=0,0");
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_NOFRAME | SDL_HWSURFACE | SDL_OPENGL);
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 	if(screen == NULL) {
 		fprintf( stderr, "Video mode set failed: %s\n",
 		SDL_GetError( ) );
 		return false;
 	}
+
+	SDL_ShowCursor(SDL_DISABLE); 
  
 	glClearColor(1, 1, 1, 1);
 	glClearDepth(1.0f);
