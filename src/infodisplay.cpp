@@ -15,6 +15,9 @@
 #include <SDL/SDL_ttf.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
+#define IS_RUNNING	true
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -28,7 +31,7 @@ void drawText(const char *text,
                       SDL_Color color,
                       SDL_Rect *location);
 int netpowerof(int x);
-void render();
+void doDisplay();
 bool init();
 
 SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
@@ -194,10 +197,20 @@ bool init() {
 	return true;
 }
 
-void render() {
-	// This is the main rendering function.  In here, we call all required information and pull what we need.
+void doDisplay() {
+	// This is the main processing and rendering function.
+	// In here, we call all required information and pull what we need.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+
+	char *date;
+	
+	time_t timer;
+
+	timer=time(NULL);
+	
+	date = asctime(localtime(&timer));
+
 	SDL_Color iro;
 	SDL_Rect position;
 
@@ -206,7 +219,7 @@ void render() {
 	iro.b = 0;
 	position.x = 0;
 	position.y = 0;
-	drawText("Orbital", fntCGothic, iro, &position);
+	drawText(date, fntCGothic, iro, &position);
 
 	SDL_GL_SwapBuffers();
 }
@@ -216,9 +229,10 @@ int main( int argc, char* argv[] ) {
 		return 1;
 	}
 
-	render();
-
-	system("sleep 120");
+	while ( IS_RUNNING ) {
+		doDisplay();
+		SDL_Delay(100);
+	}
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
