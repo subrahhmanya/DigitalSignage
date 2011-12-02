@@ -56,21 +56,12 @@ void render() {
 	SDL_Color iro;
 	SDL_Rect position;
 
-	iro.r = 254;
+	iro.r = 0;
 	iro.g = 0;
-	iro.b = 254;
-  
+	iro.b = 0;
 	position.x = 0;
 	position.y = 0;
-	drawText("Welcome to Orbital", fntCGothic, iro, &position);
-
-
-	iro.r = 20;
-	iro.g = 20;
-	iro.b = 20;
-	position.x = 200;
-	position.y = 15;
-	drawText("Welcome to\nOrbital", fntCGothic, iro, &position);
+	drawText("Orbital", fntCGothic, iro, &position);
  
 	SDL_GL_SwapBuffers();
 }
@@ -184,9 +175,6 @@ bool init() {
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,  8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
  
-//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
-
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
 	SDL_putenv("SDL_VIDEO_WINDOW_POS=0,0");
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
@@ -213,7 +201,7 @@ bool init() {
 	glPushMatrix();
 	glLoadIdentity();
  
-	SDL_WM_SetCaption("drawText", NULL);
+	SDL_WM_SetCaption("Info Display", NULL);
  
 	fntCGothic = TTF_OpenFont( "/screen/fonts/cgothic.ttf", 48 );
 	if(fntCGothic == NULL) {
