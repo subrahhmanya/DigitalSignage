@@ -12,7 +12,7 @@ function logOut {
 }
 
 #We're updating - kill previous infodisplay
-killall infodisplay > /dev/null 2>&1
+killall -9 infodisplay > /dev/null 2>&1
 
 #Let's compile some required binaries.  We do this every time, just incase.
 
