@@ -23,8 +23,6 @@ const int SCREEN_BPP = 24;
 SDL_Surface* screen = NULL;
 TTF_Font *fntCGothic;
 
-typedef unsigned char byte;
-
 void drawText(const char *text,
                       TTF_Font *font,
                       SDL_Color color,
@@ -160,7 +158,7 @@ bool init() {
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
-	SDL_putenv("SDL_VIDEO_WINDOW_POS=0,0");
+
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 	if(screen == NULL) {
 		fprintf( stderr, "Video mode set failed: %s\n",
