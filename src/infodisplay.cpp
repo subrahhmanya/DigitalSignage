@@ -17,7 +17,7 @@
 #include <string.h>
 #include <time.h>
 
-#define IS_RUNNING	true
+bool IS_RUNNING = true;
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -30,7 +30,15 @@ bool drawText(const char *text,
 			int fsize,
 			SDL_Color color,
 			SDL_Rect *location,
-			int alignment);
+			int alignment,
+			int cr,
+			int cg,
+			int cb,
+			int px,
+			int py);
+bool drawTexture(const char *fname,
+			SDL_Rect *location,
+			int scale);
 bool FileExists( const char* FileName );
 void doDisplay();
 bool init();
@@ -56,12 +64,6 @@ bool FileExists( const char* FileName )
 {
     FILE* fp = NULL;
 
-    //will not work if you do not have read permissions
-
-    //to the file, but if you don''t have read, it
-
-    //may as well not exist to begin with.
-
     fp = fopen( FileName, "rb" );
     if( fp != NULL )
     {
@@ -75,15 +77,26 @@ bool FileExists( const char* FileName )
 bool drawText(const char *text,
 			const char *fname,
 			int fsize,
-			SDL_Color color,
-			SDL_Rect *location,
-			int alignment)
+			int alignment,
+			int cr,
+			int cg,
+			int cb,
+			int px,
+			int py)
 {
 	SDL_Surface *initial;
 	SDL_Surface *intermediary;
+	SDL_Color color;
+	SDL_Rect location;
 	SDL_Rect rect;
 	int w,h,ax,ay;
 	GLuint texture;
+
+	color.r = cr;
+	color.g = cg;
+	color.b = cb;
+	location.x = px;
+	location.y = py;
 
 	TTF_Font *fntChosen;
 
@@ -91,6 +104,7 @@ bool drawText(const char *text,
 	if(fntChosen == NULL) {
 		fprintf( stderr, "Failed when loading Font: %s\n",
 		SDL_GetError( ) );
+		IS_RUNNING=false;
 		return false;
 	}
 
@@ -105,12 +119,12 @@ bool drawText(const char *text,
 	   1 = Left Align
 	   2 = Right Align */
 
-	ax=location->x;
-	ay=location->y;
+	ax=location.x;
+	ay=location.y;
 
 	if (alignment==2) {
-		ax=(location->x - w) ;
-		ay=location->y;
+		ax=(location.x - w) ;
+		ay=location.y;
 	}
 
 	/* We need to allocate some memory now for out buffer */
@@ -160,26 +174,36 @@ bool drawText(const char *text,
 		   That is why the TexCoords specify different corners
 		   than the Vertex coors seem to. */
 		glTexCoord2f(0.0f, 1.0f);
-			glVertex2f(ax    , ay);
+			glVertex2f(ax, ay);
 		glTexCoord2f(1.0f, 1.0f);
 			glVertex2f(ax + w, ay);
 		glTexCoord2f(1.0f, 0.0f);
 			glVertex2f(ax + w, ay + h);
 		glTexCoord2f(0.0f, 0.0f);
-			glVertex2f(ax    , ay + h);
+			glVertex2f(ax, ay + h);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
 	/* return the deltas in the unused w,h part of the rect */
-	location->w = initial->w;
-	location->h = initial->h;
+	location.w = initial->w;
+	location.h = initial->h;
 
 	/* Clean up */
 	TTF_CloseFont(fntChosen);
 	SDL_FreeSurface(initial);
 	SDL_FreeSurface(intermediary);
 	glDeleteTextures(2, &texture);
+	return true;
+}
+
+bool drawTexture(const char *fname,
+			SDL_Rect *location,
+			int scale)
+{
+//	SDL_Surface *texture;
+//	texture = IMG_Load(fname);
+	return true;
 }
 
 bool init() {
@@ -209,6 +233,7 @@ bool init() {
 	if(screen == NULL) {
 		fprintf( stderr, "Video mode set failed: %s\n",
 		SDL_GetError( ) );
+		IS_RUNNING=false;
 		return false;
 	}
 
@@ -248,22 +273,8 @@ void doDisplay() {
 	
 	date = asctime(localtime(&timer));
 
-	SDL_Color iro;
-	SDL_Rect position;
-
-	iro.r = 0;
-	iro.g = 0;
-	iro.b = 0;
-	position.x = 400;
-	position.y = 664;
-	drawText("Notification Center", "/screen/fonts/cgothic.ttf", 48, iro, &position, 1);
-
-	iro.r = 0;
-	iro.g = 0;
-	iro.b = 0;
-	position.x = 1426;
-	position.y = 0;
-	drawText(date, "/screen/fonts/cgothic.ttf", 48, iro, &position, 2);
+	drawText("Notification Center", "/screen/fonts/cgothic.ttf", 48, 1, 0, 0, 0, 400, 664);
+	drawText(date, "/screen/fonts/cgothic.ttf", 48, 2, 0, 0, 0, 1426, 0);
 
 	SDL_GL_SwapBuffers();
 }
