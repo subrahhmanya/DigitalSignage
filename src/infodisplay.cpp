@@ -261,7 +261,7 @@ void doDisplay() {
 	iro.r = 0;
 	iro.g = 0;
 	iro.b = 0;
-	position.x = 1316;
+	position.x = 1426;
 	position.y = 0;
 	drawText(date, "/screen/fonts/cgothic.ttf", 48, iro, &position, 2);
 
