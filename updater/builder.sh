@@ -11,6 +11,9 @@ function logOut {
         echo "$logName $(date +%s): $1"
 }
 
+#We're updating - kill previous infodisplay
+killall -9 infodisplay > /dev/null 2>&1
+
 #Let's compile some required binaries.  We do this every time, just incase.
 
 #Compile CutyCapt
@@ -26,9 +29,6 @@ logOut "Skipping CutyCapt Compilation - already latest."
 logOut "Compiling InfoDisplay..."
 cd ${srcroot}src > /dev/null 2>&1
 make > /dev/null 2>&1
-
-#We're updating - kill previous infodisplay
-killall -9 infodisplay > /dev/null 2>&1
 
 #Move new binary
 cp infodisplay ${scrroot} > /dev/null 2>&1
