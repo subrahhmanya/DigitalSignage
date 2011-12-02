@@ -220,7 +220,7 @@ int main( int argc, char* argv[] ) {
 
 	render();
 
-	system("sleep 5");
+	system("sleep 120");
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
