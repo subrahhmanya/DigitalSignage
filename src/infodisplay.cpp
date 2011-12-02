@@ -275,7 +275,7 @@ int main( int argc, char* argv[] ) {
 
 	while ( IS_RUNNING ) {
 		doDisplay();
-		SDL_Delay(100);
+		SDL_Delay(1000);
 	}
 
 	glMatrixMode(GL_PROJECTION);
