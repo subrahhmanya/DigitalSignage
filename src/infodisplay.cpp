@@ -31,6 +31,7 @@ void drawText(const char *text,
 			SDL_Color color,
 			SDL_Rect *location,
 			int alignment);
+bool FileExists( const char* FileName );
 int netpowerof(int x);
 void doDisplay();
 bool init();
@@ -50,6 +51,26 @@ SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 	}
     SDL_UnlockSurface(s);
     return s;
+}
+
+bool FileExists( const char* FileName )
+{
+    FILE* fp = NULL;
+
+    //will not work if you do not have read permissions
+
+    //to the file, but if you don''t have read, it
+
+    //may as well not exist to begin with.
+
+    fp = fopen( FileName, "rb" );
+    if( fp != NULL )
+    {
+        fclose( fp );
+        return true;
+    }
+
+    return false;
 }
 
 int nextpoweroftwo(int x)
@@ -127,11 +148,11 @@ void drawText(const char *text,
 	ay=location->y;
 
 	if (alignment==2) {
-		ax=location->x + w;
+		ax=location->x + (w-32);
 		ay=location->y;
 	}
 	if (alignment==3) {
-		ax=location->x + (w/2);
+		ax=location->x + ((w-32)/2);
 		ay=location->y;
 	}
 
@@ -181,7 +202,11 @@ bool init() {
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
 
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+	if (FileExists("/screen/full")) {
+		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+	} else {
+		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_OPENGL);
+	}
 	if(screen == NULL) {
 		fprintf( stderr, "Video mode set failed: %s\n",
 		SDL_GetError( ) );
@@ -238,21 +263,21 @@ void doDisplay() {
 	iro.b = 0;
 	position.x = 400;
 	position.y = 0;
-	drawText(date, fntCGothic, iro, &position, 1);
+	drawText("Orbital", fntCGothic, iro, &position, 1);
 
 	iro.r = 254;
 	iro.g = 0;
 	iro.b = 0;
 	position.x = 400;
 	position.y = 100;
-	drawText(date, fntCGothic, iro, &position, 2);
+	drawText("Orbital", fntCGothic, iro, &position, 2);
 
 	iro.r = 0;
 	iro.g = 254;
 	iro.b = 0;
 	position.x = 400;
 	position.y = 200;
-	drawText(date, fntCGothic, iro, &position, 3);
+	drawText("Orbital", fntCGothic, iro, &position, 3);
 
 	SDL_GL_SwapBuffers();
 }
