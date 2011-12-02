@@ -27,9 +27,10 @@ SDL_Surface* screen = NULL;
 TTF_Font *fntCGothic;
 
 void drawText(const char *text,
-                      TTF_Font *font,
-                      SDL_Color color,
-                      SDL_Rect *location);
+			TTF_Font *font,
+			SDL_Color color,
+			SDL_Rect *location,
+			int alignment);
 int netpowerof(int x);
 void doDisplay();
 bool init();
@@ -58,14 +59,15 @@ int nextpoweroftwo(int x)
 }
 
 void drawText(const char *text,
-                      TTF_Font *font,
-                      SDL_Color color,
-                      SDL_Rect *location)
+			TTF_Font *font,
+			SDL_Color color,
+			SDL_Rect *location,
+			int alignment)
 {
 	SDL_Surface *initial;
 	SDL_Surface *intermediary;
 	SDL_Rect rect;
-	int w,h;
+	int w,h,ax,ay;
 	GLuint texture;
 
 	/* Use SDL_TTF to render our text */
@@ -116,19 +118,36 @@ void drawText(const char *text,
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor3f(1.0f, 1.0f, 1.0f);
 
+	/* Do the Alignment - default is left.
+	   1 = Left Align
+	   2 = Right Align
+	   3 = Center Align */
+
+	ax=location->x;
+	ay=location->y;
+
+	if (alignment==2) {
+		ax=location->x - w;
+		ay=location->y;
+	}
+	if (alignment==3) {
+		ax=location->x - (w/2);
+		ay=location->y;
+	}
+
 	/* Draw a quad at location */
 	glBegin(GL_QUADS);
 		/* Recall that the origin is in the lower-left corner
 		   That is why the TexCoords specify different corners
 		   than the Vertex coors seem to. */
 		glTexCoord2f(0.0f, 1.0f);
-			glVertex2f(location->x    , location->y);
+			glVertex2f(ax    , ay);
 		glTexCoord2f(1.0f, 1.0f);
-			glVertex2f(location->x + w, location->y);
+			glVertex2f(ax + w, ay);
 		glTexCoord2f(1.0f, 0.0f);
-			glVertex2f(location->x + w, location->y + h);
+			glVertex2f(ax + w, ay + h);
 		glTexCoord2f(0.0f, 0.0f);
-			glVertex2f(location->x    , location->y + h);
+			glVertex2f(ax    , ay + h);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
@@ -140,7 +159,7 @@ void drawText(const char *text,
 	/* Clean up */
 	SDL_FreeSurface(initial);
 	SDL_FreeSurface(intermediary);
-	glDeleteTextures(1, &texture);
+	glDeleteTextures(2, &texture);
 }
 
 bool init() {
@@ -217,9 +236,17 @@ void doDisplay() {
 	iro.r = 0;
 	iro.g = 0;
 	iro.b = 0;
-	position.x = 0;
+	position.x = 200;
 	position.y = 0;
-	drawText(date, fntCGothic, iro, &position);
+	drawText(date, fntCGothic, iro, &position, 1);
+
+	position.x = 2000;
+	position.y = 100;
+	drawText(date, fntCGothic, iro, &position, 2);
+
+	position.x = 2000;
+	position.y = 200;
+	drawText(date, fntCGothic, iro, &position, 3);
 
 	SDL_GL_SwapBuffers();
 }
