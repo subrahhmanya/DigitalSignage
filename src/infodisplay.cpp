@@ -24,17 +24,20 @@
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const int SCREEN_BPP = 24;
+const int SCREEN_TARGET_FPS = 30;
 
 /* Define Main Screen Surface */
 SDL_Surface* screen = NULL;
+
+/* Define Fonts */
+TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
 bool IS_RUNNING = true;
 
 /* Function Declerations */
 bool drawText(const char *text,
-			const char *fname,
-			int fsize,
+			TTF_Font *font,
 			SDL_Color color,
 			SDL_Rect *location,
 			int alignment,
@@ -82,8 +85,7 @@ bool FileExists( const char* FileName )
 }
 
 bool drawText(const char *text,
-			const char *fname,
-			int fsize,
+			TTF_Font *fntChosen,
 			int alignment,
 			int cr,
 			int cg,
@@ -104,16 +106,6 @@ bool drawText(const char *text,
 	color.b = cb;
 	location.x = px;
 	location.y = py;
-
-	TTF_Font *fntChosen;
-
-	fntChosen = TTF_OpenFont(fname, fsize);
-	if(fntChosen == NULL) {
-		fprintf( stderr, "Failed when loading Font: %s\n",
-		SDL_GetError( ) );
-		IS_RUNNING=false;
-		return false;
-	}
 
 	/* Use SDL_TTF to render our text */
 	initial = TTF_RenderUTF8_Blended(fntChosen, text, color);
@@ -197,7 +189,6 @@ bool drawText(const char *text,
 	location.h = initial->h;
 
 	/* Clean up */
-	TTF_CloseFont(fntChosen);
 	SDL_FreeSurface(initial);
 	SDL_FreeSurface(intermediary);
 	glDeleteTextures(2, &texture);
@@ -246,6 +237,14 @@ bool init() {
 		return false;
 	}
 
+	fntCGothic48 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 48);
+	if(fntCGothic48 == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		IS_RUNNING=false;
+		return false;
+	}
+
 	SDL_ShowCursor(SDL_DISABLE); 
 
 	glClearColor(1, 1, 1, 1);
@@ -282,8 +281,8 @@ void doDisplay() {
 	
 	date = asctime(localtime(&timer));
 
-	drawText("Notification Center", "/screen/fonts/cgothic.ttf", 48, 1, 0, 0, 0, 400, 664);
-	drawText(date, "/screen/fonts/cgothic.ttf", 48, 2, 0, 0, 0, 1426, 0);
+	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
+	drawText(date, fntCGothic48, 2, 0, 0, 0, 1426, 0);
 
 	SDL_GL_SwapBuffers();
 }
@@ -295,7 +294,7 @@ int main( int argc, char* argv[] ) {
 
 	while ( IS_RUNNING ) {
 		doDisplay();
-		SDL_Delay(1000);
+		SDL_Delay(1000 / SCREEN_TARGET_FPS);
 	}
 
 	glMatrixMode(GL_PROJECTION);
@@ -303,6 +302,7 @@ int main( int argc, char* argv[] ) {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
+	TTF_CloseFont(fntCGothic48);
 	SDL_FreeSurface(screen);
 	TTF_Quit();
 	SDL_Quit();
