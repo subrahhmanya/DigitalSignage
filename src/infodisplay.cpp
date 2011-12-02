@@ -127,11 +127,11 @@ void drawText(const char *text,
 	ay=location->y;
 
 	if (alignment==2) {
-		ax=location->x - w;
+		ax=location->x + w;
 		ay=location->y;
 	}
 	if (alignment==3) {
-		ax=location->x - (w/2);
+		ax=location->x + (w/2);
 		ay=location->y;
 	}
 
@@ -236,21 +236,21 @@ void doDisplay() {
 	iro.r = 0;
 	iro.g = 0;
 	iro.b = 0;
-	position.x = 200;
+	position.x = 400;
 	position.y = 0;
 	drawText(date, fntCGothic, iro, &position, 1);
 
 	iro.r = 254;
 	iro.g = 0;
 	iro.b = 0;
-	position.x = 200;
+	position.x = 400;
 	position.y = 100;
 	drawText(date, fntCGothic, iro, &position, 2);
 
 	iro.r = 0;
 	iro.g = 254;
 	iro.b = 0;
-	position.x = 200;
+	position.x = 400;
 	position.y = 200;
 	drawText(date, fntCGothic, iro, &position, 3);
 
