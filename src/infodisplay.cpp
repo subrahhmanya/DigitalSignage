@@ -1,30 +1,37 @@
-//-----------------------------------------------------------------------------
-//		 Name: infodisplay.cpp
-//	   Author: Paul Wollaston
-//  Last Modified: 01/12/11
-//	Description:  Base framework for Information Display
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//          Name: infodisplay.cpp
+//        Author: Paul Wollaston
+// Project Start: 25/12/11
+// Last Modified: 02/12/11
+//   Description: Display agregated data in an easy-to-read format with
+//                ability to be flexible with what is shown.
+//-------------------------------------------------------------------------
 
+/* Include standard C libraries */
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
-// include SDL libraries
+/* include SDL libraries */
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 
-bool IS_RUNNING = true;
-
+/* Display Properties */
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const int SCREEN_BPP = 24;
 
+/* Define Main Screen Surface */
 SDL_Surface* screen = NULL;
 
+/* Variables for application (global) */
+bool IS_RUNNING = true;
+
+/* Function Declerations */
 bool drawText(const char *text,
 			const char *fname,
 			int fsize,
@@ -102,7 +109,7 @@ bool drawText(const char *text,
 
 	fntChosen = TTF_OpenFont(fname, fsize);
 	if(fntChosen == NULL) {
-		fprintf( stderr, "Failed when loading Font: %sn",
+		fprintf( stderr, "Failed when loading Font: %s\n",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
 		return false;
@@ -226,12 +233,14 @@ bool init() {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
 
 	if (FileExists("/screen/full")) {
+		/* We're running full screen on the target, so use full screen */
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 	} else {
+		/* We're running in a window (no fullscreen flag set) so don't pass SDL_FULLSCREEN */
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_OPENGL);
 	}
 	if(screen == NULL) {
-		fprintf( stderr, "Video mode set failed: %sn",
+		fprintf( stderr, "Video mode set failed: %s\n",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
 		return false;
@@ -260,8 +269,8 @@ bool init() {
 }
 
 void doDisplay() {
-	// This is the main processing and rendering function.
-	// In here, we call all required information and pull what we need.
+	/* This is the main processing and rendering function.
+	   In here, we call all required information and pull what we need. */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
