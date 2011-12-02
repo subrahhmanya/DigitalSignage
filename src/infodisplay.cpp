@@ -24,15 +24,14 @@ const int SCREEN_HEIGHT = 720;
 const int SCREEN_BPP = 24;
 
 SDL_Surface* screen = NULL;
-TTF_Font *fntCGothic;
 
-void drawText(const char *text,
-			TTF_Font *font,
+bool drawText(const char *text,
+			const char *fname,
+			int fsize,
 			SDL_Color color,
 			SDL_Rect *location,
 			int alignment);
 bool FileExists( const char* FileName );
-int netpowerof(int x);
 void doDisplay();
 bool init();
 
@@ -73,14 +72,9 @@ bool FileExists( const char* FileName )
     return false;
 }
 
-int nextpoweroftwo(int x)
-{
-	double logbase2 = log(x) / log(2);
-	return round(pow(2,ceil(logbase2)));
-}
-
-void drawText(const char *text,
-			TTF_Font *font,
+bool drawText(const char *text,
+			const char *fname,
+			int fsize,
 			SDL_Color color,
 			SDL_Rect *location,
 			int alignment)
@@ -91,12 +85,33 @@ void drawText(const char *text,
 	int w,h,ax,ay;
 	GLuint texture;
 
+	TTF_Font *fntChosen;
+
+	fntChosen = TTF_OpenFont(fname, fsize);
+	if(fntChosen == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		return false;
+	}
+
 	/* Use SDL_TTF to render our text */
-	initial = TTF_RenderUTF8_Blended(font, text, color);
+	initial = TTF_RenderUTF8_Blended(fntChosen, text, color);
 
 	/* Convert the rendered text to a known format */
-	w = nextpoweroftwo(initial->w);
-	h = nextpoweroftwo(initial->h);
+	w = initial->w;
+	h = initial->h;
+
+	/* Do the Alignment - default is left.
+	   1 = Left Align
+	   2 = Right Align */
+
+	ax=location->x;
+	ay=location->y;
+
+	if (alignment==2) {
+		ax=(location->x - w) ;
+		ay=location->y;
+	}
 
 	/* We need to allocate some memory now for out buffer */
 	unsigned char *pixels;
@@ -106,7 +121,7 @@ void drawText(const char *text,
 	glPixelStorei( GL_PACK_ROW_LENGTH, 0 ) ;
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 ) ;
 	glReadBuffer( GL_BACK );
-	glReadPixels( location->x, location->y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+	glReadPixels( ax, ay, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
 	/* Create new SDL Surface where text is layed on top of the backbuffer we just grabbed */
 	intermediary = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
@@ -139,23 +154,6 @@ void drawText(const char *text,
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	/* Do the Alignment - default is left.
-	   1 = Left Align
-	   2 = Right Align
-	   3 = Center Align */
-
-	ax=location->x;
-	ay=location->y;
-
-	if (alignment==2) {
-		ax=location->x + (w-32);
-		ay=location->y;
-	}
-	if (alignment==3) {
-		ax=location->x + ((w-32)/2);
-		ay=location->y;
-	}
-
 	/* Draw a quad at location */
 	glBegin(GL_QUADS);
 		/* Recall that the origin is in the lower-left corner
@@ -178,6 +176,7 @@ void drawText(const char *text,
 	location->h = initial->h;
 
 	/* Clean up */
+	TTF_CloseFont(fntChosen);
 	SDL_FreeSurface(initial);
 	SDL_FreeSurface(intermediary);
 	glDeleteTextures(2, &texture);
@@ -232,12 +231,6 @@ bool init() {
 
 	SDL_WM_SetCaption("Info Display", NULL);
 
-	fntCGothic = TTF_OpenFont( "/screen/fonts/cgothic.ttf", 48 );
-	if(fntCGothic == NULL) {
-		fprintf( stderr, "Failed when loading Font: %s\n",
-		SDL_GetError( ) );
-		return false;
-	}
 	return true;
 }
 
@@ -262,22 +255,15 @@ void doDisplay() {
 	iro.g = 0;
 	iro.b = 0;
 	position.x = 400;
-	position.y = 0;
-	drawText("Orbital", fntCGothic, iro, &position, 1);
-
-	iro.r = 254;
-	iro.g = 0;
-	iro.b = 0;
-	position.x = 400;
-	position.y = 100;
-	drawText("Orbital", fntCGothic, iro, &position, 2);
+	position.y = 664;
+	drawText("Notification Center", "/screen/fonts/cgothic.ttf", 48, iro, &position, 1);
 
 	iro.r = 0;
-	iro.g = 254;
+	iro.g = 0;
 	iro.b = 0;
-	position.x = 400;
-	position.y = 200;
-	drawText("Orbital", fntCGothic, iro, &position, 3);
+	position.x = 1316;
+	position.y = 0;
+	drawText(date, "/screen/fonts/cgothic.ttf", 48, iro, &position, 2);
 
 	SDL_GL_SwapBuffers();
 }
@@ -298,7 +284,6 @@ int main( int argc, char* argv[] ) {
 	glPopMatrix();
 
 	SDL_FreeSurface(screen);
-	TTF_CloseFont(fntCGothic);
 	TTF_Quit();
 	SDL_Quit();
 	return 0;
