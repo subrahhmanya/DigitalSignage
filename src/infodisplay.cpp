@@ -73,14 +73,12 @@ SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 bool FileExists( const char* FileName )
 {
     FILE* fp = NULL;
-
     fp = fopen( FileName, "rb" );
     if( fp != NULL )
     {
         fclose( fp );
         return true;
     }
-
     return false;
 }
 
@@ -274,11 +272,8 @@ void doDisplay() {
 	glLoadIdentity();
 
 	char *date;
-	
 	time_t timer;
-
 	timer=time(NULL);
-	
 	date = asctime(localtime(&timer));
 
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
@@ -291,7 +286,6 @@ int main( int argc, char* argv[] ) {
 	if(init() == false) {
 		return 1;
 	}
-
 	while ( IS_RUNNING ) {
 		doDisplay();
 		SDL_Delay(1000 / SCREEN_TARGET_FPS);
