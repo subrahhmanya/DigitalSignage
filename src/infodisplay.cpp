@@ -102,7 +102,7 @@ bool drawText(const char *text,
 
 	fntChosen = TTF_OpenFont(fname, fsize);
 	if(fntChosen == NULL) {
-		fprintf( stderr, "Failed when loading Font: %s\n",
+		fprintf( stderr, "Failed when loading Font: %sn",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
 		return false;
@@ -231,7 +231,7 @@ bool init() {
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_OPENGL);
 	}
 	if(screen == NULL) {
-		fprintf( stderr, "Video mode set failed: %s\n",
+		fprintf( stderr, "Video mode set failed: %sn",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
 		return false;
