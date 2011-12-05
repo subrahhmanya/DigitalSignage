@@ -54,6 +54,8 @@ TTF_Font *fntCGothic48;
 /* Variables for application (global) */
 bool IS_RUNNING = true;
 int wLastCheck = 0;
+int tC1 = 0;
+bool bV1 = false;
 char wTemp[4];
 
 /* Function Declerations */
@@ -471,8 +473,20 @@ void doDisplay() {
 	else
 		sprintf(mins, "%i", ltm->tm_min);
 
-	/* Create the Date/Time String */
-	sprintf(dateString, "%i:%s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+	/* Create the Date/Time String - We want blinking : */
+	char tBlinker[1];
+	if (tC1 != ltm->tm_sec)
+	{
+		if (bV1)
+			bV1 = false;
+		else
+			bV1 = true;
+		tC1 = ltm->tm_sec;
+	}
+	if (bV1)
+		sprintf(dateString, "%i:%s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+	else
+		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 	/* Do Weather Check (update once per hour only) */
 	if (wLastCheck != ltm->tm_hour)
