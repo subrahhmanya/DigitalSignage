@@ -387,7 +387,7 @@ void doDisplay() {
 	char daysInWord[3];
 	char monthsInWord[3];
 	char nthsInWord[2];
-	char dateString[24];
+	char dateString[25];
 	char mins[2];
 
 	time_t now = time(0);
@@ -415,7 +415,7 @@ void doDisplay() {
 		sprintf(mins, "%i", ltm->tm_min);
 
 	/* Create the Date/Time String */
-	sprintf(dateString, "%i:%s - %s %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+	sprintf(dateString, "%i:%s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 	/* Draw Text */
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
