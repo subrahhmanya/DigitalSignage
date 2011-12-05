@@ -30,12 +30,18 @@ const int SCREEN_TARGET_FPS = 30;
 SDL_Surface* screen = NULL;
 
 /* Define Fonts */
+TTF_Font *fntCGothic24;
 TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
 bool IS_RUNNING = true;
 
 /* Function Declerations */
+int calcDay_Dec31(int yyyy);
+int dayInYear(int dd, int mm);
+void dayInStr (char daysInWord[], int days);
+void monthInStr (char monthsInWord[], int days);
+void nthInStr (char dowInWord[], int monthday);
 bool drawText(const char *text,
 			TTF_Font *font,
 			SDL_Color color,
@@ -68,6 +74,103 @@ SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 	}
     SDL_UnlockSurface(s);
     return s;
+}
+
+int calcDay_Dec31(int yyyy)
+{
+	int dayCode = 0;
+	dayCode = ((yyyy-1)*365 + (yyyy-1)/4 - (yyyy-1)/100 + (yyyy-1)/400) % 7;
+	return dayCode;
+}
+
+int dayInYear(int dd, int mm)
+{
+	switch(mm)
+	{
+	case 11:dd += 30;
+	case 10:dd += 31;
+	case 9:dd += 30;
+	case 8:dd += 31;
+	case 7:dd += 31;
+	case 6:dd += 30;
+	case 5:dd += 31;
+	case 4:dd += 30;
+	case 3:dd += 31;
+	case 2:dd += 28;
+	case 1:dd += 31;
+	}
+	return dd;
+}
+
+void dayInStr(char daysInWord[], int days)
+{
+	switch(days)
+	{
+	case 0:strcpy(daysInWord, "Sun");break;
+	case 1:strcpy(daysInWord, "Mon");break;
+	case 2:strcpy(daysInWord, "Tue");break;
+	case 3:strcpy(daysInWord, "Wed");break;
+	case 4:strcpy(daysInWord, "Thu");break;
+	case 5:strcpy(daysInWord, "Fri");break;
+	case 6:strcpy(daysInWord, "Sat");break;
+	}
+}
+
+void monthInStr (char monthsInWord[], int month)
+{
+	switch(month)
+	{
+	case 0:strcpy(monthsInWord, "Jan");break;
+	case 1:strcpy(monthsInWord, "Feb");break;
+	case 2:strcpy(monthsInWord, "Mar");break;
+	case 3:strcpy(monthsInWord, "Apr");break;
+	case 4:strcpy(monthsInWord, "May");break;
+	case 5:strcpy(monthsInWord, "Jun");break;
+	case 6:strcpy(monthsInWord, "Jul");break;
+	case 7:strcpy(monthsInWord, "Aug");break;
+	case 8:strcpy(monthsInWord, "Sep");break;
+	case 9:strcpy(monthsInWord, "Oct");break;
+	case 10:strcpy(monthsInWord, "Nov");break;
+	case 11:strcpy(monthsInWord, "Dec");break;
+	}
+}
+
+void nthInStr (char dowInWord[], int monthday)
+{
+	switch(monthday)
+	{
+	case 1:strcpy(dowInWord, "st");break;
+	case 2:strcpy(dowInWord, "nd");break;
+	case 3:strcpy(dowInWord, "rd");break;
+	case 4:strcpy(dowInWord, "th");break;
+	case 5:strcpy(dowInWord, "th");break;
+	case 6:strcpy(dowInWord, "th");break;
+	case 7:strcpy(dowInWord, "th");break;
+	case 8:strcpy(dowInWord, "th");break;
+	case 9:strcpy(dowInWord, "th");break;
+	case 10:strcpy(dowInWord, "th");break;
+	case 11:strcpy(dowInWord, "th");break;
+	case 12:strcpy(dowInWord, "th");break;
+	case 13:strcpy(dowInWord, "th");break;
+	case 14:strcpy(dowInWord, "th");break;
+	case 15:strcpy(dowInWord, "th");break;
+	case 16:strcpy(dowInWord, "th");break;
+	case 17:strcpy(dowInWord, "th");break;
+	case 18:strcpy(dowInWord, "th");break;
+	case 19:strcpy(dowInWord, "th");break;
+	case 20:strcpy(dowInWord, "th");break;
+	case 21:strcpy(dowInWord, "st");break;
+	case 22:strcpy(dowInWord, "nd");break;
+	case 23:strcpy(dowInWord, "rd");break;
+	case 24:strcpy(dowInWord, "th");break;
+	case 25:strcpy(dowInWord, "th");break;
+	case 26:strcpy(dowInWord, "th");break;
+	case 27:strcpy(dowInWord, "th");break;
+	case 28:strcpy(dowInWord, "th");break;
+	case 29:strcpy(dowInWord, "th");break;
+	case 30:strcpy(dowInWord, "th");break;
+	case 31:strcpy(dowInWord, "st");break;
+	}
 }
 
 bool FileExists( const char* FileName )
@@ -235,6 +338,15 @@ bool init() {
 		return false;
 	}
 
+	/* Load Fonts */
+	fntCGothic24 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 24);
+	if(fntCGothic24 == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		IS_RUNNING=false;
+		return false;
+	}
+
 	fntCGothic48 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 48);
 	if(fntCGothic48 == NULL) {
 		fprintf( stderr, "Failed when loading Font: %s\n",
@@ -271,13 +383,44 @@ void doDisplay() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	char *date;
-	time_t timer;
-	timer=time(NULL);
-	date = asctime(localtime(&timer));
+	int days;
+	char daysInWord[11];
+	char monthsInWord[11];
+	char nthsInWord[2];
+	char dateString[32];
+	char mins[2];
 
+	time_t now = time(0);
+	tm *ltm = localtime(&now);
+
+	/* Calculate the day for Dec 31 of the previous year */
+	days = calcDay_Dec31(1900 + ltm->tm_year);
+
+	/* Calculate the day for the given date */
+	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
+
+	/* Add one day if the year is leap year and desired date is after February */
+	if ((!((1900 + ltm->tm_year) % 4) && ((1900 + ltm->tm_year) % 100) || !((1900 + ltm->tm_year) % 400)) && ltm->tm_mon > 2)
+		days++;
+
+	/* Get string values for Day and Year */
+	dayInStr(daysInWord, days);	
+	monthInStr(monthsInWord, ltm->tm_mon);
+	nthInStr(nthsInWord, ltm->tm_mday);
+
+	/* Add a leading 0 to the date if we are less than the 10th into the month */
+	if (ltm->tm_min < 10)
+		sprintf(mins, "0%i", ltm->tm_min);
+	else
+		sprintf(mins, "%i", ltm->tm_min);
+
+	/* Create the Date/Time String */
+	sprintf(dateString, "%i:%s - %s %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+
+	/* Draw Text */
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
-	drawText(date, fntCGothic48, 2, 0, 0, 0, 1428, 0);
+	drawText(dateString, fntCGothic48, 2, 0, 0, 0, 1280, 0);
+	drawText(nthsInWord, fntCGothic24, 1, 0, 0, 0, 1143, 30);
 
 	SDL_GL_SwapBuffers();
 }
