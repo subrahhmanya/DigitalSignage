@@ -11,13 +11,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string>
-using std::string;
 #include <time.h>
-#include <iostream>
-using std::cout;
-using std::endl;
-
-#include <cstdlib>
 
 /* include SDL libraries */
 #include <SDL/SDL.h>
@@ -25,18 +19,6 @@ using std::endl;
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
-
-#include <xercesc/parsers/SAXParser.hpp>
-using xercesc_3_1::SAXParser;
-
-#include <xercesc/sax/HandlerBase.hpp>
-using xercesc_3_1::HandlerBase;
-
-#include <xercesc/util/PlatformUtils.hpp>
-using xercesc_3_1::AttributeList;
-using xercesc_3_1::XMLException;
-using xercesc_3_1::XMLPlatformUtils;
-using xercesc_3_1::XMLString;
 
 /* Display Properties */
 const int SCREEN_WIDTH = 1280;
@@ -83,56 +65,18 @@ bool init();
 
 SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 {
-    maskColor |= 0xff000000u;
-    Uint32* surfacepixels = (Uint32*) s->pixels;
-    SDL_LockSurface(s);
-    for(int y = 0; y < s->h; y++)
-	{
-	    for(int x = 0; x < s->w; x++)
-		{
-		    Uint32* p = &(surfacepixels[y * s->pitch / 4  + x]);
-		    if(*p == maskColor) *p = 0x00000000u;
+	maskColor |= 0xff000000u;
+	Uint32* surfacepixels = (Uint32*) s->pixels;
+	SDL_LockSurface(s);
+	for(int y = 0; y < s->h; y++) {
+		for(int x = 0; x < s->w; x++) {
+			Uint32* p = &(surfacepixels[y * s->pitch / 4 + x]);
+			if(*p == maskColor) *p = 0x00000000u;
 		}
 	}
-    SDL_UnlockSurface(s);
-    return s;
+	SDL_UnlockSurface(s);
+	return s;
 }
-
-class MySaxHandler : public HandlerBase
-{
-  private:
-  string temp; // degrees F
-  string sky; // e.g, Mostly Sunny
-  string city;
-  string lastElement;
-
-  public:
-  void endDocument(){}
-  void endElement(const XMLCh* const name){}
-  void characters(const XMLCh* const chars, const unsigned int length)
-  {
-    if ((lastElement == "Temprature") && (temp == ""))
-      temp = XMLString::transcode(chars);
-    if ((lastElement == "Forecast") && (sky == ""))
-      sky = XMLString::transcode(chars);
-    if ((lastElement == "Location") && (city == ""))
-      city = XMLString::transcode(chars);
-  }
-  void ignorableWhitespace(const XMLCh* const chars, const unsigned int length){}
-  void processingInstruction(const XMLCh* const target, const XMLCh* const data){}
-  void startDocument(){}
-  void startElement(const XMLCh* const name, AttributeList& attributes)
-  {
-    lastElement = XMLString::transcode(name);
-  }
-
-  void notationDecl(const XMLCh* const name, const XMLCh* const publicId,
-    const XMLCh* const systemId){}
-  void unparsedEntityDecl(const XMLCh* const name, const XMLCh* const publicId, 
-    const XMLCh* const systemId, const XMLCh* const notationName){}
-
-  string getTemp() const;
-};
 
 int calcDay_Dec31(int yyyy)
 {
@@ -233,14 +177,14 @@ void nthInStr (char dowInWord[], int monthday)
 
 bool FileExists( const char* FileName )
 {
-    FILE* fp = NULL;
-    fp = fopen( FileName, "rb" );
-    if( fp != NULL )
-    {
-        fclose( fp );
-        return true;
-    }
-    return false;
+	FILE* fp = NULL;
+	fp = fopen( FileName, "rb" );
+	if( fp != NULL )
+	{
+		fclose( fp );
+		return true;
+	}
+	return false;
 }
 
 bool drawText(const char *text,
@@ -367,17 +311,17 @@ bool init() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
 
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   8);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,  16);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,   8);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,  8);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
@@ -517,8 +461,6 @@ int main( int argc, char* argv[] ) {
 		return 1;
 	}
 
-	XMLPlatformUtils::Initialize();
-
 	while ( IS_RUNNING ) {
 		doDisplay();
 		SDL_Delay(1000 / SCREEN_TARGET_FPS);
@@ -529,10 +471,9 @@ int main( int argc, char* argv[] ) {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
-	XMLPlatformUtils::Terminate();
-
 	TTF_CloseFont(fntCGothic48);
 	SDL_FreeSurface(screen);
+
 	TTF_Quit();
 	SDL_Quit();
 	return 0;
