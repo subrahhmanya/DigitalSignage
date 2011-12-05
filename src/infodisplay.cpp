@@ -42,7 +42,7 @@ using xercesc_3_1::XMLString;
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const int SCREEN_BPP = 24;
-const int SCREEN_TARGET_FPS = 30;
+int SCREEN_TARGET_FPS = 1;
 
 /* Define Main Screen Surface */
 SDL_Surface* screen = NULL;
