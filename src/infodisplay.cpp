@@ -10,8 +10,14 @@
 /* Include standard C libraries */
 #include <math.h>
 #include <stdio.h>
-#include <string.h>
+#include <string>
+using std::string;
 #include <time.h>
+#include <iostream>
+using std::cout;
+using std::endl;
+
+#include <cstdlib>
 
 /* include SDL libraries */
 #include <SDL/SDL.h>
@@ -19,6 +25,18 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
+
+#include <xercesc/parsers/SAXParser.hpp>
+using xercesc_3_1::SAXParser;
+
+#include <xercesc/sax/HandlerBase.hpp>
+using xercesc_3_1::HandlerBase;
+
+#include <xercesc/util/PlatformUtils.hpp>
+using xercesc_3_1::AttributeList;
+using xercesc_3_1::XMLException;
+using xercesc_3_1::XMLPlatformUtils;
+using xercesc_3_1::XMLString;
 
 /* Display Properties */
 const int SCREEN_WIDTH = 1280;
@@ -35,6 +53,8 @@ TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
 bool IS_RUNNING = true;
+int wLastCheck = 0;
+char wTemp[4];
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -75,6 +95,42 @@ SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
     SDL_UnlockSurface(s);
     return s;
 }
+
+class MySaxHandler : public HandlerBase
+{
+  private:
+  string temp; // degrees F
+  string sky; // e.g, Mostly Sunny
+  string city;
+  string lastElement;
+
+  public:
+  void endDocument(){}
+  void endElement(const XMLCh* const name){}
+  void characters(const XMLCh* const chars, const unsigned int length)
+  {
+    if ((lastElement == "Temprature") && (temp == ""))
+      temp = XMLString::transcode(chars);
+    if ((lastElement == "Forecast") && (sky == ""))
+      sky = XMLString::transcode(chars);
+    if ((lastElement == "Location") && (city == ""))
+      city = XMLString::transcode(chars);
+  }
+  void ignorableWhitespace(const XMLCh* const chars, const unsigned int length){}
+  void processingInstruction(const XMLCh* const target, const XMLCh* const data){}
+  void startDocument(){}
+  void startElement(const XMLCh* const name, AttributeList& attributes)
+  {
+    lastElement = XMLString::transcode(name);
+  }
+
+  void notationDecl(const XMLCh* const name, const XMLCh* const publicId,
+    const XMLCh* const systemId){}
+  void unparsedEntityDecl(const XMLCh* const name, const XMLCh* const publicId, 
+    const XMLCh* const systemId, const XMLCh* const notationName){}
+
+  string getTemp() const;
+};
 
 int calcDay_Dec31(int yyyy)
 {
@@ -389,6 +445,7 @@ void doDisplay() {
 	char nthsInWord[2];
 	char dateString[25];
 	char mins[2];
+	int wFarenheight;
 
 	time_t now = time(0);
 	tm *ltm = localtime(&now);
@@ -417,9 +474,25 @@ void doDisplay() {
 	/* Create the Date/Time String */
 	sprintf(dateString, "%i:%s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
+	/* Do Weather Check (update once per hour only) */
+	if (wLastCheck != ltm->tm_hour)
+	{
+		/* Hour is odd, we call check */
+
+		/* Calculate Weather */
+		wFarenheight = 37; /* Temporary Value */
+		float wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
+
+		sprintf(wTemp, "%.1fºC", wCelcius);
+
+		/* Update Timer */
+		wLastCheck = ltm->tm_hour;
+	}
+
 	/* Draw Text */
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
 	drawText(dateString, fntCGothic48, 2, 0, 0, 0, 1280, 0);
+	drawText(wTemp, fntCGothic48, 1, 0, 0, 0, 8, 0);
 	drawText(nthsInWord, fntCGothic24, 1, 0, 0, 0, 1143, 30);
 
 	SDL_GL_SwapBuffers();
@@ -429,6 +502,9 @@ int main( int argc, char* argv[] ) {
 	if(init() == false) {
 		return 1;
 	}
+
+	XMLPlatformUtils::Initialize();
+
 	while ( IS_RUNNING ) {
 		doDisplay();
 		SDL_Delay(1000 / SCREEN_TARGET_FPS);
@@ -438,6 +514,8 @@ int main( int argc, char* argv[] ) {
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+
+	XMLPlatformUtils::Terminate();
 
 	TTF_CloseFont(fntCGothic48);
 	SDL_FreeSurface(screen);
