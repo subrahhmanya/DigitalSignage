@@ -384,10 +384,10 @@ void doDisplay() {
 	glLoadIdentity();
 
 	int days;
-	char daysInWord[11];
-	char monthsInWord[11];
+	char daysInWord[3];
+	char monthsInWord[3];
 	char nthsInWord[2];
-	char dateString[32];
+	char dateString[24];
 	char mins[2];
 
 	time_t now = time(0);
