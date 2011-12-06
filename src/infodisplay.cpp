@@ -14,7 +14,8 @@
 #include <time.h>
 
 /* Include libxml */
-#include <libxml++/libxml++.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 /* include SDL libraries */
 #include <SDL/SDL.h>
@@ -42,6 +43,7 @@ int wLastCheck = 0;
 int tC1 = 0;
 bool bV1 = false;
 char wTemp[4];
+int wFarenheight=0;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -65,6 +67,39 @@ bool drawTexture(const char *fname,
 bool FileExists( const char* FileName );
 void doDisplay();
 bool init();
+
+static void print_element_names(xmlNode * a_node)
+{
+	xmlNode *cur_node = NULL;
+	char tWord[16];
+	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
+	if (cur_node->type == XML_ELEMENT_NODE) {
+		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition" )) {
+			printf("node type: Element, name: %s ** data: %s\n",
+				cur_node->name, cur_node->properties->children->content);
+			}
+		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f" )) {
+			sprintf(tWord, "%s", cur_node->properties->children->content);
+			wFarenheight = strtol(tWord,NULL,0);
+			printf("node type: Element, name: %s ** data: %s\n",
+				cur_node->name, tWord);
+			}
+		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity" )) {
+			printf("node type: Element, name: %s ** data: %s\n",
+				cur_node->name, cur_node->properties->children->content);
+			}
+		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon" )) {
+			printf("node type: Element, name: %s ** data: %s\n",
+				cur_node->name, cur_node->properties->children->content);
+			}
+		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition" )) {
+			printf("node type: Element, name: %s ** data: %s\n",
+				cur_node->name, cur_node->properties->children->content);
+			}
+		}
+		print_element_names(cur_node->children);
+	}
+}
 
 SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
 {
@@ -394,7 +429,6 @@ void doDisplay() {
 	char nthsInWord[2];
 	char dateString[25];
 	char mins[2];
-	int wFarenheight;
 
 	time_t now = time(0);
 	tm *ltm = localtime(&now);
@@ -439,9 +473,22 @@ void doDisplay() {
 	if (wLastCheck != ltm->tm_hour)
 	{
 		/* Hour is odd, we call check */
+		xmlDoc *doc = NULL;
+		xmlNode *root_element = NULL;
+
+		LIBXML_TEST_VERSION    // Macro to check API for match with
+		                       // the DLL we are using
+
+		/*parse the file and get the DOM */
+		doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
+
+		/*Get the root element node */
+		root_element = xmlDocGetRootElement(doc);
+		print_element_names(root_element);
+		xmlFreeDoc(doc);       // free document
+		xmlCleanupParser();    // Free globals
 
 		/* Calculate Weather */
-		wFarenheight = 37; /* Temporary Value */
 		float wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
 
 		sprintf(wTemp, "%.1fºC", wCelcius);
