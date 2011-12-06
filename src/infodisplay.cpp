@@ -40,7 +40,8 @@ TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
 bool IS_RUNNING = true;
-int wLastCheckH, wLastCheckM;
+int wLastCheckH, wLastCheckM, wUpdateTimer;
+int wCurDisp=0;
 int tC1 = 0;
 bool bV1 = false;
 char wTemp[4];
@@ -552,7 +553,20 @@ void doDisplay() {
 	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 1157, 28);
 
 	/* Do Looping Weather Info */
-	drawText(wWind, fntCGothic44, 1, 0, 0, 0, 200, 0);
+	if (now > (wUpdateTimer + 15))
+	{
+		wUpdateTimer=now;
+		wCurDisp++;
+		if (wCurDisp == 3)
+			wCurDisp = 0;
+	}
+	switch(wCurDisp)
+	{
+		case 0:drawText(wCondition, fntCGothic44, 1, 0, 0, 0, 200, 0);;break;
+		case 1:drawText(wHumidity, fntCGothic44, 1, 0, 0, 0, 200, 0);;break;
+		case 2:drawText(wWind, fntCGothic44, 1, 0, 0, 0, 200, 0);;break;
+	}
+
 
 	SDL_GL_SwapBuffers();
 }
