@@ -40,7 +40,7 @@ TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
 bool IS_RUNNING = true;
-int wLastCheck = 0;
+int wLastCheckH, wLastCheckM;
 int tC1 = 0;
 bool bV1 = false;
 char wTemp[4];
@@ -507,37 +507,42 @@ void doDisplay() {
 		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 	/* Do Weather Check (update once every 15 minutes) */
-	if ((wLastCheck != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45))
+	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45))
 	{
 		/* Update Timer */
-		wLastCheck = ltm->tm_hour;
+		wLastCheckH = ltm->tm_hour;
 
-		/* Hour is odd, we call check */
-		tFarenheight=0;
-		tCondition=0;
-		tHumidity=0;
-		tIcon=0;
-		tWind=0;
-		xmlDoc *doc = NULL;
-		xmlNode *root_element = NULL;
+		if (wLastCheckM != ltm->tm_min)
+		{
+			/* Only update if not already done so */
+			wLastCheckM = ltm->tm_min;
 
-		LIBXML_TEST_VERSION    // Macro to check API for match with
-		                       // the DLL we are using
+			/* Hour is odd, we call check */
+			tFarenheight=0;
+			tCondition=0;
+			tHumidity=0;
+			tIcon=0;
+			tWind=0;
+			xmlDoc *doc = NULL;
+			xmlNode *root_element = NULL;
 
-		/*parse the file and get the DOM */
-		doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
+			LIBXML_TEST_VERSION    // Macro to check API for match with
+			                       // the DLL we are using
 
-		/*Get the root element node */
-		root_element = xmlDocGetRootElement(doc);
-		parseWeather(root_element);
-		xmlFreeDoc(doc);       // free document
-		xmlCleanupParser();    // Free globals
+			/*parse the file and get the DOM */
+			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
 
-		/* Calculate Weather */
-		float wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
+			/*Get the root element node */
+			root_element = xmlDocGetRootElement(doc);
+			parseWeather(root_element);
+			xmlFreeDoc(doc);       // free document
+			xmlCleanupParser();    // Free globals
 
-		sprintf(wTemp, "%.1fºC", wCelcius);
+			/* Calculate Weather */
+			float wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
 
+			sprintf(wTemp, "%.1fºC", wCelcius);
+		}
 	}
 
 	/* Draw Text */
