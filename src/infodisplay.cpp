@@ -34,7 +34,8 @@ int SCREEN_TARGET_FPS = 1;
 SDL_Surface* screen = NULL;
 
 /* Define Fonts */
-TTF_Font *fntCGothic24;
+TTF_Font *fntCGothic22;
+TTF_Font *fntCGothic44;
 TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
@@ -44,6 +45,11 @@ int tC1 = 0;
 bool bV1 = false;
 char wTemp[4];
 int wFarenheight=0;
+char wCondition[32];
+char wHumidity[32];
+char wIcon[32];
+char wWind[32];
+int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -68,36 +74,59 @@ bool FileExists( const char* FileName );
 void doDisplay();
 bool init();
 
-static void print_element_names(xmlNode * a_node)
+static void parseWeather(xmlNode * a_node)
 {
 	xmlNode *cur_node = NULL;
 	char tWord[16];
 	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
 	if (cur_node->type == XML_ELEMENT_NODE) {
 		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition" )) {
-			printf("node type: Element, name: %s ** data: %s\n",
-				cur_node->name, cur_node->properties->children->content);
+			if (tCondition == 0) {
+				sprintf(wCondition, "%s", cur_node->properties->children->content);
+				tCondition=1;
+				printf("*UPDATE* node type: Element, name: %s ** data: %s\n",
+					cur_node->name, wCondition);
+				}
 			}
+
 		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f" )) {
 			sprintf(tWord, "%s", cur_node->properties->children->content);
-			wFarenheight = strtol(tWord,NULL,0);
-			printf("node type: Element, name: %s ** data: %s\n",
-				cur_node->name, tWord);
+			if (tFarenheight == 0) {
+				wFarenheight = strtol(tWord,NULL,0);
+				tFarenheight = wFarenheight;
+				printf("*UPDATE* node type: Element, name: %s ** data: %i\n",
+					cur_node->name, wFarenheight);
+				}
 			}
+
 		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity" )) {
-			printf("node type: Element, name: %s ** data: %s\n",
-				cur_node->name, cur_node->properties->children->content);
+			if (tHumidity == 0) {
+				tHumidity=1;
+				sprintf(wHumidity, "%s", cur_node->properties->children->content);
+				printf("*UPDATE* node type: Element, name: %s ** data: %s\n",
+					cur_node->name, wHumidity);
+				}
 			}
+
 		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon" )) {
-			printf("node type: Element, name: %s ** data: %s\n",
-				cur_node->name, cur_node->properties->children->content);
+			if (tIcon == 0) {
+				tIcon=1;
+				sprintf(wIcon, "%s", cur_node->properties->children->content);
+				printf("*UPDATE* node type: Element, name: %s ** data: %s\n",
+					cur_node->name, wIcon);
+				}
 			}
+
 		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition" )) {
-			printf("node type: Element, name: %s ** data: %s\n",
-				cur_node->name, cur_node->properties->children->content);
+			if (tWind == 0) {
+				tWind=1;
+				sprintf(wWind, "%s", cur_node->properties->children->content);
+				printf("*UPDATE* node type: Element, name: %s ** data: %s\n",
+					cur_node->name, wWind);
+				}
 			}
 		}
-		print_element_names(cur_node->children);
+		parseWeather(cur_node->children);
 	}
 }
 
@@ -379,8 +408,16 @@ bool init() {
 	}
 
 	/* Load Fonts */
-	fntCGothic24 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 24);
-	if(fntCGothic24 == NULL) {
+	fntCGothic22 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 22);
+	if(fntCGothic22 == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		IS_RUNNING=false;
+		return false;
+	}
+
+	fntCGothic44 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 44);
+	if(fntCGothic44 == NULL) {
 		fprintf( stderr, "Failed when loading Font: %s\n",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
@@ -469,10 +506,18 @@ void doDisplay() {
 	else
 		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
-	/* Do Weather Check (update once per hour only) */
-	if (wLastCheck != ltm->tm_hour)
+	/* Do Weather Check (update once every 15 minutes) */
+	if ((wLastCheck != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45))
 	{
+		/* Update Timer */
+		wLastCheck = ltm->tm_hour;
+
 		/* Hour is odd, we call check */
+		tFarenheight=0;
+		tCondition=0;
+		tHumidity=0;
+		tIcon=0;
+		tWind=0;
 		xmlDoc *doc = NULL;
 		xmlNode *root_element = NULL;
 
@@ -484,7 +529,7 @@ void doDisplay() {
 
 		/*Get the root element node */
 		root_element = xmlDocGetRootElement(doc);
-		print_element_names(root_element);
+		parseWeather(root_element);
 		xmlFreeDoc(doc);       // free document
 		xmlCleanupParser();    // Free globals
 
@@ -493,15 +538,16 @@ void doDisplay() {
 
 		sprintf(wTemp, "%.1fºC", wCelcius);
 
-		/* Update Timer */
-		wLastCheck = ltm->tm_hour;
 	}
 
 	/* Draw Text */
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
-	drawText(dateString, fntCGothic48, 2, 0, 0, 0, 1280, 0);
-	drawText(wTemp, fntCGothic48, 1, 0, 0, 0, 8, 0);
-	drawText(nthsInWord, fntCGothic24, 1, 0, 0, 0, 1143, 30);
+	drawText(dateString, fntCGothic44, 2, 0, 0, 0, 1280, 0);
+	drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 8, 0);
+	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 1157, 28);
+
+	/* Do Looping Weather Info */
+	drawText(wWind, fntCGothic44, 1, 0, 0, 0, 200, 0);
 
 	SDL_GL_SwapBuffers();
 }
@@ -521,6 +567,8 @@ int main( int argc, char* argv[] ) {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
+	TTF_CloseFont(fntCGothic22);
+	TTF_CloseFont(fntCGothic44);
 	TTF_CloseFont(fntCGothic48);
 	SDL_FreeSurface(screen);
 
