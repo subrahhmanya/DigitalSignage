@@ -13,6 +13,9 @@
 #include <string>
 #include <time.h>
 
+/* Include libxml */
+#include <libxml++/libxml++.h>
+
 /* include SDL libraries */
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
