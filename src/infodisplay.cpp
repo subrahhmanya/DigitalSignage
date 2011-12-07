@@ -520,7 +520,7 @@ bool init() {
 	SDL_ShowCursor(SDL_DISABLE); 
 
 	glEnable(GL_BLEND);
-	glClearColor(1, 1, 1, 1);
+	glClearColor(0, 0, 0, 1);
 	glClearDepth(1.0f);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -636,13 +636,13 @@ void doDisplay() {
 	drawTexture(orb_logo, 10, 625, 255,1);
 
 	/* Draw Text */
-	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 255, 450, 655);
-	drawText(dateString, fntCGothic44, 2, 0, 0, 0, 255, 1280, 0);
+	drawText("Notification Center", fntCGothic48, 1, 255, 255, 255, 255, 450, 655);
+	drawText(dateString, fntCGothic44, 2, 255, 255, 255, 255, 1280, 0);
 	if (wCelcius <= 3.0)
 		drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 8, 0);
 	else
-		drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 255, 8, 0);
-	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 255, 1157, 28);
+		drawText(wTemp, fntCGothic44, 1, 255, 255, 255, 255, 8, 0);
+	drawText(nthsInWord, fntCGothic22, 1, 255, 255, 255, 255, 1157, 28);
 
 	/* Do Looping Weather Info */
 	if (now > (wUpdateTimer + 15))
@@ -742,9 +742,9 @@ void doDisplay() {
 
 	switch(wCurDisp)
 	{
-		case 0:drawText(wCondition, fntCGothic44, 1, 0, 0, 0, wFadeV, 265, 0);;break;
-		case 1:drawText(wHumidity, fntCGothic44, 1, 0, 0, 0, wFadeV, 265, 0);;break;
-		case 2:drawText(wWind, fntCGothic44, 1, 0, 0, 0, wFadeV, 265, 0);;break;
+		case 0:drawText(wCondition, fntCGothic44, 1, 255, 255, 255, wFadeV, 265, 0);;break;
+		case 1:drawText(wHumidity, fntCGothic44, 1, 255, 255, 255, wFadeV, 265, 0);;break;
+		case 2:drawText(wWind, fntCGothic44, 1, 255, 255, 255, wFadeV, 265, 0);;break;
 	}
 
 
