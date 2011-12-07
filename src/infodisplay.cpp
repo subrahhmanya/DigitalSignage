@@ -41,7 +41,7 @@ TTF_Font *fntCGothic48;
 /* Variables for application (global) */
 bool IS_RUNNING = true;
 int wLastCheckH, wLastCheckM, wUpdateTimer;
-int wFadeV = 0;
+int wFadeV = 255;
 int wFadeA = 0;
 int wCurDisp=0;
 int tC1 = 0;
@@ -68,6 +68,7 @@ bool drawText(const char *text,
 			int cr,
 			int cg,
 			int cb,
+			int alpha,
 			int px,
 			int py);
 bool drawTexture(const char *fname,
@@ -131,21 +132,6 @@ static void parseWeather(xmlNode * a_node)
 		}
 		parseWeather(cur_node->children);
 	}
-}
-
-SDL_Surface* setColorKeyOrg(SDL_Surface* s, Uint32 maskColor)
-{
-	maskColor |= 0xff000000u;
-	Uint32* surfacepixels = (Uint32*) s->pixels;
-	SDL_LockSurface(s);
-	for(int y = 0; y < s->h; y++) {
-		for(int x = 0; x < s->w; x++) {
-			Uint32* p = &(surfacepixels[y * s->pitch / 4 + x]);
-			if(*p == maskColor) *p = 0x00000000u;
-		}
-	}
-	SDL_UnlockSurface(s);
-	return s;
 }
 
 int calcDay_Dec31(int yyyy)
@@ -263,11 +249,11 @@ bool drawText(const char *text,
 			int cr,
 			int cg,
 			int cb,
+			int alpha,
 			int px,
 			int py)
 {
 	SDL_Surface *initial;
-	SDL_Surface *intermediary;
 	SDL_Color color;
 	SDL_Rect location;
 	SDL_Rect rect;
@@ -299,37 +285,11 @@ bool drawText(const char *text,
 		ay=location.y;
 	}
 
-	/* We need to allocate some memory now for out buffer */
-	unsigned char *pixels;
-	pixels = (unsigned char*) malloc(4 * w * h);
-
-	/* Let's grab a section of the backbuffer into memory */
-	glPixelStorei( GL_PACK_ROW_LENGTH, 0 ) ;
-	glPixelStorei( GL_PACK_ALIGNMENT, 1 ) ;
-	glReadBuffer( GL_BACK );
-	glReadPixels( ax, ay, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-
-	/* Create new SDL Surface where text is layed on top of the backbuffer we just grabbed */
-	intermediary = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
-	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		0x000000FF, 0x0000FF00, 0x00FF0000, 0
-	#else
-		0x00FF0000, 0x0000FF00, 0x000000FF, 0
-	#endif
-	);
-
-	for (int i = 0 ; i < h ; i++)
-		memcpy(((char *) intermediary->pixels) + intermediary->pitch * i, pixels + 4 * w * (h-i - 1), w*4);
-	free(pixels);
-
-	/* Blit text on top of new texture */
-	SDL_BlitSurface(initial, 0, intermediary, 0);
-
 	/* Tell GL about our new texture */
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA,
-			GL_UNSIGNED_BYTE, intermediary->pixels );
+			GL_UNSIGNED_BYTE, initial->pixels );
 
 	/* GL_NEAREST looks horrible, if scaled... */
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -338,7 +298,7 @@ bool drawText(const char *text,
 	/* prepare to render our texture */
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
 
 	/* Draw a quad at location */
 	glBegin(GL_QUADS);
@@ -363,7 +323,6 @@ bool drawText(const char *text,
 
 	/* Clean up */
 	SDL_FreeSurface(initial);
-	SDL_FreeSurface(intermediary);
 	glDeleteTextures(2, &texture);
 	return true;
 }
@@ -437,6 +396,7 @@ bool init() {
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
+	glEnable(GL_BLEND);
 	glClearColor(1, 1, 1, 1);
 	glClearDepth(1.0f);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -549,10 +509,10 @@ void doDisplay() {
 	}
 
 	/* Draw Text */
-	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 400, 664);
-	drawText(dateString, fntCGothic44, 2, 0, 0, 0, 1280, 0);
-	drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 8, 0);
-	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 1157, 28);
+	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 255, 400, 664);
+	drawText(dateString, fntCGothic44, 2, 0, 0, 0, 255, 1280, 0);
+	drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 255, 8, 0);
+	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 255, 1157, 28);
 
 	/* Do Looping Weather Info */
 	if (now > (wUpdateTimer + 15))
@@ -567,20 +527,20 @@ void doDisplay() {
 	{
 		switch(wFadeA)
 		{
-		case 1:wFadeV=wFadeV+15;;break;
-		case 2:wFadeV=wFadeV-15;;break;
+		case 1:wFadeV=wFadeV-15;;break;
+		case 2:wFadeV=wFadeV+15;;break;
 		}
-		if (wFadeV >254)
+		if (wFadeV <0)
 		{
 			wFadeA=2;
-			wFadeV=254;
+			wFadeV=0;
 			wCurDisp++;
 			if (wCurDisp == 3)
 				wCurDisp = 0;
 		}
-		if (wFadeV <0)
+		if (wFadeV >255)
 		{
-			wFadeV=0;
+			wFadeV=255;
 			wFadeA=0;
 			SCREEN_TARGET_FPS = 1;
 		}
@@ -588,9 +548,9 @@ void doDisplay() {
 
 	switch(wCurDisp)
 	{
-		case 0:drawText(wCondition, fntCGothic44, 1, wFadeV, wFadeV, wFadeV, 200, 0);;break;
-		case 1:drawText(wHumidity, fntCGothic44, 1, wFadeV, wFadeV, wFadeV, 200, 0);;break;
-		case 2:drawText(wWind, fntCGothic44, 1, wFadeV, wFadeV, wFadeV, 200, 0);;break;
+		case 0:drawText(wCondition, fntCGothic44, 1, 0, 0, 0, wFadeV, 200, 0);;break;
+		case 1:drawText(wHumidity, fntCGothic44, 1, 0, 0, 0, wFadeV, 200, 0);;break;
+		case 2:drawText(wWind, fntCGothic44, 1, 0, 0, 0, wFadeV, 200, 0);;break;
 	}
 
 
