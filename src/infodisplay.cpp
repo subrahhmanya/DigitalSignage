@@ -487,7 +487,7 @@ bool init() {
 	}
 
 	/* Load Textures */
-	orb_logo = IMG_Load("/screen/textures/orblogo.bmp");
+	orb_logo = IMG_Load("/screen/textures/orblogo.png");
 	wTex_storm = IMG_Load("/screen/textures/weather/storm.gif");
 	wTex_chance_of_rain = IMG_Load("/screen/textures/weather/chance_of_rain.gif");
 	wTex_chance_of_tstorm = IMG_Load("/screen/textures/weather/chance_of_tstorm.gif");
@@ -625,7 +625,7 @@ void doDisplay() {
 	}
 
 	/* Main Drawing */
-	drawTexture(orb_logo, 0, 625, 255,3);
+	drawTexture(orb_logo, 10, 625, 255,1);
 
 	/* Draw Text */
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 255, 450, 655);
