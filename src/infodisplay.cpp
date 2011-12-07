@@ -54,6 +54,30 @@ char wIcon[32];
 char wWind[32];
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 
+/* Define Global Textures */
+SDL_Surface *orb_logo;
+SDL_Surface *wTex_storm;
+SDL_Surface *wTex_chance_of_rain;
+SDL_Surface *wTex_chance_of_tstorm;
+SDL_Surface *wTex_snow;
+SDL_Surface *wTex_cloudy;
+SDL_Surface *wTex_partly_cloudy;
+SDL_Surface *wTex_sleet;
+SDL_Surface *wTex_mostly_sunny;
+SDL_Surface *wTex_smoke;
+SDL_Surface *wTex_mostly_cloudy;
+SDL_Surface *wTex_flurries;
+SDL_Surface *wTex_rain;
+SDL_Surface *wTex_icy;
+SDL_Surface *wTex_dust;
+SDL_Surface *wTex_chance_of_snow;
+SDL_Surface *wTex_mist;
+SDL_Surface *wTex_thunderstorm;
+SDL_Surface *wTex_sunny;
+SDL_Surface *wTex_haze;
+SDL_Surface *wTex_chance_of_storm;
+SDL_Surface *wTex_fog;
+
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
 int dayInYear(int dd, int mm);
@@ -71,9 +95,13 @@ bool drawText(const char *text,
 			int alpha,
 			int px,
 			int py);
-bool drawTexture(const char *fname,
-			SDL_Rect *location,
+
+bool drawTexture(SDL_Surface *tpoint,
+			int px,
+			int py,
+			int alpha,
 			int scale);
+
 bool FileExists( const char* FileName );
 void doDisplay();
 bool init();
@@ -256,7 +284,6 @@ bool drawText(const char *text,
 	SDL_Surface *initial;
 	SDL_Color color;
 	SDL_Rect location;
-	SDL_Rect rect;
 	int w,h,ax,ay;
 	GLuint texture;
 
@@ -327,12 +354,77 @@ bool drawText(const char *text,
 	return true;
 }
 
-bool drawTexture(const char *fname,
-			SDL_Rect *location,
+bool drawTexture(SDL_Surface *tpoint,
+			int px,
+			int py,
+			int alpha,
 			int scale)
 {
-//	SDL_Surface *texture;
-//	texture = IMG_Load(fname);
+
+	SDL_Rect location;
+	GLuint TextureID = 0;
+
+	location.x = px;
+	location.y = py;
+
+	int w,h,ax,ay;
+
+	w = tpoint->w;
+	h = tpoint->h;
+
+	/* Convert the rendered text to a known format */
+	w = tpoint->w;
+	h = tpoint->h;
+
+	/* Do the Alignment - default is left.
+	   1 = Left Align
+	   2 = Right Align */
+
+	ax=location.x;
+	ay=location.y;
+
+	glGenTextures(1, &TextureID);
+	glBindTexture(GL_TEXTURE_2D, TextureID);
+ 
+	int Mode = GL_RGB;
+ 
+	if(tpoint->format->BytesPerPixel == 4) {
+		Mode = GL_RGBA;
+	}
+ 
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, w, h, 0, Mode, GL_UNSIGNED_BYTE, tpoint->pixels);
+ 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	/* prepare to render our texture */
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, TextureID);
+	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
+
+	/* Draw a quad at location */
+	glBegin(GL_QUADS);
+		/* Recall that the origin is in the lower-left corner
+		   That is why the TexCoords specify different corners
+		   than the Vertex coors seem to. */
+		glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(ax, ay);
+		glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(ax + (w/scale), ay);
+		glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(ax + (w/scale), ay + (h/scale));
+		glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(ax, ay + (h/scale));
+	glEnd();
+	/* Bad things happen if we delete the texture before it finishes */
+	glFinish();
+
+	/* return the deltas in the unused w,h part of the rect */
+	location.w = tpoint->w;
+	location.h = tpoint->h;
+
+	/* Clean up */
+	glDeleteTextures(1, &TextureID);
 	return true;
 }
 
@@ -393,6 +485,30 @@ bool init() {
 		IS_RUNNING=false;
 		return false;
 	}
+
+	/* Load Textures */
+	orb_logo = IMG_Load("/screen/textures/orblogo.bmp");
+	wTex_storm = IMG_Load("/screen/textures/weather/storm.gif");
+	wTex_chance_of_rain = IMG_Load("/screen/textures/weather/chance_of_rain.gif");
+	wTex_chance_of_tstorm = IMG_Load("/screen/textures/weather/chance_of_tstorm.gif");
+	wTex_snow = IMG_Load("/screen/textures/weather/snow.gif");
+	wTex_cloudy = IMG_Load("/screen/textures/weather/cloudy.png");
+	wTex_partly_cloudy = IMG_Load("/screen/textures/weather/partly_cloudy.gif");
+	wTex_sleet = IMG_Load("/screen/textures/weather/sleet.gif");
+	wTex_mostly_sunny = IMG_Load("/screen/textures/weather/mostly_sunny.gif");
+	wTex_smoke = IMG_Load("/screen/textures/weather/smoke.gif");
+	wTex_mostly_cloudy = IMG_Load("/screen/textures/weather/mostly_cloudy.gif");
+	wTex_flurries = IMG_Load("/screen/textures/weather/flurries.gif");
+	wTex_rain = IMG_Load("/screen/textures/weather/rain.gif");
+	wTex_icy = IMG_Load("/screen/textures/weather/icy.gif");
+	wTex_dust = IMG_Load("/screen/textures/weather/dust.gif");
+	wTex_chance_of_snow = IMG_Load("/screen/textures/weather/chance_of_snow.gif");
+	wTex_mist = IMG_Load("/screen/textures/weather/mist.gif");
+	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.gif");
+	wTex_sunny = IMG_Load("/screen/textures/weather/sunny.gif");
+	wTex_haze = IMG_Load("/screen/textures/weather/haze.gif");
+	wTex_chance_of_storm = IMG_Load("/screen/textures/weather/chance_of_storm.gif");
+	wTex_fog = IMG_Load("/screen/textures/weather/fog.gif");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -508,8 +624,11 @@ void doDisplay() {
 		}
 	}
 
+	/* Main Drawing */
+	drawTexture(orb_logo, 0, 625, 255,3);
+
 	/* Draw Text */
-	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 255, 400, 664);
+	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 255, 450, 655);
 	drawText(dateString, fntCGothic44, 2, 0, 0, 0, 255, 1280, 0);
 	drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 255, 8, 0);
 	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 255, 1157, 28);
@@ -545,12 +664,16 @@ void doDisplay() {
 			SCREEN_TARGET_FPS = 10;
 		}
 	}
+//	if (strcmp("/ig/images/weather/cloudy.gif", wIcon) ==0 )
+//	{
+//		drawTexture(wTex_cloudy, 175, 0, 255,3);
+//	}
 
 	switch(wCurDisp)
 	{
-		case 0:drawText(wCondition, fntCGothic44, 1, 0, 0, 0, wFadeV, 200, 0);;break;
-		case 1:drawText(wHumidity, fntCGothic44, 1, 0, 0, 0, wFadeV, 200, 0);;break;
-		case 2:drawText(wWind, fntCGothic44, 1, 0, 0, 0, wFadeV, 200, 0);;break;
+		case 0:drawText(wCondition, fntCGothic44, 1, 0, 0, 0, wFadeV, 265, 0);;break;
+		case 1:drawText(wHumidity, fntCGothic44, 1, 0, 0, 0, wFadeV, 265, 0);;break;
+		case 2:drawText(wWind, fntCGothic44, 1, 0, 0, 0, wFadeV, 265, 0);;break;
 	}
 
 
@@ -575,6 +698,30 @@ int main( int argc, char* argv[] ) {
 	TTF_CloseFont(fntCGothic22);
 	TTF_CloseFont(fntCGothic44);
 	TTF_CloseFont(fntCGothic48);
+
+	/* Clear Textures */
+	SDL_FreeSurface(orb_logo);
+	SDL_FreeSurface(wTex_storm);
+	SDL_FreeSurface(wTex_chance_of_rain);
+	SDL_FreeSurface(wTex_chance_of_tstorm);
+	SDL_FreeSurface(wTex_snow);
+	SDL_FreeSurface(wTex_cloudy);
+	SDL_FreeSurface(wTex_partly_cloudy);
+	SDL_FreeSurface(wTex_sleet);
+	SDL_FreeSurface(wTex_mostly_sunny);
+	SDL_FreeSurface(wTex_smoke);
+	SDL_FreeSurface(wTex_mostly_cloudy);
+	SDL_FreeSurface(wTex_flurries);
+	SDL_FreeSurface(wTex_rain);
+	SDL_FreeSurface(wTex_icy);
+	SDL_FreeSurface(wTex_dust);
+	SDL_FreeSurface(wTex_chance_of_snow);
+	SDL_FreeSurface(wTex_mist);
+	SDL_FreeSurface(wTex_thunderstorm);
+	SDL_FreeSurface(wTex_sunny);
+	SDL_FreeSurface(wTex_haze);
+	SDL_FreeSurface(wTex_chance_of_storm);
+	SDL_FreeSurface(wTex_fog);
 	SDL_FreeSurface(screen);
 
 	TTF_Quit();
