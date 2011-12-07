@@ -28,7 +28,7 @@
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const int SCREEN_BPP = 24;
-int SCREEN_TARGET_FPS = 1;
+int SCREEN_TARGET_FPS = 10;
 
 /* Define Main Screen Surface */
 SDL_Surface* screen = NULL;
@@ -542,7 +542,7 @@ void doDisplay() {
 		{
 			wFadeV=255;
 			wFadeA=0;
-			SCREEN_TARGET_FPS = 1;
+			SCREEN_TARGET_FPS = 10;
 		}
 	}
 
