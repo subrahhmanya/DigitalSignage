@@ -50,33 +50,37 @@ char wTemp[4];
 int wFarenheight=0;
 char wCondition[32];
 char wHumidity[32];
-char wIcon[32];
+char wIcon[64];
 char wWind[32];
+float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 
 /* Define Global Textures */
 SDL_Surface *orb_logo;
-SDL_Surface *wTex_storm;
-SDL_Surface *wTex_chance_of_rain;
-SDL_Surface *wTex_chance_of_tstorm;
-SDL_Surface *wTex_snow;
-SDL_Surface *wTex_cloudy;
-SDL_Surface *wTex_partly_cloudy;
-SDL_Surface *wTex_sleet;
-SDL_Surface *wTex_mostly_sunny;
-SDL_Surface *wTex_smoke;
-SDL_Surface *wTex_mostly_cloudy;
-SDL_Surface *wTex_flurries;
-SDL_Surface *wTex_rain;
-SDL_Surface *wTex_icy;
-SDL_Surface *wTex_dust;
-SDL_Surface *wTex_chance_of_snow;
-SDL_Surface *wTex_mist;
-SDL_Surface *wTex_thunderstorm;
-SDL_Surface *wTex_sunny;
-SDL_Surface *wTex_haze;
 SDL_Surface *wTex_chance_of_storm;
+SDL_Surface *wTex_mostly_sunny;
+SDL_Surface *wTex_dust;
+SDL_Surface *wTex_mostly_cloudy;
+SDL_Surface *wTex_cloudy;
+SDL_Surface *wTex_chance_of_tstorm;
+SDL_Surface *wTex_partly_cloudy;
+SDL_Surface *wTex_storm;
+SDL_Surface *wTex_sunny;
+SDL_Surface *wTex_cold;
+SDL_Surface *wTex_windy;
+SDL_Surface *wTex_flurries;
+SDL_Surface *wTex_chance_of_snow;
+SDL_Surface *wTex_chance_of_rain;
 SDL_Surface *wTex_fog;
+SDL_Surface *wTex_icy;
+SDL_Surface *wTex_sleet;
+SDL_Surface *wTex_rain;
+SDL_Surface *wTex_mist;
+SDL_Surface *wTex_haze;
+SDL_Surface *wTex_smoke;
+SDL_Surface *wTex_snow;
+SDL_Surface *wTex_hot;
+SDL_Surface *wTex_thunderstorm;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -287,9 +291,9 @@ bool drawText(const char *text,
 	int w,h,ax,ay;
 	GLuint texture;
 
-	color.r = cr;
+	color.b = cr;
 	color.g = cg;
-	color.b = cb;
+	color.r = cb;
 	location.x = px;
 	location.y = py;
 
@@ -488,27 +492,30 @@ bool init() {
 
 	/* Load Textures */
 	orb_logo = IMG_Load("/screen/textures/orblogo.png");
-	wTex_storm = IMG_Load("/screen/textures/weather/storm.gif");
-	wTex_chance_of_rain = IMG_Load("/screen/textures/weather/chance_of_rain.gif");
-	wTex_chance_of_tstorm = IMG_Load("/screen/textures/weather/chance_of_tstorm.gif");
-	wTex_snow = IMG_Load("/screen/textures/weather/snow.gif");
+	wTex_chance_of_storm = IMG_Load("/screen/textures/weather/chance_of_storm.png");
+	wTex_mostly_sunny = IMG_Load("/screen/textures/weather/mostly_sunny.png");
+	wTex_dust = IMG_Load("/screen/textures/weather/dust.png");
+	wTex_mostly_cloudy = IMG_Load("/screen/textures/weather/mostly_cloudy.png");
 	wTex_cloudy = IMG_Load("/screen/textures/weather/cloudy.png");
-	wTex_partly_cloudy = IMG_Load("/screen/textures/weather/partly_cloudy.gif");
-	wTex_sleet = IMG_Load("/screen/textures/weather/sleet.gif");
-	wTex_mostly_sunny = IMG_Load("/screen/textures/weather/mostly_sunny.gif");
-	wTex_smoke = IMG_Load("/screen/textures/weather/smoke.gif");
-	wTex_mostly_cloudy = IMG_Load("/screen/textures/weather/mostly_cloudy.gif");
-	wTex_flurries = IMG_Load("/screen/textures/weather/flurries.gif");
-	wTex_rain = IMG_Load("/screen/textures/weather/rain.gif");
-	wTex_icy = IMG_Load("/screen/textures/weather/icy.gif");
-	wTex_dust = IMG_Load("/screen/textures/weather/dust.gif");
-	wTex_chance_of_snow = IMG_Load("/screen/textures/weather/chance_of_snow.gif");
-	wTex_mist = IMG_Load("/screen/textures/weather/mist.gif");
-	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.gif");
-	wTex_sunny = IMG_Load("/screen/textures/weather/sunny.gif");
-	wTex_haze = IMG_Load("/screen/textures/weather/haze.gif");
-	wTex_chance_of_storm = IMG_Load("/screen/textures/weather/chance_of_storm.gif");
-	wTex_fog = IMG_Load("/screen/textures/weather/fog.gif");
+	wTex_chance_of_tstorm = IMG_Load("/screen/textures/weather/chance_of_tstorm.png");
+	wTex_partly_cloudy = IMG_Load("/screen/textures/weather/partly_cloudy.png");
+	wTex_storm = IMG_Load("/screen/textures/weather/storm.png");
+	wTex_sunny = IMG_Load("/screen/textures/weather/sunny.png");
+	wTex_cold = IMG_Load("/screen/textures/weather/cold.png");
+	wTex_windy = IMG_Load("/screen/textures/weather/windy.png");
+	wTex_flurries = IMG_Load("/screen/textures/weather/flurries.png");
+	wTex_chance_of_snow = IMG_Load("/screen/textures/weather/chance_of_snow.png");
+	wTex_chance_of_rain = IMG_Load("/screen/textures/weather/chance_of_rain.png");
+	wTex_fog = IMG_Load("/screen/textures/weather/fog.png");
+	wTex_icy = IMG_Load("/screen/textures/weather/icy.png");
+	wTex_sleet = IMG_Load("/screen/textures/weather/sleet.png");
+	wTex_rain = IMG_Load("/screen/textures/weather/rain.png");
+	wTex_mist = IMG_Load("/screen/textures/weather/mist.png");
+	wTex_haze = IMG_Load("/screen/textures/weather/haze.png");
+	wTex_smoke = IMG_Load("/screen/textures/weather/smoke.png");
+	wTex_snow = IMG_Load("/screen/textures/weather/snow.png");
+	wTex_hot = IMG_Load("/screen/textures/weather/hot.png");
+	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.png");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -618,19 +625,23 @@ void doDisplay() {
 			xmlCleanupParser();    // Free globals
 
 			/* Calculate Weather */
-			float wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
+			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
 
 			sprintf(wTemp, "%.1fºC", wCelcius);
 		}
 	}
 
-	/* Main Drawing */
+	/* Main Drawing Section*/
+
 	drawTexture(orb_logo, 10, 625, 255,1);
 
 	/* Draw Text */
 	drawText("Notification Center", fntCGothic48, 1, 0, 0, 0, 255, 450, 655);
 	drawText(dateString, fntCGothic44, 2, 0, 0, 0, 255, 1280, 0);
-	drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 255, 8, 0);
+	if (wCelcius <= 3.0)
+		drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 8, 0);
+	else
+		drawText(wTemp, fntCGothic44, 1, 0, 0, 0, 255, 8, 0);
 	drawText(nthsInWord, fntCGothic22, 1, 0, 0, 0, 255, 1157, 28);
 
 	/* Do Looping Weather Info */
@@ -664,10 +675,70 @@ void doDisplay() {
 			SCREEN_TARGET_FPS = 10;
 		}
 	}
-//	if (strcmp("/ig/images/weather/cloudy.gif", wIcon) ==0 )
-//	{
-//		drawTexture(wTex_cloudy, 175, 0, 255,3);
-//	}
+
+	/* Draw weather condition icon */
+	if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0 )
+		drawTexture(wTex_chance_of_storm, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0 )
+		drawTexture(wTex_mostly_sunny, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0 )
+		drawTexture(wTex_dust, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0 )
+		drawTexture(wTex_mostly_cloudy, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0 )
+		drawTexture(wTex_cloudy, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0 )
+		drawTexture(wTex_chance_of_tstorm, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) ==0 )
+		drawTexture(wTex_partly_cloudy, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0 )
+		drawTexture(wTex_storm, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0 )
+		drawTexture(wTex_sunny, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0 )
+		drawTexture(wTex_flurries, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0 )
+		drawTexture(wTex_chance_of_snow, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0 )
+		drawTexture(wTex_chance_of_rain, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0 )
+		drawTexture(wTex_fog, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0 )
+		drawTexture(wTex_icy, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0 )
+		drawTexture(wTex_sleet, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0 )
+		drawTexture(wTex_rain, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0 )
+		drawTexture(wTex_mist, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0 )
+		drawTexture(wTex_haze, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0 )
+		drawTexture(wTex_smoke, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0 )
+		drawTexture(wTex_snow, 175, 0, 255,3);
+
+	if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0 )
+		drawTexture(wTex_thunderstorm, 175, 0, 255,3);
 
 	switch(wCurDisp)
 	{
@@ -701,27 +772,30 @@ int main( int argc, char* argv[] ) {
 
 	/* Clear Textures */
 	SDL_FreeSurface(orb_logo);
-	SDL_FreeSurface(wTex_storm);
-	SDL_FreeSurface(wTex_chance_of_rain);
-	SDL_FreeSurface(wTex_chance_of_tstorm);
-	SDL_FreeSurface(wTex_snow);
-	SDL_FreeSurface(wTex_cloudy);
-	SDL_FreeSurface(wTex_partly_cloudy);
-	SDL_FreeSurface(wTex_sleet);
-	SDL_FreeSurface(wTex_mostly_sunny);
-	SDL_FreeSurface(wTex_smoke);
-	SDL_FreeSurface(wTex_mostly_cloudy);
-	SDL_FreeSurface(wTex_flurries);
-	SDL_FreeSurface(wTex_rain);
-	SDL_FreeSurface(wTex_icy);
-	SDL_FreeSurface(wTex_dust);
-	SDL_FreeSurface(wTex_chance_of_snow);
-	SDL_FreeSurface(wTex_mist);
-	SDL_FreeSurface(wTex_thunderstorm);
-	SDL_FreeSurface(wTex_sunny);
-	SDL_FreeSurface(wTex_haze);
 	SDL_FreeSurface(wTex_chance_of_storm);
+	SDL_FreeSurface(wTex_mostly_sunny);
+	SDL_FreeSurface(wTex_dust);
+	SDL_FreeSurface(wTex_mostly_cloudy);
+	SDL_FreeSurface(wTex_cloudy);
+	SDL_FreeSurface(wTex_chance_of_tstorm);
+	SDL_FreeSurface(wTex_partly_cloudy);
+	SDL_FreeSurface(wTex_storm);
+	SDL_FreeSurface(wTex_sunny);
+	SDL_FreeSurface(wTex_cold);
+	SDL_FreeSurface(wTex_windy);
+	SDL_FreeSurface(wTex_flurries);
+	SDL_FreeSurface(wTex_chance_of_snow);
+	SDL_FreeSurface(wTex_chance_of_rain);
 	SDL_FreeSurface(wTex_fog);
+	SDL_FreeSurface(wTex_icy);
+	SDL_FreeSurface(wTex_sleet);
+	SDL_FreeSurface(wTex_rain);
+	SDL_FreeSurface(wTex_mist);
+	SDL_FreeSurface(wTex_haze);
+	SDL_FreeSurface(wTex_smoke);
+	SDL_FreeSurface(wTex_snow);
+	SDL_FreeSurface(wTex_hot);
+	SDL_FreeSurface(wTex_thunderstorm);
 	SDL_FreeSurface(screen);
 
 	TTF_Quit();
