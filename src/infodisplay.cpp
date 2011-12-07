@@ -567,9 +567,8 @@ void doDisplay() {
 	{
 		switch(wFadeA)
 		{
-		case 0:wFadeV=0;;break;
-		case 1:wFadeV=wFadeV+10;;break;
-		case 2:wFadeV=wFadeV-10;;break;
+		case 1:wFadeV=wFadeV+15;;break;
+		case 2:wFadeV=wFadeV-15;;break;
 		}
 		if (wFadeV >254)
 		{
