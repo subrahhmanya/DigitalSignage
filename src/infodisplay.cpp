@@ -636,7 +636,7 @@ void doDisplay() {
 	drawTexture(orb_logo, 15, 620, 255,1);
 
 	/* Draw Text */
-	drawText("Notification Center", fntCGothic48, 1, 255, 255, 255, 255, 450, 655);
+	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 450, 655);
 	drawText(dateString, fntCGothic44, 2, 255, 255, 255, 255, 1270, 10);
 	if (wCelcius <= 3.0)
 		drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 18, 0);
