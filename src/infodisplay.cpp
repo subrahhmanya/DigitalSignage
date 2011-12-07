@@ -41,6 +41,8 @@ TTF_Font *fntCGothic48;
 /* Variables for application (global) */
 bool IS_RUNNING = true;
 int wLastCheckH, wLastCheckM, wUpdateTimer;
+int wFadeV = 0;
+int wFadeA = 0;
 int wCurDisp=0;
 int tC1 = 0;
 bool bV1 = false;
@@ -556,15 +558,40 @@ void doDisplay() {
 	if (now > (wUpdateTimer + 15))
 	{
 		wUpdateTimer=now;
-		wCurDisp++;
-		if (wCurDisp == 3)
-			wCurDisp = 0;
+		wFadeA=1;
+		SCREEN_TARGET_FPS = 30;
 	}
+
+	/* Process Fading Weather Info (if applicable) */
+	if ((wFadeA == 1) || (wFadeA == 2))
+	{
+		switch(wFadeA)
+		{
+		case 0:wFadeV=0;;break;
+		case 1:wFadeV=wFadeV+10;;break;
+		case 2:wFadeV=wFadeV-10;;break;
+		}
+		if (wFadeV >254)
+		{
+			wFadeA=2;
+			wFadeV=254;
+			wCurDisp++;
+			if (wCurDisp == 3)
+				wCurDisp = 0;
+		}
+		if (wFadeV <0)
+		{
+			wFadeV=0;
+			wFadeA=0;
+			SCREEN_TARGET_FPS = 1;
+		}
+	}
+
 	switch(wCurDisp)
 	{
-		case 0:drawText(wCondition, fntCGothic44, 1, 0, 0, 0, 200, 0);;break;
-		case 1:drawText(wHumidity, fntCGothic44, 1, 0, 0, 0, 200, 0);;break;
-		case 2:drawText(wWind, fntCGothic44, 1, 0, 0, 0, 200, 0);;break;
+		case 0:drawText(wCondition, fntCGothic44, 1, wFadeV, wFadeV, wFadeV, 200, 0);;break;
+		case 1:drawText(wHumidity, fntCGothic44, 1, wFadeV, wFadeV, wFadeV, 200, 0);;break;
+		case 2:drawText(wWind, fntCGothic44, 1, wFadeV, wFadeV, wFadeV, 200, 0);;break;
 	}
 
 
