@@ -2,7 +2,7 @@
 //          Name: infodisplay.cpp
 //        Author: Paul Wollaston
 // Project Start: 25/12/11
-// Last Modified: 02/12/11
+// Last Modified: 07/12/11
 //   Description: Display agregated data in an easy-to-read format with
 //                ability to be flexible with what is shown.
 //-------------------------------------------------------------------------
@@ -746,7 +746,6 @@ void doDisplay() {
 		case 1:drawText(wHumidity, fntCGothic44, 1, 255, 255, 255, wFadeV, 275, 10);;break;
 		case 2:drawText(wWind, fntCGothic44, 1, 255, 255, 255, wFadeV, 275, 10);;break;
 	}
-
 
 	SDL_GL_SwapBuffers();
 }
