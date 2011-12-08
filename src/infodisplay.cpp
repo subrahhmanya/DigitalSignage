@@ -688,6 +688,7 @@ void doDisplay() {
 
 	if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0 )
 		drawTexture(wTex_mostly_cloudy, 185, 0, 255,3);
+		drawTexture(wTex_haze, 185, 0, 255,3);
 
 	if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0 )
 		drawTexture(wTex_cloudy, 185, 0, 255,3);
