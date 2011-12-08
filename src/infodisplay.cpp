@@ -52,6 +52,7 @@ char wCondition[32];
 char wHumidity[32];
 char wIcon[64];
 char wWind[32];
+int wIWind=0;
 float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 
@@ -157,6 +158,13 @@ static void parseWeather(xmlNode * a_node)
 			if (tWind == 0) {
 				tWind=1;
 				sprintf(wWind, "%s", cur_node->properties->children->content);
+				/* Get speed of wind and convert to int */
+				for(int i = 0; i < strlen(wWind); ++i)
+				{
+					if (isdigit(wWind[i]))
+						if (wIWind == 0)
+							wIWind = atoi(&wWind[i]);
+				}
 				printf("*UPDATE* node type: Element, name: %s ** data: %s\n",
 					cur_node->name, wWind);
 				}
@@ -739,6 +747,10 @@ void doDisplay() {
 
 	if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0 )
 		drawTexture(wTex_thunderstorm, 185, 0, 255,3);
+
+	/* Draw Leaves over Weather Icon if wind is 20mph+ */
+	if (wIWind >= 20)
+		drawTexture(wTex_windy, 185, 0, 255, 3);
 
 	switch(wCurDisp)
 	{
