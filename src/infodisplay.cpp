@@ -617,12 +617,16 @@ void doDisplay() {
 	{
 		if (wLastCheckM != ltm->tm_min)
 		{
+			/* Update last check interval */
+			wLastCheckM = ltm->tm_min;
+
 			/* Hour is odd, we call check */
 			tFarenheight=0;
 			tCondition=0;
 			tHumidity=0;
 			tIcon=0;
 			tWind=0;
+			wOK = false; /* New Check - default wOK to false (so data regarded dirty first) */
 			xmlDoc *doc = NULL;
 			xmlNode *root_element = NULL;
 
@@ -633,8 +637,6 @@ void doDisplay() {
 			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
 			if (doc)
 			{
-				/* Update last check interval */
-				wLastCheckM = ltm->tm_min;
 
 				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 				/*Get the root element node */
@@ -645,11 +647,13 @@ void doDisplay() {
 				/* Update last check interval */
 				if (wOK)
 					wLastCheckH = ltm->tm_hour;
+				else
+					wLastCheckH = 0;
 			} else {
 				/* Update last check interval (we want to check in another minute) */
 				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 				printf("NO DATA/NET CONNECTION\n");
-				wLastCheckM = ltm->tm_min;
+				wLastCheckH = 0;
 				wOK = false;
 			}
 			/* Calculate Weather */
@@ -761,7 +765,7 @@ void doDisplay() {
 			drawTexture(wTex_windy, 185, 0, 255, 3);
 
 		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 18, 0);
+			drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 18, 10);
 		else
 			drawText(wTemp, fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 
