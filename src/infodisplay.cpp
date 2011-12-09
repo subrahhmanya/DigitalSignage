@@ -602,7 +602,6 @@ void doDisplay() {
 		sprintf(mins, "%i", ltm->tm_min);
 
 	/* Create the Date/Time String - We want blinking : */
-	char tBlinker[1];
 	if (tC1 != ltm->tm_sec)
 	{
 		if (bV1)
