@@ -620,6 +620,11 @@ void doDisplay() {
 			/* Update last check interval */
 			wLastCheckM = ltm->tm_min;
 
+			if (ltm->tm_min < 10)
+				printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+			else
+				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+
 			/* Hour is odd, we call check */
 			tFarenheight=0;
 			tCondition=0;
@@ -638,7 +643,6 @@ void doDisplay() {
 			if (doc)
 			{
 
-				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 				/*Get the root element node */
 				root_element = xmlDocGetRootElement(doc);
 				parseWeather(root_element);
@@ -651,7 +655,6 @@ void doDisplay() {
 					wLastCheckH = 0;
 			} else {
 				/* Update last check interval (we want to check in another minute) */
-				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 				printf("NO DATA/NET CONNECTION\n");
 				wLastCheckH = 0;
 				wOK = false;
