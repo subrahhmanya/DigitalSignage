@@ -116,61 +116,74 @@ static void parseWeather(xmlNode * a_node)
 {
 	xmlNode *cur_node = NULL;
 	char tWord[16];
-	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
-	if (cur_node->type == XML_ELEMENT_NODE) {
-		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition" )) {
-			if (tCondition == 0) {
-				sprintf(wCondition, "%s", cur_node->properties->children->content);
-				tCondition=1;
-				printf("*UPDATE* Item: %s \tData: %s\n",
-					cur_node->name, wCondition);
-				}
-			}
-
-		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f" )) {
-			sprintf(tWord, "%s", cur_node->properties->children->content);
-			if (tFarenheight == 0) {
-				wFarenheight = strtol(tWord,NULL,0);
-				tFarenheight = wFarenheight;
-				printf("*UPDATE* Item: %s \t\tData: %i\n",
-					cur_node->name, wFarenheight);
-				}
-			}
-
-		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity" )) {
-			if (tHumidity == 0) {
-				tHumidity=1;
-				sprintf(wHumidity, "%s", cur_node->properties->children->content);
-				printf("*UPDATE* Item: %s \tData: %s\n",
-					cur_node->name, wHumidity);
-				}
-			}
-
-		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon" )) {
-			if (tIcon == 0) {
-				tIcon=1;
-				sprintf(wIcon, "%s", cur_node->properties->children->content);
-				printf("*UPDATE* Item: %s \t\tData: %s\n",
-					cur_node->name, wIcon);
-				}
-			}
-
-		if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition" )) {
-			if (tWind == 0) {
-				tWind=1;
-				sprintf(wWind, "%s", cur_node->properties->children->content);
-				/* Get speed of wind and convert to int */
-				for(int i = 0; i < strlen(wWind); ++i)
+	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
+	{
+		if (cur_node->type == XML_ELEMENT_NODE)
+		{
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition" ))
+			{
+				if (tCondition == 0)
 				{
-					if (isdigit(wWind[i]))
-						if (wIWind == 0)
-							wIWind = atoi(&wWind[i]);
+					sprintf(wCondition, "%s", cur_node->properties->children->content);
+					tCondition=1;
+					printf("*UPDATE* Item: %s \tData: %s\n", cur_node->name, wCondition);
 				}
-				printf("*UPDATE* Item: %s \tData: %s\n",
-					cur_node->name, wWind);
-				/* Weather is only ok when we know we have all values */
-				wOK = true;
+			}
+
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f" ))
+			{
+				sprintf(tWord, "%s", cur_node->properties->children->content);
+				if (tFarenheight == 0)
+				{
+					wFarenheight = strtol(tWord,NULL,0);
+					tFarenheight = wFarenheight;
+					printf("*UPDATE* Item: %s \t\tData: %i\n",
+						cur_node->name, wFarenheight);
 				}
+			}
+
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity" ))
+			{
+				if (tHumidity == 0)
+				{
+					tHumidity=1;
+					sprintf(wHumidity, "%s", cur_node->properties->children->content);
+					printf("*UPDATE* Item: %s \tData: %s\n", cur_node->name, wHumidity);
+				}
+			}
+
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon" ))
+			{
+				if (tIcon == 0)
+				{
+					tIcon=1;
+					sprintf(wIcon, "%s", cur_node->properties->children->content);
+					printf("*UPDATE* Item: %s \t\tData: %s\n", cur_node->name, wIcon);
+				}
+			}
+
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition" ))
+			{
+				if (tWind == 0)
+				{
+					tWind=1;
+					sprintf(wWind, "%s", cur_node->properties->children->content);
+					/* Get speed of wind and convert to int */
+					for(int i = 0; i < strlen(wWind); ++i)
+					{
+						if (isdigit(wWind[i]))
+							if (wIWind == 0)
+								wIWind = atoi(&wWind[i]);
+					}
+					printf("*UPDATE* Item: %s \tData: %s\n",
+						cur_node->name, wWind);
+				}
+				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence. 
+				   This way, even if only part of the data was missed, we still declare as Dirty */
+				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0) && (tFarenheight != 0) && (tCondition != 0))
+					wOK = true;
+				else
+					wOK = false;
 			}
 		}
 		parseWeather(cur_node->children);
@@ -768,6 +781,8 @@ void doDisplay() {
 			drawTexture(wTex_windy, 185, 0, 255, 3);
 
 		if (wCelcius <= 3.0)
+			drawText(wTemp, fntCGothic44, 1, 128, 128, 255, 255, 18, 10);
+		else if (wCelcius >= 25.0)
 			drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 18, 10);
 		else
 			drawText(wTemp, fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
