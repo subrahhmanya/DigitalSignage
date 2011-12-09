@@ -170,8 +170,6 @@ static void parseWeather(xmlNode * a_node)
 					cur_node->name, wWind);
 				/* Weather is only ok when we know we have all values */
 				wOK = true;
-				/* Update last check interval */
-				wLastCheckH = ltm->tm_hour;
 				}
 			}
 		}
@@ -644,6 +642,9 @@ void doDisplay() {
 				parseWeather(root_element);
 				xmlFreeDoc(doc);       // free document
 				xmlCleanupParser();    // Free globals
+				/* Update last check interval */
+				if (wOK)
+					wLastCheckH = ltm->tm_hour;
 			} else {
 				/* Update last check interval (we want to check in another minute) */
 				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
