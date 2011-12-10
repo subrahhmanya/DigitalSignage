@@ -108,6 +108,12 @@ bool drawTexture(SDL_Surface *tpoint,
 			int alpha,
 			int scale);
 
+bool drawInfoBox(int px,
+			int py,
+			int w,
+			int h,
+			int alpha);
+
 bool FileExists( const char* FileName );
 void doDisplay();
 bool init();
@@ -456,6 +462,32 @@ bool drawTexture(SDL_Surface *tpoint,
 	return true;
 }
 
+bool drawInfoBox(int px,
+			int py,
+			int w,
+			int h,
+			int alpha)
+{
+	/* Testing of Box Drawing on screen */
+	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
+
+	/* Draw a quad at location */
+	glBegin(GL_QUADS);
+		/* Recall that the origin is in the lower-left corner
+		   That is why the TexCoords specify different corners
+		   than the Vertex coors seem to. */
+//		glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(px, py);
+//		glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(px + w, py);
+//		glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(px + w, py + h);
+//		glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(px, py + h);
+	glEnd();
+	
+}
+
 bool init() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -795,6 +827,8 @@ void doDisplay() {
 	} else {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
+
+	drawInfoBox(25, 75, 600, 530, 255);
 
 	SDL_GL_SwapBuffers();
 }
