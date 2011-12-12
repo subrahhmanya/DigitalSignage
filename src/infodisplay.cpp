@@ -86,6 +86,7 @@ SDL_Surface *wTex_smoke;
 SDL_Surface *wTex_snow;
 SDL_Surface *wTex_hot;
 SDL_Surface *wTex_thunderstorm;
+SDL_Surface *board_Test;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -467,12 +468,15 @@ bool drawTexture(SDL_Surface *tpoint,
 
 bool drawInfoBox(int px,
 			int py,
-			int w,
-			int h,
+			int ow,
+			int oh,
 			int alpha)
 {
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
+
+	int w = board_Test->w;
+	int h = board_Test->h;
 
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	int tw = orb_bl->w;
@@ -493,31 +497,28 @@ bool drawInfoBox(int px,
 	/* Draw Left Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px-8, py+8);
+		glVertex2f(px-16, py);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+8, py+8);
+		glVertex2f(px, py);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+8, py+h-8);
+		glVertex2f(px, py+h);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px-8, py+h-8);
+		glVertex2f(px-16, py+h);
 	glEnd();
 	/* Draw Right Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+w+8, py+8);
+		glVertex2f(px+w+16, py);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w-8, py+8);
+		glVertex2f(px+w, py);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w-8, py+h-8);
+		glVertex2f(px+w, py+h);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+w+8, py+h-8);
+		glVertex2f(px+w+16, py+h);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
-	glGenTextures(1, &TextureID);
-
-	glBindTexture(GL_TEXTURE_2D, TextureID);
 	tw = orb_bt->w;
 	th = orb_bt->h;
 	Mode = GL_RGB;
@@ -528,37 +529,33 @@ bool drawInfoBox(int px,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	/* Draw Top Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+8, py+h-8);
+		glVertex2f(px, py+h);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w-8, py+h-8);
+		glVertex2f(px+w, py+h);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w-8, py+h+8);
+		glVertex2f(px+w, py+h+16);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+8, py+h+8);
+		glVertex2f(px, py+h+16);
 	glEnd();
 	/* Draw Bottom Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+8, py+8);
+		glVertex2f(px, py);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w-8, py+8);
+		glVertex2f(px+w, py);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w-8, py-8);
+		glVertex2f(px+w, py-16);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+8, py-8);
+		glVertex2f(px, py-16);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
-	glGenTextures(1, &TextureID);
-
-	glBindTexture(GL_TEXTURE_2D, TextureID);
 	tw = orb_bcrnr->w;
 	th = orb_bcrnr->h;
 	Mode = GL_RGB;
@@ -569,58 +566,70 @@ bool drawInfoBox(int px,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	/* Draw TL */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px-8, py+h-8);
+		glVertex2f(px-16, py+h);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+8, py+h-8);
+		glVertex2f(px, py+h);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+8, py + h + 8);
+		glVertex2f(px, py + h + 16);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px-8, py + h + 8);
+		glVertex2f(px-16, py + h + 16);
 	glEnd();
 	/* Draw BL */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px-8, py+8);
+		glVertex2f(px-16, py);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+8, py+8);
+		glVertex2f(px, py);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+8, py-8);
+		glVertex2f(px, py-16);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px-8, py-8);
+		glVertex2f(px-16, py-16);
 	glEnd();
 	/* Draw TR */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+w+8, py+h-8);
+		glVertex2f(px+w+16, py+h);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w-8, py+h-8);
+		glVertex2f(px+w, py+h);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w-8, py+h+8);
+		glVertex2f(px+w, py+h+16);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+w+8, py+h+8);
+		glVertex2f(px+w+16, py+h+16);
 	glEnd();
 	/* Draw BR */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+w+8, py+8);
+		glVertex2f(px+w+16, py);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w-8, py+8);
+		glVertex2f(px+w, py);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w-8, py-8);
+		glVertex2f(px+w, py-16);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+w+8, py-8);
+		glVertex2f(px+w+16, py-16);
 	glEnd();
 
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
 	/* Draw Box + Contents */
+	tw = board_Test->w;
+	th = board_Test->h;
+	Mode = GL_RGB;
+	if(board_Test->format->BytesPerPixel == 4) {
+		Mode = GL_RGBA;
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, board_Test->pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	/* prepare to render our texture */
+	glBindTexture(GL_TEXTURE_2D, TextureID);
+
+
 	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
 
 	/* Draw a quad at location */
@@ -628,15 +637,22 @@ bool drawInfoBox(int px,
 		/* Recall that the origin is in the lower-left corner
 		   That is why the TexCoords specify different corners
 		   than the Vertex coors seem to. */
-//		glTexCoord2f(0.0f, 1.0f);
+		glTexCoord2f(0.0f, 1.0f);
 			glVertex2f(px, py);
-//		glTexCoord2f(1.0f, 1.0f);
+		glTexCoord2f(1.0f, 1.0f);
 			glVertex2f(px + w, py);
-//		glTexCoord2f(1.0f, 0.0f);
+		glTexCoord2f(1.0f, 0.0f);
 			glVertex2f(px + w, py + h);
-//		glTexCoord2f(0.0f, 0.0f);
+		glTexCoord2f(0.0f, 0.0f);
 			glVertex2f(px, py + h);
 	glEnd();
+
+	/* Bad things happen if we delete the texture before it finishes */
+	glFinish();
+
+	/* Clean up */
+	glDeleteTextures(1, &TextureID);
+	return true;
 }
 
 bool init() {
@@ -726,6 +742,9 @@ bool init() {
 	wTex_snow = IMG_Load("/screen/textures/weather/snow.png");
 	wTex_hot = IMG_Load("/screen/textures/weather/hot.png");
 	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.png");
+
+	/* This is a testing texture */
+	board_Test = IMG_Load("/screen/boards/1/1.png");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -1035,6 +1054,7 @@ int main( int argc, char* argv[] ) {
 	SDL_FreeSurface(wTex_snow);
 	SDL_FreeSurface(wTex_hot);
 	SDL_FreeSurface(wTex_thunderstorm);
+	SDL_FreeSurface(board_Test);
 	SDL_FreeSurface(screen);
 
 	TTF_Quit();

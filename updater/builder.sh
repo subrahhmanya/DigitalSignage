@@ -35,6 +35,7 @@ cp infodisplay ${scrroot} > /dev/null 2>&1
 rm infodisplay > /dev/null 2>&1
 cp -a fonts ${scrroot}
 cp -a textures ${scrroot}
+cp -a boards ${scrroot}
 
 # Load Application
 logOut "Launching InfoDisplay..."
