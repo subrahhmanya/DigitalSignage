@@ -114,8 +114,7 @@ bool drawTexture(SDL_Surface *tpoint,
 
 bool drawInfoBox(int px,
 			int py,
-			int w,
-			int h,
+			int scale,
 			int alpha);
 
 bool FileExists( const char* FileName );
@@ -468,16 +467,15 @@ bool drawTexture(SDL_Surface *tpoint,
 
 bool drawInfoBox(int px,
 			int py,
-			int ow,
-			int oh,
+			int scale,
 			int alpha)
 {
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
 
-	int w = board_Test->w;
-	int h = board_Test->h;
-
+	int w = (board_Test->w / 100.0) * scale;
+	int h = (board_Test->h / 100.0) * scale;
+	printf("Data WxH - WxH = %ix%i - %ix%i\n", w, h, board_Test->w, board_Test->h);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	int tw = orb_bl->w;
 	int th = orb_bl->h;
@@ -1001,7 +999,7 @@ void doDisplay() {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
 
-	drawInfoBox(25, 75, 600, 530, 255);
+	drawInfoBox(25, 75, 100, 255);
 
 	SDL_GL_SwapBuffers();
 }
