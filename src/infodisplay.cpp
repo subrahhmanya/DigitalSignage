@@ -112,7 +112,8 @@ bool drawTexture(SDL_Surface *tpoint,
 			int alpha,
 			int scale);
 
-bool drawInfoBox(int px,
+bool drawInfoBox(SDL_Surface *tpoint,
+			int px,
 			int py,
 			int scale,
 			int alpha);
@@ -465,7 +466,8 @@ bool drawTexture(SDL_Surface *tpoint,
 	return true;
 }
 
-bool drawInfoBox(int px,
+bool drawInfoBox(SDL_Surface *tpoint,
+			int px,
 			int py,
 			int scale,
 			int alpha)
@@ -473,9 +475,9 @@ bool drawInfoBox(int px,
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
 
-	int w = (board_Test->w / 100.0) * scale;
-	int h = (board_Test->h / 100.0) * scale;
-	printf("Data WxH - WxH = %ix%i - %ix%i\n", w, h, board_Test->w, board_Test->h);
+	int w = (tpoint->w / 100.0) * scale;
+	int h = (tpoint->h / 100.0) * scale;
+
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	int tw = orb_bl->w;
 	int th = orb_bl->h;
@@ -615,13 +617,13 @@ bool drawInfoBox(int px,
 	glFinish();
 
 	/* Draw Box + Contents */
-	tw = board_Test->w;
-	th = board_Test->h;
+	tw = tpoint->w;
+	th = tpoint->h;
 	Mode = GL_RGB;
-	if(board_Test->format->BytesPerPixel == 4) {
+	if(tpoint->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, board_Test->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, tpoint->pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
@@ -999,7 +1001,11 @@ void doDisplay() {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
 
-	drawInfoBox(25, 75, 100, 255);
+	drawInfoBox(board_Test, 25, 75, (100.0/255.0)*wFadeV, wFadeV);
+	/* Draw a box to the *Right* of the Board Test */
+	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, (100.0/255.0)*wFadeV, wFadeV);
+	/* Now draw another above */
+	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, (100.0/255.0)*255, 255);
 
 	SDL_GL_SwapBuffers();
 }
