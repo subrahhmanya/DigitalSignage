@@ -1143,17 +1143,12 @@ int main( int argc, char* argv[] ) {
 		return 1;
 	}
 
-    //Timer used to calculate the frames per second
-    Timer fps;
-
     //Timer used to update the caption
     Timer update;
 
     //Start the update timer
     update.start();
 
-    //Start the frame timer
-    fps.start();
 	sprintf(sFPS, "0");
 	while ( IS_RUNNING ) {
 		doDisplay();
