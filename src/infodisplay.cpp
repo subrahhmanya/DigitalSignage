@@ -44,6 +44,8 @@ int wLastCheckH, wLastCheckM, wUpdateTimer;
 int wFadeV = 255;
 int wFadeA = 0;
 int wCurDisp=0;
+int dFPS = 0;
+char sFPS[32];
 int tC1 = 0;
 bool bV1 = false;
 bool wOK = false;
@@ -121,6 +123,129 @@ bool drawInfoBox(SDL_Surface *tpoint,
 bool FileExists( const char* FileName );
 void doDisplay();
 bool init();
+
+//The timer
+class Timer
+{
+	private:
+	//The clock time when the timer started
+	int startTicks;
+
+	//The ticks stored when the timer was paused
+	int pausedTicks;
+
+	//The timer status
+	bool paused;
+	bool started;
+
+	public:
+	//Initializes variables
+	Timer();
+
+	//The various clock actions
+	void start();
+	void stop();
+	void pause();
+	void unpause();
+
+	//Gets the timer's time
+	int get_ticks();
+
+	//Checks the status of the timer
+	bool is_started();
+	bool is_paused();
+};
+
+Timer::Timer()
+{
+    //Initialize the variables
+    startTicks = 0;
+    pausedTicks = 0;
+    paused = false;
+    started = false;
+}
+
+void Timer::start()
+{
+    //Start the timer
+    started = true;
+
+    //Unpause the timer
+    paused = false;
+
+    //Get the current clock time
+    startTicks = SDL_GetTicks();
+}
+
+void Timer::stop()
+{
+    //Stop the timer
+    started = false;
+
+    //Unpause the timer
+    paused = false;
+}
+
+void Timer::pause()
+{
+    //If the timer is running and isn't already paused
+    if( ( started == true ) && ( paused == false ) )
+    {
+        //Pause the timer
+        paused = true;
+
+        //Calculate the paused ticks
+        pausedTicks = SDL_GetTicks() - startTicks;
+    }
+}
+
+void Timer::unpause()
+{
+    //If the timer is paused
+    if( paused == true )
+    {
+        //Unpause the timer
+        paused = false;
+
+        //Reset the starting ticks
+        startTicks = SDL_GetTicks() - pausedTicks;
+
+        //Reset the paused ticks
+        pausedTicks = 0;
+    }
+}
+
+int Timer::get_ticks()
+{
+    //If the timer is running
+    if( started == true )
+    {
+        //If the timer is paused
+        if( paused == true )
+        {
+            //Return the number of ticks when the timer was paused
+            return pausedTicks;
+        }
+        else
+        {
+            //Return the current time minus the start time
+            return SDL_GetTicks() - startTicks;
+        }
+    }
+
+    //If the timer isn't running
+    return 0;
+}
+
+bool Timer::is_started()
+{
+    return started;
+}
+
+bool Timer::is_paused()
+{
+    return paused;
+}
 
 static void parseWeather(xmlNode * a_node)
 {
@@ -475,8 +600,8 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
 
-	int w = (tpoint->w / 100.0) * scale;
-	int h = (tpoint->h / 100.0) * scale;
+	int w = (tpoint->w / 255.0) * scale;
+	int h = (tpoint->h / 255.0) * scale;
 
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	int tw = orb_bl->w;
@@ -838,7 +963,9 @@ void doDisplay() {
 			wLastCheckM = ltm->tm_min;
 
 			if (ltm->tm_min < 10)
+				{
 				printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+				}
 			else
 				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 
@@ -1001,12 +1128,13 @@ void doDisplay() {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
 
-	drawInfoBox(board_Test, 25, 75, (100.0/255.0)*wFadeV, wFadeV);
+	drawInfoBox(board_Test, 25, 75, wFadeV, wFadeV);
 	/* Draw a box to the *Right* of the Board Test */
-	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, (100.0/255.0)*wFadeV, wFadeV);
+	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, wFadeV, wFadeV);
 	/* Now draw another above */
-	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, (100.0/255.0)*255, 255);
+	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, 255, 255);
 
+	drawText(sFPS, fntCGothic22, 2, 255, 255, 255, 255, 1275, 695);
 	SDL_GL_SwapBuffers();
 }
 
@@ -1015,9 +1143,31 @@ int main( int argc, char* argv[] ) {
 		return 1;
 	}
 
+    //Timer used to calculate the frames per second
+    Timer fps;
+
+    //Timer used to update the caption
+    Timer update;
+
+    //Start the update timer
+    update.start();
+
+    //Start the frame timer
+    fps.start();
+	sprintf(sFPS, "0");
 	while ( IS_RUNNING ) {
 		doDisplay();
+		dFPS++;
 		SDL_Delay(1000 / SCREEN_TARGET_FPS);
+
+        if( update.get_ticks() > 1000 )
+        {
+		sprintf(sFPS, "%i FPS", dFPS);
+		dFPS=0;
+            //Restart the update timer
+            update.start();
+        }
+
 	}
 
 	glMatrixMode(GL_PROJECTION);
