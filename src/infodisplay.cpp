@@ -608,6 +608,10 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
 
+	/* We don't want the border to have less opacity than the contents, so match contents to border if required */
+	if (balpha < calpha)
+		calpha = balpha;
+
 	int w = (tpoint->w / 255.0) * scale;
 	int h = (tpoint->h / 255.0) * scale;
 
@@ -1138,9 +1142,9 @@ void doDisplay() {
 
 	drawInfoBox(board_Test, 25, 75, 1.0f, 1.0f, 1.0f, wFadeV, 255, wFadeV);
 	/* Draw a box to the *Right* of the Board Test */
-	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, 0.0f, 0.0f, 1.0f, wFadeV, 255, wFadeV);
+	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, 0.0f, 0.0f, 1.0f, wFadeV, 255, 255);
 	/* Now draw another above */
-	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, 1.0f, 0.0f, 0.0f, 255, 255, 255);
+	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, 1.0f, 0.0f, 0.0f, 255, wFadeV, 255);
 
 	drawText(sFPS, fntCGothic22, 2, 255, 255, 255, 255, 1275, 695);
 	SDL_GL_SwapBuffers();
