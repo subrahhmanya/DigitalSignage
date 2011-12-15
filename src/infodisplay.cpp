@@ -1140,11 +1140,7 @@ void doDisplay() {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
 
-	drawInfoBox(board_Test, 25, 75, 1.0f, 1.0f, 1.0f, wFadeV, 255, wFadeV);
-	/* Draw a box to the *Right* of the Board Test */
-	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, 0.0f, 0.0f, 1.0f, wFadeV, 255, 255);
-	/* Now draw another above */
-	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, 1.0f, 0.0f, 0.0f, 255, wFadeV, 255);
+	drawInfoBox(board_Test, 25, 75, 1.0f, 1.0f, 1.0f, 255, 255, 255);
 
 	drawText(sFPS, fntCGothic22, 2, 255, 255, 255, 255, 1275, 695);
 	SDL_GL_SwapBuffers();
