@@ -117,8 +117,12 @@ bool drawTexture(SDL_Surface *tpoint,
 bool drawInfoBox(SDL_Surface *tpoint,
 			int px,
 			int py,
+			float br,
+			float bg,
+			float bb,
 			int scale,
-			int alpha);
+			int balpha,
+			int calpha);
 
 bool FileExists( const char* FileName );
 void doDisplay();
@@ -594,8 +598,12 @@ bool drawTexture(SDL_Surface *tpoint,
 bool drawInfoBox(SDL_Surface *tpoint,
 			int px,
 			int py,
+			float br,
+			float bg,
+			float bb,
 			int scale,
-			int alpha)
+			int balpha,
+			int calpha)
 {
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
@@ -617,7 +625,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	/* Testing of Box Drawing on screen */
-	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
+	glColor4f(br, bg, bb, (float)balpha/255.0);
 
 	/* Draw Left Border */
 	glBegin(GL_QUADS);
@@ -755,7 +763,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 
-	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
+	glColor4f(1.0f, 1.0f, 1.0f, (float)calpha/255.0);
 
 	/* Draw a quad at location */
 	glBegin(GL_QUADS);
@@ -1128,11 +1136,11 @@ void doDisplay() {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
 
-	drawInfoBox(board_Test, 25, 75, wFadeV, wFadeV);
+	drawInfoBox(board_Test, 25, 75, 1.0f, 1.0f, 1.0f, wFadeV, 255, wFadeV);
 	/* Draw a box to the *Right* of the Board Test */
-	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, wFadeV, wFadeV);
+	drawInfoBox(wTex_snow, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75, 0.0f, 0.0f, 1.0f, wFadeV, 255, wFadeV);
 	/* Now draw another above */
-	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, 255, 255);
+	drawInfoBox(wTex_sunny, ((board_Test->w / 255.0) * wFadeV) + 42 + 25, 75 + ((wTex_snow->h / 255.0) * wFadeV) + 42, 1.0f, 0.0f, 0.0f, 255, 255, 255);
 
 	drawText(sFPS, fntCGothic22, 2, 255, 255, 255, 255, 1275, 695);
 	SDL_GL_SwapBuffers();
