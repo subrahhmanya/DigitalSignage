@@ -973,7 +973,6 @@ void doDisplay() {
 
 		/* Draw weather condition icon */
 
-
 		if (wCelcius <= 3.0)
 			drawTexture(wTex_cold, 185, 0, (255-wFadeV[1]),3);
 		else if (wCelcius >= 25.0)
@@ -1063,7 +1062,7 @@ void doDisplay() {
 		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
 	}
 
-	drawInfoBox(board_Test, 25, 85, 1.0f, 1.0f, 1.0f, 255, 255, 255);
+//	drawInfoBox(board_Test, 25, 85, 1.0f, 1.0f, 1.0f, 255, 255, 255);
 
 	/* Are we Animating? */
 	if ((dAnim[0] == 1) || (dAnim[1] == 1) || (dAnim[2] == 1) || (dAnim[3] == 1) || (dAnim[4] == 1))
