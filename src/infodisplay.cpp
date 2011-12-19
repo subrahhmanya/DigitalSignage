@@ -1211,7 +1211,7 @@ void doDisplay() {
 			1.0f,
 			255,
 			255,
-			255);
+			wFadeV[0]);
 
 	/* Orbital Logo above everything else */
 	if (FileExists("/screen/white")) {
