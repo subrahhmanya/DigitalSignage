@@ -101,7 +101,8 @@ SDL_Surface *wTex_smoke;
 SDL_Surface *wTex_snow;
 SDL_Surface *wTex_hot;
 SDL_Surface *wTex_thunderstorm;
-SDL_Surface *board_Test;
+SDL_Surface *board_TestA;
+SDL_Surface *board_TestB;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -880,7 +881,8 @@ bool init() {
 	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.png");
 
 	/* This is a testing texture */
-	board_Test = IMG_Load("/screen/boards/1/1.png");
+	board_TestA = IMG_Load("/screen/boards/1/1.png");
+	board_TestB = IMG_Load("/screen/boards/1/2.png");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -958,15 +960,15 @@ void doDisplay() {
 
 	/* Draw Text */
 	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 420, 670);
-	drawText(dateString, fntCGothic34, 2, 255, 255, 255, 255, 1275, 5);
+	drawText(dateString, fntCGothic34, 2, 255, 255, 255, 255, 1275, 10);
 
 	if (bV1)
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 47, 7);
+			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 47, 12);
 		else
-			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 27, 7);
+			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 27, 12);
 
-	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1180, 28);
+	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1180, 33);
 
 	/* Do Weather Check (update once every 15 minutes) */
 	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
@@ -1097,11 +1099,11 @@ void doDisplay() {
 		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic34, 1, 128, 128, 255, 255, 10, 5);
+			drawText(wTemp, fntCGothic34, 1, 128, 128, 255, 255, 10, 10);
 		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic34, 1, 255, 0, 0, 255, 10, 5);
+			drawText(wTemp, fntCGothic34, 1, 255, 0, 0, 255, 10, 10);
 		else
-			drawText(wTemp, fntCGothic34, 1, 255, 255, 255, 255, 10, 5);
+			drawText(wTemp, fntCGothic34, 1, 255, 255, 255, 255, 10, 10);
 
 		int pCIW = pTWidth;
 
@@ -1180,23 +1182,40 @@ void doDisplay() {
 
 		switch(wCurDisp)
 		{
-			case 0:drawText(wCondition, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 5);;break;
-			case 1:drawText(wHumidity, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 5);;break;
-			case 2:drawText(wWind, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 5);;break;
+			case 0:drawText(wCondition, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 10);;break;
+			case 1:drawText(wHumidity, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 10);;break;
+			case 2:drawText(wWind, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 10);;break;
 		}
 	} else {
-		drawText("Weather Unavailable", fntCGothic34, 1, 255, 255, 255, 255, 10, 5);
+		drawText("Weather Unavailable", fntCGothic34, 1, 255, 255, 255, 255, 10, 10);
 	}
 
-	/* Are we Animating? */
-	if ((dAnim[0] == 1) || (dAnim[1] == 1) || (dAnim[2] == 1) || (dAnim[3] == 1) || (dAnim[4] == 1))
-		SCREEN_TARGET_FPS = 30;
-	else
-		SCREEN_TARGET_FPS = 5;
+	/* Draw Boards */
+	drawInfoBox(board_TestA,
+			1,
+			18,
+			68,
+			1.0f,
+			1.0f,
+			1.0f,
+			255,
+			255,
+			255);
+
+	drawInfoBox(board_TestB,
+			1,
+			653,
+			68,
+			1.0f,
+			1.0f,
+			1.0f,
+			255,
+			255,
+			255);
 
 	/* Orbital Logo above everything else */
 	drawInfoBox(orb_logo,
-			3,
+			1,
 			(1280/2)-((orb_logo->w/4)),
 			10,
 			1.0f,
@@ -1205,6 +1224,12 @@ void doDisplay() {
 			128,
 			255,
 			255);
+
+	/* Are we Animating? */
+	if ((dAnim[0] == 1) || (dAnim[1] == 1) || (dAnim[2] == 1) || (dAnim[3] == 1) || (dAnim[4] == 1))
+		SCREEN_TARGET_FPS = 30;
+	else
+		SCREEN_TARGET_FPS = 5;
 
 	SDL_GL_SwapBuffers();
 }
@@ -1267,7 +1292,8 @@ int main( int argc, char* argv[] ) {
 	SDL_FreeSurface(wTex_snow);
 	SDL_FreeSurface(wTex_hot);
 	SDL_FreeSurface(wTex_thunderstorm);
-	SDL_FreeSurface(board_Test);
+	SDL_FreeSurface(board_TestA);
+	SDL_FreeSurface(board_TestB);
 	SDL_FreeSurface(screen);
 
 	TTF_Quit();
