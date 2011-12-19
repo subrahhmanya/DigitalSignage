@@ -34,7 +34,9 @@ int SCREEN_TARGET_FPS = 5;
 SDL_Surface* screen = NULL;
 
 /* Define Fonts */
+TTF_Font *fntCGothic16;
 TTF_Font *fntCGothic22;
+TTF_Font *fntCGothic36;
 TTF_Font *fntCGothic44;
 TTF_Font *fntCGothic48;
 
@@ -58,6 +60,7 @@ char wHumidity[32];
 char wIcon[64];
 char wWind[32];
 int wIWind=0;
+int pTWidth=0;
 float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 
@@ -393,6 +396,7 @@ bool drawText(const char *text,
 	/* return the deltas in the unused w,h part of the rect */
 	location.w = initial->w;
 	location.h = initial->h;
+	pTWidth = initial->w;
 
 	/* Clean up */
 	SDL_FreeSurface(initial);
@@ -468,6 +472,7 @@ bool drawTexture(SDL_Surface *tpoint,
 	/* return the deltas in the unused w,h part of the rect */
 	location.w = tpoint->w;
 	location.h = tpoint->h;
+	pTWidth = tpoint->w/scale;
 
 	/* Clean up */
 	glDeleteTextures(1, &TextureID);
@@ -705,8 +710,24 @@ bool init() {
 	}
 
 	/* Load Fonts */
+	fntCGothic16 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 16);
+	if(fntCGothic16 == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		IS_RUNNING=false;
+		return false;
+	}
+
 	fntCGothic22 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 22);
 	if(fntCGothic22 == NULL) {
+		fprintf( stderr, "Failed when loading Font: %s\n",
+		SDL_GetError( ) );
+		IS_RUNNING=false;
+		return false;
+	}
+
+	fntCGothic36 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 36);
+	if(fntCGothic36 == NULL) {
 		fprintf( stderr, "Failed when loading Font: %s\n",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
@@ -831,10 +852,8 @@ void doDisplay() {
 			bV1 = true;
 		tC1 = ltm->tm_sec;
 	}
-	if (bV1)
-		sprintf(dateString, "%i:%s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
-	else
-		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+
+	sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 	/* Main Drawing Section*/
 
@@ -842,11 +861,18 @@ void doDisplay() {
 
 	/* Draw Text */
 	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 450, 655);
-	drawText(dateString, fntCGothic44, 2, 255, 255, 255, 255, 1270, 10);
-	drawText(nthsInWord, fntCGothic22, 1, 255, 255, 255, 255, 1147, 38);
+	drawText(dateString, fntCGothic36, 2, 255, 255, 255, 255, 1275, 5);
+
+	if (bV1)
+		if (ltm->tm_hour > 9)
+			drawText(":", fntCGothic36, 2, 255, 255, 255, 255, 1275 - pTWidth + 49, 7);
+		else
+			drawText(":", fntCGothic36, 2, 255, 255, 255, 255, 1275 - pTWidth + 29, 7);
+
+	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1173, 28);
 
 	/* Do Weather Check (update once every 15 minutes) */
-	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45))
+	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
 	{
 		if (wLastCheckM != ltm->tm_min)
 		{
@@ -971,98 +997,99 @@ void doDisplay() {
 			}
 		}
 
-		/* Draw weather condition icon */
+		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
-			drawTexture(wTex_cold, 185, 0, (255-wFadeV[1]),3);
+			drawText(wTemp, fntCGothic36, 1, 128, 128, 255, 255, 10, 5);
 		else if (wCelcius >= 25.0)
-			drawTexture(wTex_hot, 185, 0, (255-wFadeV[1]),3);
+			drawText(wTemp, fntCGothic36, 1, 255, 0, 0, 255, 10, 5);
+		else
+			drawText(wTemp, fntCGothic36, 1, 255, 255, 255, 255, 10, 5);
+
+		int pCIW = pTWidth;
+
+		/* Draw weather condition icon */
+		if (wCelcius <= 3.0)
+			drawTexture(wTex_cold, pCIW+15, 0, (255-wFadeV[1]),4);
+		else if (wCelcius >= 25.0)
+			drawTexture(wTex_hot, pCIW+15, 0, (255-wFadeV[1]),4);
 
 		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_storm, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_chance_of_storm, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0 )
-			drawTexture(wTex_mostly_sunny, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_mostly_sunny, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0 )
-			drawTexture(wTex_dust, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_dust, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0 )
-			drawTexture(wTex_mostly_cloudy, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_mostly_cloudy, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0 )
-			drawTexture(wTex_cloudy, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_cloudy, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_tstorm, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_chance_of_tstorm, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) ==0 )
-			drawTexture(wTex_partly_cloudy, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_partly_cloudy, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0 )
-			drawTexture(wTex_storm, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_storm, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0 )
-			drawTexture(wTex_sunny, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_sunny, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0 )
-			drawTexture(wTex_flurries, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_flurries, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_snow, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_chance_of_snow, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_rain, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_chance_of_rain, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0 )
-			drawTexture(wTex_fog, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_fog, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0 )
-			drawTexture(wTex_icy, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_icy, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0 )
-			drawTexture(wTex_sleet, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_sleet, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0 )
-			drawTexture(wTex_rain, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_rain, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0 )
-			drawTexture(wTex_mist, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_mist, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0 )
-			drawTexture(wTex_haze, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_haze, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0 )
-			drawTexture(wTex_smoke, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_smoke, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0 )
-			drawTexture(wTex_snow, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_snow, pCIW+15, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0 )
-			drawTexture(wTex_thunderstorm, 185, 0, wFadeV[1],3);
+			drawTexture(wTex_thunderstorm, pCIW+15, 0, wFadeV[1],4);
 
 		/* Draw Leaves over Weather Icon if wind is 20mph+ */
 		if (wIWind >= 20)
-			drawTexture(wTex_windy, 185, 0, 255, 3);
-
-		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic44, 1, 128, 128, 255, 255, 18, 10);
-		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic44, 1, 255, 0, 0, 255, 18, 10);
-		else
-			drawText(wTemp, fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
+			drawTexture(wTex_windy, pCIW+15, 0, 255, 4);
 
 		switch(wCurDisp)
 		{
-			case 0:drawText(wCondition, fntCGothic44, 1, 255, 255, 255, wFadeV[0], 275, 10);;break;
-			case 1:drawText(wHumidity, fntCGothic44, 1, 255, 255, 255, wFadeV[0], 275, 10);;break;
-			case 2:drawText(wWind, fntCGothic44, 1, 255, 255, 255, wFadeV[0], 275, 10);;break;
+			case 0:drawText(wCondition, fntCGothic36, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 20, 5);;break;
+			case 1:drawText(wHumidity, fntCGothic36, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 20, 5);;break;
+			case 2:drawText(wWind, fntCGothic36, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 20, 5);;break;
 		}
 	} else {
-		drawText("Weather Unavailable", fntCGothic44, 1, 255, 255, 255, 255, 18, 10);
+		drawText("Weather Unavailable", fntCGothic36, 1, 255, 255, 255, 255, 10, 5);
 	}
-
-//	drawInfoBox(board_Test, 25, 85, 1.0f, 1.0f, 1.0f, 255, 255, 255);
 
 	/* Are we Animating? */
 	if ((dAnim[0] == 1) || (dAnim[1] == 1) || (dAnim[2] == 1) || (dAnim[3] == 1) || (dAnim[4] == 1))
@@ -1089,6 +1116,8 @@ int main( int argc, char* argv[] ) {
 	glPopMatrix();
 
 	TTF_CloseFont(fntCGothic22);
+	TTF_CloseFont(fntCGothic16);
+	TTF_CloseFont(fntCGothic36);
 	TTF_CloseFont(fntCGothic44);
 	TTF_CloseFont(fntCGothic48);
 
