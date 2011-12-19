@@ -1217,23 +1217,23 @@ void doDisplay() {
 	if (FileExists("/screen/white")) {
 		drawInfoBox(orb_logo,
 				2,
-				(1280/2)-((((orb_logo->w / 255.0) * 160)+8)/2),
+				(1280/2)-((((orb_logo->w / 255.0) * 157)+8)/2),
 				10,
 				1.0f,
 				1.0f,
 				1.0f,
-				160,
+				157,
 				255,
 				255);
 	} else {
 		drawInfoBox(orb_logo,
 				1,
-				(1280/2)-((((orb_logo->w / 255.0) * 160)+8)/2),
+				(1280/2)-((((orb_logo->w / 255.0) * 157)+8)/2),
 				10,
 				1.0f,
 				1.0f,
 				1.0f,
-				160,
+				157,
 				255,
 				255);
 	}
