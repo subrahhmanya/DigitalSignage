@@ -1214,16 +1214,29 @@ void doDisplay() {
 			255);
 
 	/* Orbital Logo above everything else */
-	drawInfoBox(orb_logo,
-			1,
-			(1280/2)-((orb_logo->w/4)),
-			10,
-			1.0f,
-			1.0f,
-			1.0f,
-			128,
-			255,
-			255);
+	if (FileExists("/screen/white")) {
+		drawInfoBox(orb_logo,
+				2,
+				(1280/2)-((orb_logo->w/4)),
+				10,
+				1.0f,
+				1.0f,
+				1.0f,
+				128,
+				255,
+				255);
+	} else {
+		drawInfoBox(orb_logo,
+				1,
+				(1280/2)-((orb_logo->w/4)),
+				10,
+				1.0f,
+				1.0f,
+				1.0f,
+				128,
+				255,
+				255);
+	}
 
 	/* Are we Animating? */
 	if ((dAnim[0] == 1) || (dAnim[1] == 1) || (dAnim[2] == 1) || (dAnim[3] == 1) || (dAnim[4] == 1))
