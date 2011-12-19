@@ -72,6 +72,8 @@ SDL_Surface *orb_bcrnr;
 SDL_Surface *orb_wl;
 SDL_Surface *orb_wt;
 SDL_Surface *orb_wcrnr;
+SDL_Surface *orb_boxb;
+SDL_Surface *orb_boxw;
 SDL_Surface *wTex_chance_of_storm;
 SDL_Surface *wTex_mostly_sunny;
 SDL_Surface *wTex_dust;
@@ -376,7 +378,7 @@ bool drawText(const char *text,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	/* prepare to render our texture */
-	glEnable(GL_TEXTURE_2D);
+//	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
 
@@ -452,7 +454,7 @@ bool drawTexture(SDL_Surface *tpoint,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	/* prepare to render our texture */
-	glEnable(GL_TEXTURE_2D);
+//	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
 
@@ -494,6 +496,11 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			int balpha,
 			int calpha)
 {
+	/* Box Types (bcol)
+		1 = Black BG
+		2 = White BG
+		3 = Transparent BG */
+
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
 	SDL_Surface *brdr_top;
@@ -504,17 +511,18 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	if (balpha < calpha)
 		calpha = balpha;
 
-	if (bcol == 1)
+	switch(bcol)
 	{
-		brdr_top = orb_bt;
-		brdr_left = orb_bl;
-		brdr_crnr = orb_bcrnr;
-	}
-	else
-	{
-		brdr_top = orb_wt;
-		brdr_left = orb_wl;
-		brdr_crnr = orb_wcrnr;
+		case 1:
+			brdr_top = orb_bt;
+			brdr_left = orb_bl;
+			brdr_crnr = orb_bcrnr;
+			break;
+		case 2:
+			brdr_top = orb_wt;
+			brdr_left = orb_wl;
+			brdr_crnr = orb_wcrnr;
+			break;
 	}
 
 	int w = (tpoint->w / 255.0) * scale;
@@ -531,7 +539,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
-	glEnable(GL_TEXTURE_2D);
+//	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	/* Testing of Box Drawing on screen */
 	glColor4f(br, bg, bb, (float)balpha/255.0);
@@ -661,20 +669,69 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Draw Box + Contents */
 	tw = tpoint->w;
 	th = tpoint->h;
+
+	if (bcol != 3)
+	{
+		/* Draw a quad at location */
+		if (bcol == 1)
+		{
+			Mode = GL_RGB;
+			if(tpoint->format->BytesPerPixel == 4) {
+				Mode = GL_RGBA;
+			}
+
+			glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, orb_boxb->pixels);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			/* prepare to render our texture */
+			glBindTexture(GL_TEXTURE_2D, TextureID);
+		} else {
+			Mode = GL_RGB;
+			if(tpoint->format->BytesPerPixel == 4) {
+				Mode = GL_RGBA;
+			}
+
+			glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, orb_boxw->pixels);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			/* prepare to render our texture */
+			glBindTexture(GL_TEXTURE_2D, TextureID);
+		}
+
+		glColor4f(1.0f, 1.0f, 1.0f, (float)balpha/255.0);
+
+		glBegin(GL_QUADS);
+			/* Recall that the origin is in the lower-left corner
+			   That is why the TexCoords specify different corners
+			   than the Vertex coors seem to. */
+			glTexCoord2f(0.0f, 1.0f);
+				glVertex2f(px, py);
+			glTexCoord2f(1.0f, 1.0f);
+				glVertex2f(px + w, py);
+			glTexCoord2f(1.0f, 0.0f);
+				glVertex2f(px + w, py + h);
+			glTexCoord2f(0.0f, 0.0f);
+				glVertex2f(px, py + h);
+		glEnd();
+		/* Bad things happen if we delete the texture before it finishes */
+		glFinish();
+	}
+
+	/* Now draw Texture */
+
 	Mode = GL_RGB;
 	if(tpoint->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
+
 	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, tpoint->pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
-
 	glColor4f(1.0f, 1.0f, 1.0f, (float)calpha/255.0);
 
-	/* Draw a quad at location */
 	glBegin(GL_QUADS);
 		/* Recall that the origin is in the lower-left corner
 		   That is why the TexCoords specify different corners
@@ -779,6 +836,8 @@ bool init() {
 	orb_wl = IMG_Load("/screen/textures/orb_wl.png");
 	orb_wt = IMG_Load("/screen/textures/orb_wt.png");
 	orb_wcrnr = IMG_Load("/screen/textures/orb_wcrnr.png");
+	orb_boxb = IMG_Load("/screen/textures/orb_boxb.png");
+	orb_boxw = IMG_Load("/screen/textures/orb_boxw.png");
 	wTex_chance_of_storm = IMG_Load("/screen/textures/weather/chance_of_storm.png");
 	wTex_mostly_sunny = IMG_Load("/screen/textures/weather/mostly_sunny.png");
 	wTex_dust = IMG_Load("/screen/textures/weather/dust.png");
@@ -881,15 +940,15 @@ void doDisplay() {
 
 	/* Main Drawing Section*/
 
-	drawTexture(orb_logo, 15, 620, 255,1);
+//	drawTexture(orb_logo, 15, 620, 255,1);
 
 	drawInfoBox(orb_logo,
 			2,
 			15,
 			620,
-			1.0,
-			1.0,
-			1.0,
+			1.0f,
+			1.0f,
+			1.0f,
 			255,
 			255,
 			255);
@@ -1165,6 +1224,8 @@ int main( int argc, char* argv[] ) {
 	SDL_FreeSurface(orb_wl);
 	SDL_FreeSurface(orb_wt);
 	SDL_FreeSurface(orb_wcrnr);
+	SDL_FreeSurface(orb_boxb);
+	SDL_FreeSurface(orb_boxw);
 	SDL_FreeSurface(wTex_chance_of_storm);
 	SDL_FreeSurface(wTex_mostly_sunny);
 	SDL_FreeSurface(wTex_dust);
