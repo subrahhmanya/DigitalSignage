@@ -36,7 +36,7 @@ SDL_Surface* screen = NULL;
 /* Define Fonts */
 TTF_Font *fntCGothic16;
 TTF_Font *fntCGothic22;
-TTF_Font *fntCGothic36;
+TTF_Font *fntCGothic34;
 TTF_Font *fntCGothic44;
 TTF_Font *fntCGothic48;
 
@@ -72,6 +72,9 @@ SDL_Surface *orb_bcrnr;
 SDL_Surface *orb_wl;
 SDL_Surface *orb_wt;
 SDL_Surface *orb_wcrnr;
+SDL_Surface *orb_tl;
+SDL_Surface *orb_tt;
+SDL_Surface *orb_tcrnr;
 SDL_Surface *orb_boxb;
 SDL_Surface *orb_boxw;
 SDL_Surface *wTex_chance_of_storm;
@@ -523,6 +526,11 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			brdr_left = orb_wl;
 			brdr_crnr = orb_wcrnr;
 			break;
+		case 3:
+			brdr_top = orb_tt;
+			brdr_left = orb_tl;
+			brdr_crnr = orb_tcrnr;
+			break;
 	}
 
 	int w = (tpoint->w / 255.0) * scale;
@@ -547,24 +555,24 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Draw Left Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px-16, py);
+		glVertex2f(px-12, py+4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px, py);
+		glVertex2f(px+4, py+4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px, py+h);
+		glVertex2f(px+4, py+h-4);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px-16, py+h);
+		glVertex2f(px-12, py+h-4);
 	glEnd();
 	/* Draw Right Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+w+16, py);
+		glVertex2f(px+w+12, py+4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w, py);
+		glVertex2f(px+w-4, py+4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w, py+h);
+		glVertex2f(px+w-4, py+h-4);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+w+16, py+h);
+		glVertex2f(px+w+12, py+h-4);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
@@ -584,24 +592,24 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Draw Top Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px, py+h);
+		glVertex2f(px+4, py+h-4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w, py+h);
+		glVertex2f(px+w-4, py+h-4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w, py+h+16);
+		glVertex2f(px+w-4, py+h+12);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px, py+h+16);
+		glVertex2f(px+4, py+h+12);
 	glEnd();
 	/* Draw Bottom Border */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px, py);
+		glVertex2f(px+4, py+4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w, py);
+		glVertex2f(px+w-4, py+4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w, py-16);
+		glVertex2f(px+w-4, py-12);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px, py-16);
+		glVertex2f(px+4, py-12);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
@@ -621,62 +629,62 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Draw TL */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px-16, py+h);
+		glVertex2f(px-12, py+h-4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px, py+h);
+		glVertex2f(px+4, py+h-4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px, py + h + 16);
+		glVertex2f(px+4, py + h + 12);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px-16, py + h + 16);
+		glVertex2f(px-12, py + h + 12);
 	glEnd();
 	/* Draw BL */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px-16, py);
+		glVertex2f(px-12, py+4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px, py);
+		glVertex2f(px+4, py+4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px, py-16);
+		glVertex2f(px+4, py-12);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px-16, py-16);
+		glVertex2f(px-12, py-12);
 	glEnd();
 	/* Draw TR */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+w+16, py+h);
+		glVertex2f(px+w+12, py+h-4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w, py+h);
+		glVertex2f(px+w-4, py+h-4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w, py+h+16);
+		glVertex2f(px+w-4, py+h+12);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+w+16, py+h+16);
+		glVertex2f(px+w+12, py+h+12);
 	glEnd();
 	/* Draw BR */
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px+w+16, py);
+		glVertex2f(px+w+12, py+4);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px+w, py);
+		glVertex2f(px+w-4, py+4);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px+w, py-16);
+		glVertex2f(px+w-4, py-12);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px+w+16, py-16);
+		glVertex2f(px+w+12, py-12);
 	glEnd();
 
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
 	/* Draw Box + Contents */
-	tw = tpoint->w;
-	th = tpoint->h;
-
 	if (bcol != 3)
 	{
 		/* Draw a quad at location */
 		if (bcol == 1)
 		{
+			tw = orb_boxb->w;
+			th = orb_boxb->h;
+
 			Mode = GL_RGB;
-			if(tpoint->format->BytesPerPixel == 4) {
+			if(orb_boxb->format->BytesPerPixel == 4) {
 				Mode = GL_RGBA;
 			}
 
@@ -686,8 +694,11 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			/* prepare to render our texture */
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 		} else {
+			tw = orb_boxw->w;
+			th = orb_boxw->h;
+
 			Mode = GL_RGB;
-			if(tpoint->format->BytesPerPixel == 4) {
+			if(orb_boxb->format->BytesPerPixel == 4) {
 				Mode = GL_RGBA;
 			}
 
@@ -698,7 +709,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 		}
 
-		glColor4f(1.0f, 1.0f, 1.0f, (float)balpha/255.0);
+		glColor4f(br, bg, bb, (float)balpha/255.0);
 
 		glBegin(GL_QUADS);
 			/* Recall that the origin is in the lower-left corner
@@ -718,6 +729,8 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	}
 
 	/* Now draw Texture */
+	tw = tpoint->w;
+	th = tpoint->h;
 
 	Mode = GL_RGB;
 	if(tpoint->format->BytesPerPixel == 4) {
@@ -804,8 +817,8 @@ bool init() {
 		return false;
 	}
 
-	fntCGothic36 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 36);
-	if(fntCGothic36 == NULL) {
+	fntCGothic34 = TTF_OpenFont("/screen/fonts/cgothic.ttf", 34);
+	if(fntCGothic34 == NULL) {
 		fprintf( stderr, "Failed when loading Font: %s\n",
 		SDL_GetError( ) );
 		IS_RUNNING=false;
@@ -836,6 +849,9 @@ bool init() {
 	orb_wl = IMG_Load("/screen/textures/orb_wl.png");
 	orb_wt = IMG_Load("/screen/textures/orb_wt.png");
 	orb_wcrnr = IMG_Load("/screen/textures/orb_wcrnr.png");
+	orb_tl = IMG_Load("/screen/textures/orb_tl.png");
+	orb_tt = IMG_Load("/screen/textures/orb_tt.png");
+	orb_tcrnr = IMG_Load("/screen/textures/orb_tcrnr.png");
 	orb_boxb = IMG_Load("/screen/textures/orb_boxb.png");
 	orb_boxw = IMG_Load("/screen/textures/orb_boxw.png");
 	wTex_chance_of_storm = IMG_Load("/screen/textures/weather/chance_of_storm.png");
@@ -940,31 +956,17 @@ void doDisplay() {
 
 	/* Main Drawing Section*/
 
-//	drawTexture(orb_logo, 15, 620, 255,1);
-
-	drawInfoBox(orb_logo,
-			2,
-			15,
-			620,
-			1.0f,
-			1.0f,
-			1.0f,
-			255,
-			255,
-			255);
-
-
 	/* Draw Text */
-	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 450, 655);
-	drawText(dateString, fntCGothic36, 2, 255, 255, 255, 255, 1275, 5);
+	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 420, 670);
+	drawText(dateString, fntCGothic34, 2, 255, 255, 255, 255, 1275, 5);
 
 	if (bV1)
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic36, 2, 255, 255, 255, 255, 1275 - pTWidth + 49, 7);
+			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 47, 7);
 		else
-			drawText(":", fntCGothic36, 2, 255, 255, 255, 255, 1275 - pTWidth + 29, 7);
+			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 27, 7);
 
-	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1173, 28);
+	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1180, 28);
 
 	/* Do Weather Check (update once every 15 minutes) */
 	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
@@ -1095,95 +1097,95 @@ void doDisplay() {
 		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic36, 1, 128, 128, 255, 255, 10, 5);
+			drawText(wTemp, fntCGothic34, 1, 128, 128, 255, 255, 10, 5);
 		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic36, 1, 255, 0, 0, 255, 10, 5);
+			drawText(wTemp, fntCGothic34, 1, 255, 0, 0, 255, 10, 5);
 		else
-			drawText(wTemp, fntCGothic36, 1, 255, 255, 255, 255, 10, 5);
+			drawText(wTemp, fntCGothic34, 1, 255, 255, 255, 255, 10, 5);
 
 		int pCIW = pTWidth;
 
 		/* Draw weather condition icon */
 		if (wCelcius <= 3.0)
-			drawTexture(wTex_cold, pCIW+15, 0, (255-wFadeV[1]),4);
+			drawTexture(wTex_cold, pCIW+12, 0, (255-wFadeV[1]),4);
 		else if (wCelcius >= 25.0)
-			drawTexture(wTex_hot, pCIW+15, 0, (255-wFadeV[1]),4);
+			drawTexture(wTex_hot, pCIW+12, 0, (255-wFadeV[1]),4);
 
 		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_storm, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_chance_of_storm, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0 )
-			drawTexture(wTex_mostly_sunny, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_mostly_sunny, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0 )
-			drawTexture(wTex_dust, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_dust, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0 )
-			drawTexture(wTex_mostly_cloudy, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_mostly_cloudy, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0 )
-			drawTexture(wTex_cloudy, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_cloudy, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_tstorm, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_chance_of_tstorm, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) ==0 )
-			drawTexture(wTex_partly_cloudy, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_partly_cloudy, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0 )
-			drawTexture(wTex_storm, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_storm, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0 )
-			drawTexture(wTex_sunny, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_sunny, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0 )
-			drawTexture(wTex_flurries, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_flurries, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_snow, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_chance_of_snow, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_rain, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_chance_of_rain, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0 )
-			drawTexture(wTex_fog, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_fog, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0 )
-			drawTexture(wTex_icy, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_icy, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0 )
-			drawTexture(wTex_sleet, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_sleet, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0 )
-			drawTexture(wTex_rain, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_rain, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0 )
-			drawTexture(wTex_mist, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_mist, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0 )
-			drawTexture(wTex_haze, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_haze, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0 )
-			drawTexture(wTex_smoke, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_smoke, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0 )
-			drawTexture(wTex_snow, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_snow, pCIW+12, 0, wFadeV[1],4);
 
 		if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0 )
-			drawTexture(wTex_thunderstorm, pCIW+15, 0, wFadeV[1],4);
+			drawTexture(wTex_thunderstorm, pCIW+12, 0, wFadeV[1],4);
 
 		/* Draw Leaves over Weather Icon if wind is 20mph+ */
 		if (wIWind >= 20)
-			drawTexture(wTex_windy, pCIW+15, 0, 255, 4);
+			drawTexture(wTex_windy, pCIW+12, 0, 255, 4);
 
 		switch(wCurDisp)
 		{
-			case 0:drawText(wCondition, fntCGothic36, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 20, 5);;break;
-			case 1:drawText(wHumidity, fntCGothic36, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 20, 5);;break;
-			case 2:drawText(wWind, fntCGothic36, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 20, 5);;break;
+			case 0:drawText(wCondition, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 5);;break;
+			case 1:drawText(wHumidity, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 5);;break;
+			case 2:drawText(wWind, fntCGothic34, 1, 255, 255, 255, wFadeV[0], pCIW + pTWidth + 15, 5);;break;
 		}
 	} else {
-		drawText("Weather Unavailable", fntCGothic36, 1, 255, 255, 255, 255, 10, 5);
+		drawText("Weather Unavailable", fntCGothic34, 1, 255, 255, 255, 255, 10, 5);
 	}
 
 	/* Are we Animating? */
@@ -1191,6 +1193,18 @@ void doDisplay() {
 		SCREEN_TARGET_FPS = 30;
 	else
 		SCREEN_TARGET_FPS = 5;
+
+	/* Orbital Logo above everything else */
+	drawInfoBox(orb_logo,
+			3,
+			(1280/2)-((orb_logo->w/4)),
+			10,
+			1.0f,
+			1.0f,
+			1.0f,
+			128,
+			255,
+			255);
 
 	SDL_GL_SwapBuffers();
 }
@@ -1212,7 +1226,7 @@ int main( int argc, char* argv[] ) {
 
 	TTF_CloseFont(fntCGothic22);
 	TTF_CloseFont(fntCGothic16);
-	TTF_CloseFont(fntCGothic36);
+	TTF_CloseFont(fntCGothic34);
 	TTF_CloseFont(fntCGothic44);
 	TTF_CloseFont(fntCGothic48);
 
@@ -1224,6 +1238,9 @@ int main( int argc, char* argv[] ) {
 	SDL_FreeSurface(orb_wl);
 	SDL_FreeSurface(orb_wt);
 	SDL_FreeSurface(orb_wcrnr);
+	SDL_FreeSurface(orb_tl);
+	SDL_FreeSurface(orb_tt);
+	SDL_FreeSurface(orb_tcrnr);
 	SDL_FreeSurface(orb_boxb);
 	SDL_FreeSurface(orb_boxw);
 	SDL_FreeSurface(wTex_chance_of_storm);
