@@ -1193,7 +1193,7 @@ void doDisplay() {
 	/* Draw Boards */
 	drawInfoBox(board_TestA,
 			1,
-			18,
+			(1280/2)-(board_TestA->w)-12,
 			78,
 			1.0f,
 			1.0f,
@@ -1204,7 +1204,7 @@ void doDisplay() {
 
 	drawInfoBox(board_TestB,
 			1,
-			653,
+			(1280/2)+12,
 			78,
 			1.0f,
 			1.0f,
@@ -1217,7 +1217,7 @@ void doDisplay() {
 	if (FileExists("/screen/white")) {
 		drawInfoBox(orb_logo,
 				2,
-				(1280/2)-((orb_logo->w/3))+10,
+				(1280/2)-((((orb_logo->w / 255.0) * 160)+8)/2),
 				10,
 				1.0f,
 				1.0f,
@@ -1228,7 +1228,7 @@ void doDisplay() {
 	} else {
 		drawInfoBox(orb_logo,
 				1,
-				(1280/2)-((orb_logo->w/3))+10,
+				(1280/2)-((((orb_logo->w / 255.0) * 160)+8)/2),
 				10,
 				1.0f,
 				1.0f,
