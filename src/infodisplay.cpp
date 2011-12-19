@@ -69,6 +69,9 @@ SDL_Surface *orb_logo;
 SDL_Surface *orb_bl;
 SDL_Surface *orb_bt;
 SDL_Surface *orb_bcrnr;
+SDL_Surface *orb_wl;
+SDL_Surface *orb_wt;
+SDL_Surface *orb_wcrnr;
 SDL_Surface *wTex_chance_of_storm;
 SDL_Surface *wTex_mostly_sunny;
 SDL_Surface *wTex_dust;
@@ -120,6 +123,7 @@ bool drawTexture(SDL_Surface *tpoint,
 			int scale);
 
 bool drawInfoBox(SDL_Surface *tpoint,
+			int bcol,
 			int px,
 			int py,
 			float br,
@@ -480,6 +484,7 @@ bool drawTexture(SDL_Surface *tpoint,
 }
 
 bool drawInfoBox(SDL_Surface *tpoint,
+			int bcol,
 			int px,
 			int py,
 			float br,
@@ -491,22 +496,38 @@ bool drawInfoBox(SDL_Surface *tpoint,
 {
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
+	SDL_Surface *brdr_top;
+	SDL_Surface *brdr_left;
+	SDL_Surface *brdr_crnr;
 
 	/* We don't want the border to have less opacity than the contents, so match contents to border if required */
 	if (balpha < calpha)
 		calpha = balpha;
 
+	if (bcol == 1)
+	{
+		brdr_top = orb_bt;
+		brdr_left = orb_bl;
+		brdr_crnr = orb_bcrnr;
+	}
+	else
+	{
+		brdr_top = orb_wt;
+		brdr_left = orb_wl;
+		brdr_crnr = orb_wcrnr;
+	}
+
 	int w = (tpoint->w / 255.0) * scale;
 	int h = (tpoint->h / 255.0) * scale;
 
 	glBindTexture(GL_TEXTURE_2D, TextureID);
-	int tw = orb_bl->w;
-	int th = orb_bl->h;
+	int tw = brdr_left->w;
+	int th = brdr_left->h;
 	int Mode = GL_RGB;
-	if(orb_bl->format->BytesPerPixel == 4) {
+	if(brdr_left->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, orb_bl->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, brdr_left->pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
@@ -540,13 +561,13 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
-	tw = orb_bt->w;
-	th = orb_bt->h;
+	tw = brdr_top->w;
+	th = brdr_top->h;
 	Mode = GL_RGB;
-	if(orb_bt->format->BytesPerPixel == 4) {
+	if(brdr_top->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, orb_bt->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, brdr_top->pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
@@ -577,13 +598,13 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
 
-	tw = orb_bcrnr->w;
-	th = orb_bcrnr->h;
+	tw = brdr_crnr->w;
+	th = brdr_crnr->h;
 	Mode = GL_RGB;
-	if(orb_bcrnr->format->BytesPerPixel == 4) {
+	if(brdr_crnr->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, orb_bcrnr->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, tw, th, 0, Mode, GL_UNSIGNED_BYTE, brdr_crnr->pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
@@ -755,6 +776,9 @@ bool init() {
 	orb_bl = IMG_Load("/screen/textures/orb_bl.png");
 	orb_bt = IMG_Load("/screen/textures/orb_bt.png");
 	orb_bcrnr = IMG_Load("/screen/textures/orb_bcrnr.png");
+	orb_wl = IMG_Load("/screen/textures/orb_wl.png");
+	orb_wt = IMG_Load("/screen/textures/orb_wt.png");
+	orb_wcrnr = IMG_Load("/screen/textures/orb_wcrnr.png");
 	wTex_chance_of_storm = IMG_Load("/screen/textures/weather/chance_of_storm.png");
 	wTex_mostly_sunny = IMG_Load("/screen/textures/weather/mostly_sunny.png");
 	wTex_dust = IMG_Load("/screen/textures/weather/dust.png");
@@ -858,6 +882,18 @@ void doDisplay() {
 	/* Main Drawing Section*/
 
 	drawTexture(orb_logo, 15, 620, 255,1);
+
+	drawInfoBox(orb_logo,
+			2,
+			15,
+			620,
+			1.0,
+			1.0,
+			1.0,
+			255,
+			255,
+			255);
+
 
 	/* Draw Text */
 	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 450, 655);
@@ -1126,6 +1162,9 @@ int main( int argc, char* argv[] ) {
 	SDL_FreeSurface(orb_bl);
 	SDL_FreeSurface(orb_bt);
 	SDL_FreeSurface(orb_bcrnr);
+	SDL_FreeSurface(orb_wl);
+	SDL_FreeSurface(orb_wt);
+	SDL_FreeSurface(orb_wcrnr);
 	SDL_FreeSurface(wTex_chance_of_storm);
 	SDL_FreeSurface(wTex_mostly_sunny);
 	SDL_FreeSurface(wTex_dust);
