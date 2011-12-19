@@ -42,7 +42,8 @@ TTF_Font *fntCGothic48;
 
 /* Variables for application (global) */
 bool IS_RUNNING = true;
-int wLastCheckH, wLastCheckM;
+int wLastCheckH = 99;
+int wLastCheckM = 99;
 int wUpdateTimer[5] = {0, 0, 0, 0, 0};
 int wFadeV[5] = {255, 255, 255, 255, 255};
 int wFadeA[5] = {0, 0, 0, 0, 0};
