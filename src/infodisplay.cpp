@@ -133,6 +133,9 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			int bcol,
 			int px,
 			int py,
+			int minx,
+			int miny,
+			int scrollv,
 			float br,
 			float bg,
 			float bb,
@@ -494,6 +497,9 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			int bcol,
 			int px,
 			int py,
+			int minx,
+			int miny,
+			int scrollv,
 			float br,
 			float bg,
 			float bb,
@@ -535,8 +541,8 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			break;
 	}
 
-	int w = (tpoint->w / 255.0) * scale;
-	int h = (tpoint->h / 255.0) * scale;
+	int w = (minx / 255.0) * scale;
+	int h = (miny / 255.0) * scale;
 
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	int tw = brdr_left->w;
@@ -549,7 +555,6 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* prepare to render our texture */
-//	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	/* Testing of Box Drawing on screen */
 	glColor4f(br, bg, bb, (float)balpha/255.0);
@@ -733,6 +738,9 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Now draw Texture */
 	tw = tpoint->w;
 	th = tpoint->h;
+
+	w = (tpoint->w / 255.0) * scale;
+	h = (tpoint->h / 255.0) * scale;
 
 	Mode = GL_RGB;
 	if(tpoint->format->BytesPerPixel == 4) {
@@ -1197,6 +1205,9 @@ void doDisplay() {
 //			1,
 //			(1280/2)-(board_TestA->w)-12,
 //			78,
+//			-1,
+//			-1,
+//			0,
 //			1.0f,
 //			1.0f,
 //			1.0f,
@@ -1208,6 +1219,9 @@ void doDisplay() {
 //			1,
 //			(1280/2)+12,
 //			78,
+//			-1,
+//			-1,
+//			0,
 //			1.0f,
 //			1.0f,
 //			1.0f,
@@ -1221,6 +1235,9 @@ void doDisplay() {
 				2,
 				(1280/2)-((((orb_logo->w / 255.0) * 157)+8)/2),
 				10,
+				orb_logo->w,
+				orb_logo->h,
+				0,
 				1.0f,
 				1.0f,
 				1.0f,
@@ -1232,6 +1249,9 @@ void doDisplay() {
 				1,
 				(1280/2)-((((orb_logo->w / 255.0) * 157)+8)/2),
 				10,
+				orb_logo->w,
+				orb_logo->h,
+				0,
 				1.0f,
 				1.0f,
 				1.0f,
