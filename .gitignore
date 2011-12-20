@@ -117,3 +117,4 @@ ext-libs/ftgl/test/Makefile.in
 src/infodisplay
 src/infodisplay.cpp~
 src/Makefile~
+updater/builder.sh~
