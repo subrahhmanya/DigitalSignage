@@ -778,8 +778,6 @@ bool drawInfoBox(SDL_Surface *tpoint,
 
 	/* If we are scrolling, let's add shaded top/bottom bit (only 8px needed) */
 
-	printf("H1-H2-TX-PX - %i, %i, %f, %f\n", h, hs, (float)((float)scrollv/hs), (float)((float)((float)scrollv+h)/hs));
-
 	/* Clean up */
 	glDeleteTextures(1, &TextureID);
 	return true;
