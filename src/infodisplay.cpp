@@ -741,6 +741,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 
 	w = (tpoint->w / 255.0) * scale;
 	h = (tpoint->h / 255.0) * scale;
+	int hs = (tpoint->h / 255.0) * scale;
 
 	Mode = GL_RGB;
 	if(tpoint->format->BytesPerPixel == 4) {
@@ -755,22 +756,29 @@ bool drawInfoBox(SDL_Surface *tpoint,
 
 	glColor4f(1.0f, 1.0f, 1.0f, (float)calpha/255.0);
 
+	if (h > miny)
+		h = miny;
+
 	glBegin(GL_QUADS);
 		/* Recall that the origin is in the lower-left corner
 		   That is why the TexCoords specify different corners
 		   than the Vertex coors seem to. */
-		glTexCoord2f(0.0f, 1.0f);
+		glTexCoord2f(0.0f, (float)((float)((float)scrollv+h)/hs));
 			glVertex2f(px, py);
-		glTexCoord2f(1.0f, 1.0f);
+		glTexCoord2f(1.0f, (float)((float)((float)scrollv+h)/hs));
 			glVertex2f(px + w, py);
-		glTexCoord2f(1.0f, 0.0f);
+		glTexCoord2f(1.0f, (float)((float)scrollv/hs));
 			glVertex2f(px + w, py + h);
-		glTexCoord2f(0.0f, 0.0f);
+		glTexCoord2f(0.0f, (float)((float)scrollv/hs));
 			glVertex2f(px, py + h);
 	glEnd();
 
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
+
+	/* If we are scrolling, let's add shaded top/bottom bit (only 8px needed) */
+
+	printf("H1-H2-TX-PX - %i, %i, %f, %f\n", h, hs, (float)((float)scrollv/hs), (float)((float)((float)scrollv+h)/hs));
 
 	/* Clean up */
 	glDeleteTextures(1, &TextureID);
@@ -1201,19 +1209,19 @@ void doDisplay() {
 
 	/* Draw Boards */
 	/* Removed for Testing on Final Machine Only during Revision Changey */
-//	drawInfoBox(board_TestA,
-//			1,
-//			(1280/2)-(board_TestA->w)-12,
-//			78,
-//			-1,
-//			-1,
-//			0,
-//			1.0f,
-//			1.0f,
-//			1.0f,
-//			255,
-//			255,
-//			255);
+	drawInfoBox(board_TestA,
+			1,
+			(1280/2)-(board_TestA->w)-12,
+			78,
+			609,
+			588,
+			0,
+			1.0f,
+			1.0f,
+			1.0f,
+			255,
+			255,
+			255);
 
 //	drawInfoBox(board_TestB,
 //			1,
