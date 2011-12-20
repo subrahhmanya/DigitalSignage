@@ -118,3 +118,4 @@ src/infodisplay
 src/infodisplay.cpp~
 src/Makefile~
 updater/builder.sh~
+src/boards/FontTest.html~
