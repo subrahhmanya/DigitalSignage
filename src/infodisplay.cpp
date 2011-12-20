@@ -1192,27 +1192,28 @@ void doDisplay() {
 	}
 
 	/* Draw Boards */
-	drawInfoBox(board_TestA,
-			1,
-			(1280/2)-(board_TestA->w)-12,
-			78,
-			1.0f,
-			1.0f,
-			1.0f,
-			255,
-			255,
-			255);
+	/* Removed for Testing on Final Machine Only during Revision Changey */
+//	drawInfoBox(board_TestA,
+//			1,
+//			(1280/2)-(board_TestA->w)-12,
+//			78,
+//			1.0f,
+//			1.0f,
+//			1.0f,
+//			255,
+//			255,
+//			255);
 
-	drawInfoBox(board_TestB,
-			1,
-			(1280/2)+12,
-			78,
-			1.0f,
-			1.0f,
-			1.0f,
-			255,
-			255,
-			wFadeV[0]);
+//	drawInfoBox(board_TestB,
+//			1,
+//			(1280/2)+12,
+//			78,
+//			1.0f,
+//			1.0f,
+//			1.0f,
+//			255,
+//			255,
+//			wFadeV[0]);
 
 	/* Orbital Logo above everything else */
 	if (FileExists("/screen/white")) {
