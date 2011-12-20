@@ -64,6 +64,7 @@ int wIWind=0;
 int pTWidth=0;
 float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
+int tSa = 0;
 
 /* Define Global Textures */
 SDL_Surface *orb_logo;
@@ -1206,14 +1207,27 @@ void doDisplay() {
 	}
 
 	/* Draw Boards */
-	/* Removed for Testing on Final Machine Only during Revision Changey */
+
+	/* Test Scrolling */
+	if (board_TestA->h > 588)
+	{
+		dAnim[2] = 1;
+		tSa++;
+	}
+
+	if (tSa > (board_TestA->h))
+	{
+		dAnim[2] = 0;
+		tSa = board_TestA->h;
+	}
+
 	drawInfoBox(board_TestA,
 			1,
 			(1280/2)-(board_TestA->w)-12,
 			78,
 			609,
 			588,
-			0,
+			tSa,
 			1.0f,
 			1.0f,
 			1.0f,
