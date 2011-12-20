@@ -1215,10 +1215,10 @@ void doDisplay() {
 		tSa++;
 	}
 
-	if (tSa > (board_TestA->h))
+	if ((tSa*2) > (board_TestA->h))
 	{
 		dAnim[2] = 0;
-		tSa = board_TestA->h;
+		tSa = (board_TestA->h * 2);
 	}
 
 	drawInfoBox(board_TestA,
@@ -1227,7 +1227,7 @@ void doDisplay() {
 			78,
 			609,
 			588,
-			tSa,
+			tSa / 2,
 			1.0f,
 			1.0f,
 			1.0f,
