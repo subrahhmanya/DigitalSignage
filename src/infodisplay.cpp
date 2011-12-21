@@ -47,6 +47,9 @@ int wLastCheckM = 99;
 int wUpdateTimer[5] = {0, 0, 0, 0, 0};
 int wFadeV[5] = {255, 255, 255, 255, 255};
 int wFadeA[5] = {0, 0, 0, 0, 0};
+int bScroll[3] = {0, 0, 0};
+int bVisible[3] = {0, 0, 0};
+int bTimer[3] = {0, 0, 0};
 int dAnim[5] = {0, 0, 0, 0, 0};
 int wCurDisp=0;
 int dFPS = 0;
@@ -64,7 +67,6 @@ int wIWind=0;
 int pTWidth=0;
 float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
-int tSa = 0;
 
 /* Define Global Textures */
 SDL_Surface *orb_logo;
@@ -1208,52 +1210,117 @@ void doDisplay() {
 
 	/* Draw Boards */
 
-	/* Test Scrolling */
-	if (board_TestA->h > 588)
+	/* Process LH Board */
+	if (bVisible[0]==1)
 	{
-		dAnim[2] = 1;
-		tSa++;
+		/* Scrolling */
+		if (board_TestA->h > 588)
+		{
+			/* We have to scroll, it's taller than 588 pixels high */
+			dAnim[2] = 1;
+			bScroll[0]++;
+		}
+
+		if ((bScroll[0]*2) > (board_TestA->h))
+		{
+			/* Instead of eventually hitting an upper limit on the scroll
+			   we loop the scroll value to keep things clean */
+			dAnim[2] = 0;
+			bScroll[0] = bScroll[0] - (board_TestA->h * 2);
+		}
+
+		/* Draw Board */
+		drawInfoBox(board_TestA,
+				1,
+				(1280/2)-(board_TestA->w)-12,
+				78,
+				609,
+				588,
+				bScroll[0] / 2,
+				1.0f,
+				1.0f,
+				1.0f,
+				255,
+				255,
+				255);
 	}
 
-	if ((tSa*2) > (board_TestA->h))
+	/* Process RH Board */
+	if (bVisible[0]==1)
 	{
-		dAnim[2] = 0;
-		tSa = tSa - (board_TestA->h * 2);
+		/* Scrolling */
+		if (board_TestA->h > 588)
+		{
+			/* We have to scroll, it's taller than 588 pixels high */
+			dAnim[3] = 1;
+			bScroll[0]++;
+		}
+
+		if ((bScroll[0]*2) > (board_TestA->h))
+		{
+			/* Instead of eventually hitting an upper limit on the scroll
+			   we loop the scroll value to keep things clean */
+			dAnim[3] = 0;
+			bScroll[0] = bScroll[0] - (board_TestA->h * 2);
+		}
+
+		/* Draw Board */
+		drawInfoBox(board_TestB,
+				1,
+				(1280/2)+12,
+				78,
+				609,
+				588,
+				bScroll[1],
+				1.0f,
+				1.0f,
+				1.0f,
+				255,
+				255,
+				255);
 	}
 
-	drawInfoBox(board_TestA,
-			1,
-			(1280/2)-(board_TestA->w)-12,
-			78,
-			609,
-			588,
-			tSa / 2,
-			1.0f,
-			1.0f,
-			1.0f,
-			255,
-			255,
-			255);
+	/* Process FS Board */
+	if (bVisible[0]==1)
+	{
+		/* Scrolling */
+		if (board_TestA->h > 588)
+		{
+			/* We have to scroll, it's taller than 588 pixels high */
+			dAnim[4] = 1;
+			bScroll[0]++;
+		}
 
-//	drawInfoBox(board_TestB,
-//			1,
-//			(1280/2)+12,
-//			78,
-//			-1,
-//			-1,
-//			0,
-//			1.0f,
-//			1.0f,
-//			1.0f,
-//			255,
-//			255,
-//			wFadeV[0]);
+		if ((bScroll[0]*2) > (board_TestA->h))
+		{
+			/* Instead of eventually hitting an upper limit on the scroll
+			   we loop the scroll value to keep things clean */
+			dAnim[4] = 0;
+			bScroll[0] = bScroll[0] - (board_TestA->h * 2);
+		}
+
+		/* Draw Board */
+		drawInfoBox(board_TestB,
+				1,
+				19,
+				78,
+				1280-19-19,
+				588,
+				bScroll[2],
+				1.0f,
+				1.0f,
+				1.0f,
+				255,
+				255,
+				255);
+	}
 
 	/* Orbital Logo above everything else */
+	int logoScale=130;
 	if (FileExists("/screen/white")) {
 		drawInfoBox(orb_logo,
 				2,
-				(1280/2)-((((orb_logo->w / 255.0) * 157)+8)/2),
+				(1280/2)-((((orb_logo->w / 255.0) * logoScale)+8)/2),
 				10,
 				orb_logo->w,
 				orb_logo->h,
@@ -1261,13 +1328,13 @@ void doDisplay() {
 				1.0f,
 				1.0f,
 				1.0f,
-				157,
+				logoScale,
 				255,
 				255);
 	} else {
 		drawInfoBox(orb_logo,
 				1,
-				(1280/2)-((((orb_logo->w / 255.0) * 157)+8)/2),
+				(1280/2)-((((orb_logo->w / 255.0) * logoScale)+8)/2),
 				10,
 				orb_logo->w,
 				orb_logo->h,
@@ -1275,7 +1342,7 @@ void doDisplay() {
 				1.0f,
 				1.0f,
 				1.0f,
-				157,
+				logoScale,
 				255,
 				255);
 	}
