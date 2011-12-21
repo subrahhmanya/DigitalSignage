@@ -50,7 +50,10 @@ int wFadeA[5] = {0, 0, 0, 0, 0};
 int bScroll[3] = {0, 0, 0};
 int bVisible[3] = {0, 0, 0};
 int bTimer[3] = {0, 0, 0};
+int bDuration[3] = {0, 0, 0};
+int bNo[3] = {0, 0, 0};
 int bTimeStamp[3] = {0, 0, 0};
+int bCondition[3] = {0, 0, 0};
 int bAlpha[6] = {0, 0, 0, 0, 0, 0};
 int bCTimer = 15;
 int dAnim[5] = {0, 0, 0, 0, 0};
@@ -1218,7 +1221,8 @@ void doDisplay() {
 	}
 
 	/* Draw Boards */
-	/* We need to pull and process all information from /screen/boards */
+	/* We need to pull and process all information from /screen/boards 
+	   Also checki any other information we need on the 15s Interval */
 	if (bCTimer > 14) {
 		/* Do the check every 15 seconds */
 
@@ -1233,28 +1237,224 @@ void doDisplay() {
 		if (FileExists("/screen/white"))
 			logoisWhite=1;
 
+		/* LH Board Check */
 		if (FileExists("/screen/boards/1/bTimeStamp")) {
-			/* Board Active */
+			if (FileExists("/screen/boards/1/bDuration")) {
+				if (FileExists("/screen/boards/1/bNum")) {
+					/* Board Active, pull data to variables */
+					char str[20];
+					int tTS=0;
+					FILE *fp;
+					fp = fopen("/screen/boards/1/bTimeStamp", "r");
+					while(fgets(str,sizeof(str),fp) != NULL)
+					{
+						/* strip trailing '\n' if it exists */
+						int len = strlen(str)-1;
+						if(str[len] == '\n') 
+							str[len] = 0;
+						printf("TimeStamp 1 - %s\n", str);
+						tTS = strtol(str,NULL,0);
+					}
+					fclose(fp);
+
+					if (bTimeStamp[0] != tTS)
+					{
+						/* Transition to new Board */
+						bTimeStamp[0] = tTS;
+						bCondition[0] = 1;
+
+						/* Parse other files */
+						fp = fopen("/screen/boards/1/bDuration", "r");
+						while(fgets(str,sizeof(str),fp) != NULL)
+						{
+							/* strip trailing '\n' if it exists */
+							int len = strlen(str)-1;
+							if(str[len] == '\n') 
+								str[len] = 0;
+							printf("Duration 1 - %s\n", str);
+							tTS = strtol(str,NULL,0);
+						}
+						fclose(fp);
+
+						bDuration[0] = tTS;
+
+						fp = fopen("/screen/boards/1/bNum", "r");
+						while(fgets(str,sizeof(str),fp) != NULL)
+						{
+							/* strip trailing '\n' if it exists */
+							int len = strlen(str)-1;
+							if(str[len] == '\n') 
+								str[len] = 0;
+							printf("No. Boards 1 - %s\n", str);
+							tTS = strtol(str,NULL,0);
+						}
+						fclose(fp);
+
+						bNo[0] = tTS;
+					}
+				} else {
+					/* Board Not Active */
+					bTimeStamp[0]=0;
+					bCondition[0]=2;
+				}
+			} else {
+				/* Board Not Active */
+				bTimeStamp[0]=0;
+				bCondition[0]=2;
+			}
 		} else {
 			/* Board Not Active */
 			bTimeStamp[0]=0;
+			bCondition[0]=2;
 		}
 
+		/* RH Board Check */
 		if (FileExists("/screen/boards/2/bTimeStamp")) {
-			/* Board Active */
+			if (FileExists("/screen/boards/2/bDuration")) {
+				if (FileExists("/screen/boards/2/bNum")) {
+					/* Board Active, pull data to variables */
+					char str[20];
+					int tTS=0;
+					FILE *fp;
+					fp = fopen("/screen/boards/2/bTimeStamp", "r");
+					while(fgets(str,sizeof(str),fp) != NULL)
+					{
+						/* strip trailing '\n' if it exists */
+						int len = strlen(str)-1;
+						if(str[len] == '\n') 
+							str[len] = 0;
+						printf("TimeStamp 2 - %s\n", str);
+						tTS = strtol(str,NULL,0);
+					}
+					fclose(fp);
+
+					if (bTimeStamp[1] != tTS)
+					{
+						/* Transition to new Board */
+						bTimeStamp[1] = tTS;
+						bCondition[1] = 1;
+
+						/* Parse other files */
+						fp = fopen("/screen/boards/2/bDuration", "r");
+						while(fgets(str,sizeof(str),fp) != NULL)
+						{
+							/* strip trailing '\n' if it exists */
+							int len = strlen(str)-1;
+							if(str[len] == '\n') 
+								str[len] = 0;
+							printf("Duration 2 - %s\n", str);
+							tTS = strtol(str,NULL,0);
+						}
+						fclose(fp);
+
+						bDuration[1] = tTS;
+
+						fp = fopen("/screen/boards/2/bNum", "r");
+						while(fgets(str,sizeof(str),fp) != NULL)
+						{
+							/* strip trailing '\n' if it exists */
+							int len = strlen(str)-1;
+							if(str[len] == '\n') 
+								str[len] = 0;
+							printf("No. Boards 2 - %s\n", str);
+							tTS = strtol(str,NULL,0);
+						}
+						fclose(fp);
+
+						bNo[1] = tTS;
+					}
+				} else {
+					/* Board Not Active */
+					bTimeStamp[1]=0;
+					bCondition[1]=2;
+				}
+			} else {
+				/* Board Not Active */
+				bTimeStamp[1]=0;
+				bCondition[1]=2;
+			}
 		} else {
 			/* Board Not Active */
-			bTimeStamp[0]=0;
+			bTimeStamp[1]=0;
+			bCondition[1]=2;
 		}
 
+		/* FS Board Check */
 		if (FileExists("/screen/boards/3/bTimeStamp")) {
-			/* Board Active */
+			if (FileExists("/screen/boards/3/bDuration")) {
+				if (FileExists("/screen/boards/3/bNum")) {
+					/* Board Active, pull data to variables */
+					char str[20];
+					int tTS=0;
+					FILE *fp;
+					fp = fopen("/screen/boards/3/bTimeStamp", "r");
+					while(fgets(str,sizeof(str),fp) != NULL)
+					{
+						/* strip trailing '\n' if it exists */
+						int len = strlen(str)-1;
+						if(str[len] == '\n') 
+							str[len] = 0;
+						printf("TimeStamp 3 - %s\n", str);
+						tTS = strtol(str,NULL,0);
+					}
+					fclose(fp);
+
+					if (bTimeStamp[2] != tTS)
+					{
+						/* Transition to new Board */
+						bTimeStamp[2] = tTS;
+						bCondition[2] = 1;
+
+						/* Parse other files */
+						fp = fopen("/screen/boards/3/bDuration", "r");
+						while(fgets(str,sizeof(str),fp) != NULL)
+						{
+							/* strip trailing '\n' if it exists */
+							int len = strlen(str)-1;
+							if(str[len] == '\n') 
+								str[len] = 0;
+							printf("Duration 3 - %s\n", str);
+							tTS = strtol(str,NULL,0);
+						}
+						fclose(fp);
+
+						bDuration[2] = tTS;
+
+						fp = fopen("/screen/boards/3/bNum", "r");
+						while(fgets(str,sizeof(str),fp) != NULL)
+						{
+							/* strip trailing '\n' if it exists */
+							int len = strlen(str)-1;
+							if(str[len] == '\n') 
+								str[len] = 0;
+							printf("No. Boards 3 - %s\n", str);
+							tTS = strtol(str,NULL,0);
+						}
+						fclose(fp);
+
+						bNo[2] = tTS;
+					}
+				} else {
+					/* Board Not Active */
+					bTimeStamp[2]=0;
+					bCondition[2]=2;
+				}
+			} else {
+				/* Board Not Active */
+				bTimeStamp[2]=0;
+				bCondition[2]=2;
+			}
 		} else {
 			/* Board Not Active */
-			bTimeStamp[0]=0;
+			bTimeStamp[2]=0;
+			bCondition[2]=2;
 		}
+
+
 		bCTimer=0;
 	}
+
+	/* Process Board Animation/Texture Loading */
 
 	/* Process LH Board */
 	if (bVisible[0]==1)
