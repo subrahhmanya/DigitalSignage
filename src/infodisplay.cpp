@@ -52,6 +52,7 @@ int bVisible[3] = {0, 0, 0};
 int bTimer[3] = {0, 0, 0};
 int bTimeStamp[3] = {0, 0, 0};
 int bAlpha[6] = {0, 0, 0, 0, 0, 0};
+int bCTimer = 15;
 int dAnim[5] = {0, 0, 0, 0, 0};
 int wCurDisp=0;
 int dFPS = 0;
@@ -69,6 +70,7 @@ int wIWind=0;
 int pTWidth=0;
 float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
+int logoisWhite=0;
 
 /* Define Global Textures */
 SDL_Surface *orb_logo;
@@ -973,6 +975,9 @@ void doDisplay() {
 			bV1 = false;
 		else
 			bV1 = true;
+
+		/* Process Other Counters */
+		bCTimer++;
 		tC1 = ltm->tm_sec;
 	}
 
@@ -1214,6 +1219,42 @@ void doDisplay() {
 
 	/* Draw Boards */
 	/* We need to pull and process all information from /screen/boards */
+	if (bCTimer > 14) {
+		/* Do the check every 15 seconds */
+
+		if (ltm->tm_min < 10)
+			{
+			printf("Performing 15s Timer Check - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+			}
+		else
+			printf("Performing 15s Timer Check - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+
+		/* Determine if Logo is White or Black */
+		if (FileExists("/screen/white"))
+			logoisWhite=1;
+
+		if (FileExists("/screen/boards/1/bTimeStamp")) {
+			/* Board Active */
+		} else {
+			/* Board Not Active */
+			bTimeStamp[0]=0;
+		}
+
+		if (FileExists("/screen/boards/2/bTimeStamp")) {
+			/* Board Active */
+		} else {
+			/* Board Not Active */
+			bTimeStamp[0]=0;
+		}
+
+		if (FileExists("/screen/boards/3/bTimeStamp")) {
+			/* Board Active */
+		} else {
+			/* Board Not Active */
+			bTimeStamp[0]=0;
+		}
+		bCTimer=0;
+	}
 
 	/* Process LH Board */
 	if (bVisible[0]==1)
@@ -1340,9 +1381,9 @@ void doDisplay() {
 
 	/* Orbital Logo above everything else */
 	int logoScale=130;
-	if (FileExists("/screen/white")) {
+	if (logoisWhite==0) {
 		drawInfoBox(orb_logo,
-				2,
+				1,
 				(1280/2)-((((orb_logo->w / 255.0) * logoScale)+8)/2),
 				12,
 				orb_logo->w,
@@ -1356,7 +1397,7 @@ void doDisplay() {
 				255);
 	} else {
 		drawInfoBox(orb_logo,
-				1,
+				2,
 				(1280/2)-((((orb_logo->w / 255.0) * logoScale)+8)/2),
 				12,
 				orb_logo->w,
