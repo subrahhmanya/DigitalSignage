@@ -50,6 +50,8 @@ int wFadeA[5] = {0, 0, 0, 0, 0};
 int bScroll[3] = {0, 0, 0};
 int bVisible[3] = {0, 0, 0};
 int bTimer[3] = {0, 0, 0};
+int bTimeStamp[3] = {0, 0, 0};
+int bAlpha[6] = {0, 0, 0, 0, 0, 0};
 int dAnim[5] = {0, 0, 0, 0, 0};
 int wCurDisp=0;
 int dFPS = 0;
@@ -105,8 +107,9 @@ SDL_Surface *wTex_smoke;
 SDL_Surface *wTex_snow;
 SDL_Surface *wTex_hot;
 SDL_Surface *wTex_thunderstorm;
-SDL_Surface *board_TestA;
-SDL_Surface *board_TestB;
+SDL_Surface *boardTex_A;
+SDL_Surface *boardTex_B;
+SDL_Surface *boardTex_C;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -899,8 +902,9 @@ bool init() {
 	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.png");
 
 	/* This is a testing texture */
-	board_TestA = IMG_Load("/screen/boards/1/1.png");
-	board_TestB = IMG_Load("/screen/boards/1/2.png");
+	boardTex_A = IMG_Load("/screen/boards/1/1.png");
+	boardTex_B = IMG_Load("/screen/boards/1/2.png");
+	boardTex_C = IMG_Load("/screen/boards/1/1.png");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -978,15 +982,15 @@ void doDisplay() {
 
 	/* Draw Text */
 	drawText("Notification Centre", fntCGothic48, 1, 255, 255, 255, 255, 420, 670);
-	drawText(dateString, fntCGothic34, 2, 255, 255, 255, 255, 1275, 15);
+	drawText(dateString, fntCGothic34, 2, 255, 255, 255, 255, 1270, 15);
 
 	if (bV1)
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 47, 17);
+			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 42, 17);
 		else
-			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 27, 17);
+			drawText(":", fntCGothic34, 2, 255, 255, 255, 255, 1275 - pTWidth + 22, 17);
 
-	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1180, 38);
+	drawText(nthsInWord, fntCGothic16, 1, 255, 255, 255, 255, 1175, 38);
 
 	/* Do Weather Check (update once every 15 minutes) */
 	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
@@ -1209,110 +1213,129 @@ void doDisplay() {
 	}
 
 	/* Draw Boards */
+	/* We need to pull all information from /screen/boards */
 
 	/* Process LH Board */
 	if (bVisible[0]==1)
 	{
 		/* Scrolling */
-		if (board_TestA->h > 588)
+		/* Only scroll when Alpha = 255 */
+		if (bAlpha[0] == 255)
 		{
-			/* We have to scroll, it's taller than 588 pixels high */
-			dAnim[2] = 1;
-			bScroll[0]++;
-		}
+			if (boardTex_A->h > 588)
+			{
+				/* We have to scroll, it's taller than 588 pixels high */
+				dAnim[2] = 1;
+				bScroll[0]++;
+			}
 
-		if ((bScroll[0]*2) > (board_TestA->h))
-		{
-			/* Instead of eventually hitting an upper limit on the scroll
-			   we loop the scroll value to keep things clean */
+			if ((bScroll[0]*2) > (boardTex_A->h))
+			{
+				/* Instead of eventually hitting an upper limit on the scroll
+				   we loop the scroll value to keep things clean */
+				dAnim[2] = 0;
+				bScroll[0] = bScroll[0] - (boardTex_A->h * 2);
+			}
+
+			/* Draw Board */
+			drawInfoBox(boardTex_A,
+					1,
+					(1280/2)-(boardTex_A->w)-12,
+					78,
+					609,
+					588,
+					bScroll[0] / 2,
+					1.0f,
+					1.0f,
+					1.0f,
+					255,
+					bAlpha[0],
+					bAlpha[1]);
+		}
+		else
 			dAnim[2] = 0;
-			bScroll[0] = bScroll[0] - (board_TestA->h * 2);
-		}
-
-		/* Draw Board */
-		drawInfoBox(board_TestA,
-				1,
-				(1280/2)-(board_TestA->w)-12,
-				78,
-				609,
-				588,
-				bScroll[0] / 2,
-				1.0f,
-				1.0f,
-				1.0f,
-				255,
-				255,
-				255);
 	}
 
 	/* Process RH Board */
-	if (bVisible[0]==1)
+	if (bVisible[1]==1)
 	{
 		/* Scrolling */
-		if (board_TestA->h > 588)
+		/* Only scroll when Alpha = 255 */
+		if (bAlpha[2] == 255)
 		{
-			/* We have to scroll, it's taller than 588 pixels high */
-			dAnim[3] = 1;
-			bScroll[0]++;
-		}
+			if (boardTex_B->h > 588)
+			{
+				/* We have to scroll, it's taller than 588 pixels high */
+				dAnim[3] = 1;
+				bScroll[1]++;
+			}
 
-		if ((bScroll[0]*2) > (board_TestA->h))
-		{
-			/* Instead of eventually hitting an upper limit on the scroll
-			   we loop the scroll value to keep things clean */
+			if ((bScroll[1]*2) > (boardTex_B->h))
+			{
+				/* Instead of eventually hitting an upper limit on the scroll
+				   we loop the scroll value to keep things clean */
+				dAnim[3] = 0;
+				bScroll[1] = bScroll[1] - (boardTex_B->h * 2);
+			}
+
+			/* Draw Board */
+			drawInfoBox(boardTex_B,
+					1,
+					(1280/2)+12,
+					78,
+					609,
+					588,
+					bScroll[1] / 2,
+					1.0f,
+					1.0f,
+					1.0f,
+					255,
+					bAlpha[2],
+					bAlpha[3]);
+		}
+		else
 			dAnim[3] = 0;
-			bScroll[0] = bScroll[0] - (board_TestA->h * 2);
-		}
-
-		/* Draw Board */
-		drawInfoBox(board_TestB,
-				1,
-				(1280/2)+12,
-				78,
-				609,
-				588,
-				bScroll[1],
-				1.0f,
-				1.0f,
-				1.0f,
-				255,
-				255,
-				255);
 	}
 
 	/* Process FS Board */
-	if (bVisible[0]==1)
+	if (bVisible[2]==0)
 	{
 		/* Scrolling */
-		if (board_TestA->h > 588)
+		/* Only scroll when Alpha = 255 */
+		if (bAlpha[4] == 255)
 		{
-			/* We have to scroll, it's taller than 588 pixels high */
-			dAnim[4] = 1;
-			bScroll[0]++;
-		}
+			if (boardTex_C->h > 588)
+			{
+				/* We have to scroll, it's taller than 588 pixels high */
+				dAnim[4] = 1;
+				bScroll[2]++;
+			}
 
-		if ((bScroll[0]*2) > (board_TestA->h))
-		{
-			/* Instead of eventually hitting an upper limit on the scroll
-			   we loop the scroll value to keep things clean */
+			if ((bScroll[2]*2) > (boardTex_C->h))
+			{
+				/* Instead of eventually hitting an upper limit on the scroll
+				   we loop the scroll value to keep things clean */
+				dAnim[4] = 0;
+				bScroll[2] = bScroll[2] - (boardTex_C->h * 2);
+			}
+
+			/* Draw Board */
+			drawInfoBox(boardTex_C,
+					1,
+					19,
+					78,
+					1280-19-19,
+					588,
+					bScroll[2] / 2,
+					1.0f,
+					1.0f,
+					1.0f,
+					255,
+					bAlpha[4],
+					bAlpha[5]);
+		}
+		else
 			dAnim[4] = 0;
-			bScroll[0] = bScroll[0] - (board_TestA->h * 2);
-		}
-
-		/* Draw Board */
-		drawInfoBox(board_TestB,
-				1,
-				19,
-				78,
-				1280-19-19,
-				588,
-				bScroll[2],
-				1.0f,
-				1.0f,
-				1.0f,
-				255,
-				255,
-				255);
 	}
 
 	/* Orbital Logo above everything else */
@@ -1321,7 +1344,7 @@ void doDisplay() {
 		drawInfoBox(orb_logo,
 				2,
 				(1280/2)-((((orb_logo->w / 255.0) * logoScale)+8)/2),
-				10,
+				12,
 				orb_logo->w,
 				orb_logo->h,
 				0,
@@ -1335,7 +1358,7 @@ void doDisplay() {
 		drawInfoBox(orb_logo,
 				1,
 				(1280/2)-((((orb_logo->w / 255.0) * logoScale)+8)/2),
-				10,
+				12,
 				orb_logo->w,
 				orb_logo->h,
 				0,
@@ -1414,8 +1437,9 @@ int main( int argc, char* argv[] ) {
 	SDL_FreeSurface(wTex_snow);
 	SDL_FreeSurface(wTex_hot);
 	SDL_FreeSurface(wTex_thunderstorm);
-	SDL_FreeSurface(board_TestA);
-	SDL_FreeSurface(board_TestB);
+	SDL_FreeSurface(boardTex_A);
+	SDL_FreeSurface(boardTex_B);
+	SDL_FreeSurface(boardTex_C);
 	SDL_FreeSurface(screen);
 
 	TTF_Quit();
