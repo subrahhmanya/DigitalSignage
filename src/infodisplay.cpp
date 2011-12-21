@@ -54,8 +54,9 @@ int bDuration[3] = {0, 0, 0};
 int bNo[3] = {0, 0, 0};
 int bTimeStamp[3] = {0, 0, 0};
 int bCondition[3] = {0, 0, 0};
-int bAlpha[6] = {0, 0, 0, 0, 0, 0};
-int bCTimer = 15;
+int bBAlpha[3] = {0, 0, 0};
+int bCAlpha[3] = {0, 0, 0};
+int bCTimer[3] = {15, 15, 0};
 int dAnim[5] = {0, 0, 0, 0, 0};
 int wCurDisp=0;
 int dFPS = 0;
@@ -907,9 +908,7 @@ bool init() {
 	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.png");
 
 	/* This is a testing texture */
-	boardTex_A = IMG_Load("/screen/boards/1/1.png");
 	boardTex_B = IMG_Load("/screen/boards/2/1.png");
-	boardTex_C = IMG_Load("/screen/boards/3/1.png");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -980,7 +979,10 @@ void doDisplay() {
 			bV1 = true;
 
 		/* Process Other Counters */
-		bCTimer++;
+		bCTimer[0]++;
+		bCTimer[1]++;
+		bCTimer[2]++;
+		bCTimer[3]++;
 		tC1 = ltm->tm_sec;
 	}
 
@@ -1223,7 +1225,7 @@ void doDisplay() {
 	/* Draw Boards */
 	/* We need to pull and process all information from /screen/boards 
 	   Also checki any other information we need on the 15s Interval */
-	if (bCTimer > 14) {
+	if (bCTimer[0] > 14) {
 		/* Do the check every 15 seconds */
 
 		if (ltm->tm_min < 10)
@@ -1259,8 +1261,11 @@ void doDisplay() {
 					if (bTimeStamp[0] != tTS)
 					{
 						/* Transition to new Board */
+						if (bTimeStamp[0] == 0)
+							bCondition[0] = 1;
+						else
+							bCondition[0] = 3;
 						bTimeStamp[0] = tTS;
-						bCondition[0] = 1;
 
 						/* Parse other files */
 						fp = fopen("/screen/boards/1/bDuration", "r");
@@ -1292,17 +1297,17 @@ void doDisplay() {
 				} else {
 					/* Board Not Active */
 					bTimeStamp[0]=0;
-					bCondition[0]=2;
+					bCondition[0]=3;
 				}
 			} else {
 				/* Board Not Active */
 				bTimeStamp[0]=0;
-				bCondition[0]=2;
+				bCondition[0]=3;
 			}
 		} else {
 			/* Board Not Active */
 			bTimeStamp[0]=0;
-			bCondition[0]=2;
+			bCondition[0]=3;
 		}
 
 		/* RH Board Check */
@@ -1327,8 +1332,11 @@ void doDisplay() {
 					if (bTimeStamp[1] != tTS)
 					{
 						/* Transition to new Board */
+						if (bTimeStamp[1] == 0)
+							bCondition[1] = 1;
+						else
+							bCondition[1] = 3;
 						bTimeStamp[1] = tTS;
-						bCondition[1] = 1;
 
 						/* Parse other files */
 						fp = fopen("/screen/boards/2/bDuration", "r");
@@ -1360,17 +1368,17 @@ void doDisplay() {
 				} else {
 					/* Board Not Active */
 					bTimeStamp[1]=0;
-					bCondition[1]=2;
+					bCondition[1]=3;
 				}
 			} else {
 				/* Board Not Active */
 				bTimeStamp[1]=0;
-				bCondition[1]=2;
+				bCondition[1]=3;
 			}
 		} else {
 			/* Board Not Active */
 			bTimeStamp[1]=0;
-			bCondition[1]=2;
+			bCondition[1]=3;
 		}
 
 		/* FS Board Check */
@@ -1395,8 +1403,11 @@ void doDisplay() {
 					if (bTimeStamp[2] != tTS)
 					{
 						/* Transition to new Board */
+						if (bTimeStamp[2] == 0)
+							bCondition[2] = 1;
+						else
+							bCondition[2] = 3;
 						bTimeStamp[2] = tTS;
-						bCondition[2] = 1;
 
 						/* Parse other files */
 						fp = fopen("/screen/boards/3/bDuration", "r");
@@ -1428,66 +1439,399 @@ void doDisplay() {
 				} else {
 					/* Board Not Active */
 					bTimeStamp[2]=0;
-					bCondition[2]=2;
+					bCondition[2]=3;
 				}
 			} else {
 				/* Board Not Active */
 				bTimeStamp[2]=0;
-				bCondition[2]=2;
+				bCondition[2]=3;
 			}
 		} else {
 			/* Board Not Active */
 			bTimeStamp[2]=0;
-			bCondition[2]=2;
+			bCondition[2]=3;
 		}
 
-		if ((bTimeStamp[0]==0) && (bTimeStamp[0]==0) && (bTimeStamp[0]==0))
+		if ((bTimeStamp[0]==0) && (bTimeStamp[1]==0) && (bTimeStamp[2]==0))
 			printf("*No Boards Defined!\n");
 
-		bCTimer=0;
+		bCTimer[0]=0;
 	}
 
 	/* Process Board Animation/Texture Loading */
+	/* Board 1 */
+	if (bTimeStamp[0] != 0)
+	{
+		if (bCondition[0] == 1)
+		{
+			/* Load Texture */
+			boardTex_A = IMG_Load("/screen/boards/1/1.png");
+			bVisible[0] = 1;
+			bCondition[0] = 2;
+			printf("Tex Loaded\n");
+		}
+		if (bCondition[0] == 2)
+		{
+			/* Fade in (New Board) */
+			if (bBAlpha[0] != 255)
+			{
+				bBAlpha[0] = bBAlpha[0] + 15;
+				dAnim[2] = 1;
+				if (bBAlpha[0] > 255)
+				{
+					bBAlpha[0] = 255;
+					bCondition[0] = 0;
+					dAnim[2] = 0;
+				}
+			} else {
+				bCondition[0] = 0;
+				dAnim[2] = 0;
+			}
+			bCAlpha[0] = bBAlpha[0];
+		}
+		if (bCondition[0] == 3)
+		{
+			/* Fade out (New Board) */
+			if (bBAlpha[0] != 0)
+			{
+				bBAlpha[0] = bBAlpha[0] - 15;
+				dAnim[2] = 1;
+				if (bBAlpha[0] < 0)
+				{
+					bBAlpha[0] = 0;
+					bCondition[0] = 1;
+					dAnim[2] = 0;
+					bScroll[0] = 0;
+				}
+			} else {
+				bCondition[0] = 1;
+				dAnim[2] = 0;
+				bScroll[0] = 0;
+			}
+			bCAlpha[0] = bBAlpha[0];
+		}
 
+		if (bCondition[0] == 4)
+		{
+			/* Fade out (Content Scroll Reached) */
+			if (bCAlpha[0] != 0)
+			{
+				bCAlpha[0] = bCAlpha[0] - 15;
+				dAnim[2] = 1;
+				if (bCAlpha[0] < 0)
+				{
+					bCAlpha[0] = 0;
+					bCondition[0] = 5;
+					dAnim[2] = 0;
+					bScroll[0] = 0;
+				}
+			} else {
+				bCondition[0] = 5;
+				dAnim[2] = 0;
+				bScroll[0] = 0;
+			}
+		}
+
+		if (bCondition[0] == 5)
+		{
+			/* Fade in (Content Scroll Reached) */
+			if (bCAlpha[0] != 255)
+			{
+				bCAlpha[0] = bCAlpha[0] + 15;
+				dAnim[2] = 1;
+				if (bCAlpha[1] > 255)
+				{
+					bCAlpha[0] = 255;
+					bCondition[0] = 5;
+					dAnim[2] = 0;
+					bScroll[0] = 0;
+				}
+			} else {
+				bCondition[0] = 0;
+				dAnim[2] = 0;
+				bScroll[0] = 0;
+			}
+		}
+
+		if (bCondition[0] == 6)
+		{
+			/* Fade out (then load new pane) */
+			if (bCAlpha[1] != 0)
+			{
+				bCAlpha[0] = bCAlpha[0] - 15;
+				dAnim[2] = 1;
+				if (bCAlpha[0] < 0)
+				{
+					bCAlpha[0] = 0;
+					bCondition[0] = 5;
+					dAnim[2] = 0;
+					bScroll[0] = 0;
+				}
+			} else {
+				bCondition[0] = 5;
+				dAnim[2] = 0;
+				bScroll[0] = 0;
+			}
+		}
+
+		if (bCondition[0] == 7)
+		{
+			/* Fade in (new pane loaded) */
+			if (bCAlpha[0] != 255)
+			{
+				bCAlpha[0] = bCAlpha[0] + 15;
+				dAnim[2] = 1;
+				if (bCAlpha[0] > 255)
+				{
+					bCAlpha[0] = 255;
+					bCondition[0] = 5;
+					dAnim[2] = 0;
+					bScroll[0] = 0;
+				}
+			} else {
+				bCondition[0] = 0;
+				dAnim[2] = 0;
+				bScroll[0] = 0;
+			}
+		}
+	} else {
+		/* No Board.  Fade old if present */
+		if (bCondition[0] == 3)
+		{
+			if (bBAlpha[0] != 0)
+			{
+				bBAlpha[0] = bBAlpha[0] - 15;
+				dAnim[2] = 1;
+				if (bBAlpha[0] < 0)
+				{
+					bBAlpha[0] = 0;
+					bCondition[0] = 0;
+					bVisible[0] = 0;
+					dAnim[2] = 0;
+					bScroll[0] = 0;
+					SDL_FreeSurface(boardTex_A);
+				}
+			} else {
+				bCondition[0] = 0;
+				bVisible[0] = 0;
+				dAnim[2] = 0;
+				bScroll[0] = 0;
+				SDL_FreeSurface(boardTex_A);
+			}
+			bCAlpha[0] = bBAlpha[0];
+		}
+	}
+
+	/* Board 3 */
+	if (bTimeStamp[2] != 0)
+	{
+		if (bCondition[2] == 1)
+		{
+			/* Load Texture */
+			boardTex_C = IMG_Load("/screen/boards/3/1.png");
+			bVisible[2] = 1;
+			bCondition[2] = 2;
+			printf("Tex Loaded\n");
+		}
+		if (bCondition[2] == 2)
+		{
+			/* Fade in (New Board) */
+			if (bBAlpha[2] != 255)
+			{
+				bBAlpha[2] = bBAlpha[2] + 15;
+				dAnim[4] = 1;
+				if (bBAlpha[2] > 255)
+				{
+					bBAlpha[2] = 255;
+					bCondition[2] = 0;
+					dAnim[4] = 0;
+				}
+			} else {
+				bCondition[2] = 0;
+				dAnim[4] = 0;
+			}
+			bCAlpha[2] = bBAlpha[2];
+		}
+		if (bCondition[2] == 3)
+		{
+			/* Fade out (New Board) */
+			if (bBAlpha[2] != 0)
+			{
+				bBAlpha[2] = bBAlpha[2] - 15;
+				dAnim[4] = 1;
+				if (bBAlpha[2] < 0)
+				{
+					bBAlpha[2] = 0;
+					bCondition[2] = 1;
+					dAnim[4] = 0;
+					bScroll[2] = 0;
+				}
+			} else {
+				bCondition[2] = 1;
+				dAnim[4] = 0;
+				bScroll[2] = 0;
+			}
+			bCAlpha[2] = bBAlpha[2];
+		}
+
+		if (bCondition[2] == 4)
+		{
+			/* Fade out (Content Scroll Reached) */
+			if (bCAlpha[2] != 0)
+			{
+				bCAlpha[2] = bCAlpha[2] - 15;
+				dAnim[4] = 1;
+				if (bCAlpha[2] < 0)
+				{
+					bCAlpha[2] = 0;
+					bCondition[2] = 5;
+					dAnim[4] = 0;
+					bScroll[2] = 0;
+				}
+			} else {
+				bCondition[2] = 5;
+				dAnim[4] = 0;
+				bScroll[2] = 0;
+			}
+		}
+
+		if (bCondition[2] == 5)
+		{
+			/* Fade in (Content Scroll Reached) */
+			if (bCAlpha[2] != 255)
+			{
+				bCAlpha[2] = bCAlpha[2] + 15;
+				dAnim[4] = 1;
+				if (bCAlpha[1] > 255)
+				{
+					bCAlpha[2] = 255;
+					bCondition[2] = 5;
+					dAnim[4] = 0;
+					bScroll[2] = 0;
+				}
+			} else {
+				bCondition[2] = 0;
+				dAnim[4] = 0;
+				bScroll[2] = 0;
+			}
+		}
+
+		if (bCondition[2] == 6)
+		{
+			/* Fade out (then load new pane) */
+			if (bCAlpha[1] != 0)
+			{
+				bCAlpha[2] = bCAlpha[2] - 15;
+				dAnim[4] = 1;
+				if (bCAlpha[2] < 0)
+				{
+					bCAlpha[2] = 0;
+					bCondition[2] = 5;
+					dAnim[4] = 0;
+					bScroll[2] = 0;
+				}
+			} else {
+				bCondition[2] = 5;
+				dAnim[4] = 0;
+				bScroll[2] = 0;
+			}
+		}
+
+		if (bCondition[2] == 7)
+		{
+			/* Fade in (new pane loaded) */
+			if (bCAlpha[2] != 255)
+			{
+				bCAlpha[2] = bCAlpha[2] + 15;
+				dAnim[4] = 1;
+				if (bCAlpha[2] > 255)
+				{
+					bCAlpha[2] = 255;
+					bCondition[2] = 5;
+					dAnim[4] = 0;
+					bScroll[2] = 0;
+				}
+			} else {
+				bCondition[2] = 0;
+				dAnim[4] = 0;
+				bScroll[2] = 0;
+			}
+		}
+	} else {
+		/* No Board.  Fade old if present */
+		if (bCondition[2] == 3)
+		{
+			if (bBAlpha[2] != 0)
+			{
+				bBAlpha[2] = bBAlpha[2] - 15;
+				dAnim[4] = 1;
+				if (bBAlpha[2] < 0)
+				{
+					bBAlpha[2] = 0;
+					bCondition[2] = 0;
+					bVisible[2] = 0;
+					dAnim[4] = 0;
+					bScroll[2] = 0;
+					SDL_FreeSurface(boardTex_C);
+				}
+			} else {
+				bCondition[2] = 0;
+				bVisible[2] = 0;
+				dAnim[4] = 0;
+				bScroll[2] = 0;
+				SDL_FreeSurface(boardTex_C);
+			}
+			bCAlpha[2] = bBAlpha[2];
+		}
+	}
+
+	/* Draw Boards */
 	/* Process LH Board */
 	if (bVisible[0]==1)
 	{
 		/* Scrolling */
 		/* Only scroll when Alpha = 255 */
-		if (bAlpha[0] == 255)
+		if ((bBAlpha[0] == 255) && (bCAlpha[0] == 255))
 		{
-			if (boardTex_A->h > 588)
+			if ((boardTex_A->h > 588) && (bScroll[0] / 3) < (boardTex_A->h-588))
 			{
 				/* We have to scroll, it's taller than 588 pixels high */
-				dAnim[2] = 1;
-				bScroll[0]++;
+				if (bCTimer[1] > 14)
+				{
+					dAnim[2] = 1;
+					bScroll[0]++;
+				}
 			}
 
-			if ((bScroll[0]*2) > (boardTex_A->h))
+			if ((bScroll[0] / 3) > (boardTex_A->h-588))
 			{
 				/* Instead of eventually hitting an upper limit on the scroll
 				   we loop the scroll value to keep things clean */
-				dAnim[2] = 0;
-				bScroll[0] = bScroll[0] - (boardTex_A->h * 2);
+				bScroll[0] = 3 * (boardTex_A->h - 588);
+				bCTimer[1] = 0;
 			}
 
-			/* Draw Board */
-			drawInfoBox(boardTex_A,
-					1,
-					(1280/2)-(boardTex_A->w)-12,
-					78,
-					609,
-					588,
-					bScroll[0] / 2,
-					1.0f,
-					1.0f,
-					1.0f,
-					255,
-					bAlpha[0],
-					bAlpha[1]);
+			if ((bScroll[0] / 3) == (boardTex_A->h-588))
+			{
+				dAnim[2] = 0;
+				if (bCTimer[1] > 14)
+					bCondition[0] = 4;
+			}
 		}
-		else
-			dAnim[2] = 0;
+		/* Draw Board */
+		drawInfoBox(boardTex_A,
+				1,
+				(1280/2)-(boardTex_A->w)-12,
+				78,
+				609,
+				588,
+				bScroll[0] / 3,
+				1.0f,
+				1.0f,
+				1.0f,
+				255,
+				bBAlpha[0],
+				bCAlpha[0]);
 	}
 
 	/* Process RH Board */
@@ -1495,7 +1839,7 @@ void doDisplay() {
 	{
 		/* Scrolling */
 		/* Only scroll when Alpha = 255 */
-		if (bAlpha[2] == 255)
+		if (bBAlpha[2] == 255)
 		{
 			if (boardTex_B->h > 588)
 			{
@@ -1524,52 +1868,63 @@ void doDisplay() {
 					1.0f,
 					1.0f,
 					255,
-					bAlpha[2],
-					bAlpha[3]);
+					bBAlpha[1],
+					bCAlpha[1]);
 		}
 		else
 			dAnim[3] = 0;
 	}
 
 	/* Process FS Board */
-	if (bVisible[2]==0)
+	if (bVisible[2]==1)
 	{
 		/* Scrolling */
 		/* Only scroll when Alpha = 255 */
-		if (bAlpha[4] == 255)
+		if ((bBAlpha[2] == 255) && (bCAlpha[2] == 255))
 		{
 			if (boardTex_C->h > 588)
 			{
 				/* We have to scroll, it's taller than 588 pixels high */
-				dAnim[4] = 1;
-				bScroll[2]++;
+				if ((bCTimer[3] > 14)  && (bCondition[2] == 0))
+				{
+					dAnim[4] = 1;
+					bScroll[2]++;
+				}				
 			}
 
-			if ((bScroll[2]*2) > (boardTex_C->h))
+			if ((bScroll[2] / 3) > (boardTex_C->h-588))
 			{
 				/* Instead of eventually hitting an upper limit on the scroll
 				   we loop the scroll value to keep things clean */
-				dAnim[4] = 0;
-				bScroll[2] = bScroll[2] - (boardTex_C->h * 2);
+				bScroll[2] = 3 * (boardTex_C->h - 588);
+				if (bCTimer[3] > 15)
+				{
+					bCTimer[3] = 0;
+					dAnim[4] = 0;
+				}
+				
+				if (bCTimer[3] > 14)
+				{
+					bCTimer[3] = 0;
+					bCondition[2] = 4;
+					dAnim[4] = 0;
+				}
 			}
-
-			/* Draw Board */
-			drawInfoBox(boardTex_C,
-					1,
-					19,
-					78,
-					1280-19-19,
-					588,
-					bScroll[2] / 2,
-					1.0f,
-					1.0f,
-					1.0f,
-					255,
-					bAlpha[4],
-					bAlpha[5]);
 		}
-		else
-			dAnim[4] = 0;
+		/* Draw Board */
+		drawInfoBox(boardTex_C,
+				2,
+				19,
+				78,
+				1280-19-19,
+				588,
+				bScroll[2] / 3,
+				1.0f,
+				1.0f,
+				1.0f,
+				255,
+				bBAlpha[2],
+				bCAlpha[2]);
 	}
 
 	/* Orbital Logo above everything else */
