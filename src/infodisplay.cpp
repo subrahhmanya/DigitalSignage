@@ -1252,7 +1252,6 @@ void doDisplay() {
 						int len = strlen(str)-1;
 						if(str[len] == '\n') 
 							str[len] = 0;
-						printf("TimeStamp 1 - %s\n", str);
 						tTS = strtol(str,NULL,0);
 					}
 					fclose(fp);
@@ -1271,7 +1270,6 @@ void doDisplay() {
 							int len = strlen(str)-1;
 							if(str[len] == '\n') 
 								str[len] = 0;
-							printf("Duration 1 - %s\n", str);
 							tTS = strtol(str,NULL,0);
 						}
 						fclose(fp);
@@ -1285,7 +1283,6 @@ void doDisplay() {
 							int len = strlen(str)-1;
 							if(str[len] == '\n') 
 								str[len] = 0;
-							printf("No. Boards 1 - %s\n", str);
 							tTS = strtol(str,NULL,0);
 						}
 						fclose(fp);
@@ -1323,7 +1320,6 @@ void doDisplay() {
 						int len = strlen(str)-1;
 						if(str[len] == '\n') 
 							str[len] = 0;
-						printf("TimeStamp 2 - %s\n", str);
 						tTS = strtol(str,NULL,0);
 					}
 					fclose(fp);
@@ -1342,7 +1338,6 @@ void doDisplay() {
 							int len = strlen(str)-1;
 							if(str[len] == '\n') 
 								str[len] = 0;
-							printf("Duration 2 - %s\n", str);
 							tTS = strtol(str,NULL,0);
 						}
 						fclose(fp);
@@ -1356,7 +1351,6 @@ void doDisplay() {
 							int len = strlen(str)-1;
 							if(str[len] == '\n') 
 								str[len] = 0;
-							printf("No. Boards 2 - %s\n", str);
 							tTS = strtol(str,NULL,0);
 						}
 						fclose(fp);
@@ -1394,7 +1388,6 @@ void doDisplay() {
 						int len = strlen(str)-1;
 						if(str[len] == '\n') 
 							str[len] = 0;
-						printf("TimeStamp 3 - %s\n", str);
 						tTS = strtol(str,NULL,0);
 					}
 					fclose(fp);
@@ -1413,7 +1406,6 @@ void doDisplay() {
 							int len = strlen(str)-1;
 							if(str[len] == '\n') 
 								str[len] = 0;
-							printf("Duration 3 - %s\n", str);
 							tTS = strtol(str,NULL,0);
 						}
 						fclose(fp);
@@ -1427,7 +1419,6 @@ void doDisplay() {
 							int len = strlen(str)-1;
 							if(str[len] == '\n') 
 								str[len] = 0;
-							printf("No. Boards 3 - %s\n", str);
 							tTS = strtol(str,NULL,0);
 						}
 						fclose(fp);
@@ -1450,6 +1441,8 @@ void doDisplay() {
 			bCondition[2]=2;
 		}
 
+		if ((bTimeStamp[0]==0) && (bTimeStamp[0]==0) && (bTimeStamp[0]==0))
+			printf("*No Boards Defined!\n");
 
 		bCTimer=0;
 	}
