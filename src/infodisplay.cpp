@@ -903,8 +903,8 @@ bool init() {
 
 	/* This is a testing texture */
 	boardTex_A = IMG_Load("/screen/boards/1/1.png");
-	boardTex_B = IMG_Load("/screen/boards/1/2.png");
-	boardTex_C = IMG_Load("/screen/boards/1/1.png");
+	boardTex_B = IMG_Load("/screen/boards/2/1.png");
+	boardTex_C = IMG_Load("/screen/boards/3/1.png");
 
 	SDL_ShowCursor(SDL_DISABLE); 
 
@@ -1213,7 +1213,7 @@ void doDisplay() {
 	}
 
 	/* Draw Boards */
-	/* We need to pull all information from /screen/boards */
+	/* We need to pull and process all information from /screen/boards */
 
 	/* Process LH Board */
 	if (bVisible[0]==1)

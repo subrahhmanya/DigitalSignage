@@ -30,6 +30,11 @@ logOut "Compiling InfoDisplay..."
 cd ${srcroot}src > /dev/null 2>&1
 make > /dev/null 2>&1
 
+#Create Directory Structure (if not already done)
+mkdir -p ${scrroot}boards/1
+mkdir -p ${scrroot}boards/2
+mkdir -p ${scrroot}boards/3
+
 #Move new binary
 rm ${scrroot}infodisplay
 cp infodisplay ${scrroot} > /dev/null 2>&1
