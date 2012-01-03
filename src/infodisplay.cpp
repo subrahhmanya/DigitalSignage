@@ -1,8 +1,8 @@
 //-------------------------------------------------------------------------
 //          Name: infodisplay.cpp
 //        Author: Paul Wollaston
-// Project Start: 25/12/11
-// Last Modified: 07/12/11
+// Project Start: 25/11/11
+// Last Modified: 03/12/12
 //   Description: Display agregated data in an easy-to-read format with
 //                ability to be flexible with what is shown.
 //-------------------------------------------------------------------------
