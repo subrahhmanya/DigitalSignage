@@ -1249,6 +1249,8 @@ void doDisplay() {
 		/* Determine if Logo is White or Black */
 		if (FileExists("/screen/white"))
 			logoisWhite=1;
+		else
+			logoisWhite=0;
 
 		/* LH Board Check */
 		if (FileExists("/screen/boards/1/bTimeStamp")) {
