@@ -1605,26 +1605,6 @@ void doDisplay() {
 			}
 		}
 
-		if (bCondition[0] == 7)
-		{
-			/* Fade in (new pane loaded) */
-			if (bCAlpha[0] != 255)
-			{
-				bCAlpha[0] = bCAlpha[0] + 15;
-				dAnim[2] = 1;
-				if (bCAlpha[0] > 255)
-				{
-					bCAlpha[0] = 255;
-					bCondition[0] = 5;
-					dAnim[2] = 0;
-					bScroll[0] = 0;
-				}
-			} else {
-				bCondition[0] = 0;
-				dAnim[2] = 0;
-				bScroll[0] = 0;
-			}
-		}
 	} else {
 		/* No Board.  Fade old if present */
 		if (bCondition[0] == 3)
@@ -1780,26 +1760,6 @@ void doDisplay() {
 			}
 		}
 
-		if (bCondition[1] == 7)
-		{
-			/* Fade in (new pane loaded) */
-			if (bCAlpha[1] != 255)
-			{
-				bCAlpha[1] = bCAlpha[1] + 15;
-				dAnim[3] = 1;
-				if (bCAlpha[1] > 255)
-				{
-					bCAlpha[1] = 255;
-					bCondition[1] = 5;
-					dAnim[3] = 0;
-					bScroll[1] = 0;
-				}
-			} else {
-				bCondition[1] = 0;
-				dAnim[3] = 0;
-				bScroll[1] = 0;
-			}
-		}
 	} else {
 		/* No Board.  Fade old if present */
 		if (bCondition[1] == 3)
@@ -1955,26 +1915,6 @@ void doDisplay() {
 			}
 		}
 
-		if (bCondition[2] == 7)
-		{
-			/* Fade in (new pane loaded) */
-			if (bCAlpha[2] != 255)
-			{
-				bCAlpha[2] = bCAlpha[2] + 15;
-				dAnim[4] = 1;
-				if (bCAlpha[2] > 255)
-				{
-					bCAlpha[2] = 255;
-					bCondition[2] = 5;
-					dAnim[4] = 0;
-					bScroll[2] = 0;
-				}
-			} else {
-				bCondition[2] = 0;
-				dAnim[4] = 0;
-				bScroll[2] = 0;
-			}
-		}
 	} else {
 		/* No Board.  Fade old if present */
 		if (bCondition[2] == 3)
