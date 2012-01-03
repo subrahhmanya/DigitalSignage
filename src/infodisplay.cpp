@@ -52,8 +52,10 @@ int bVisible[3] = {0, 0, 0};
 int bTimer[3] = {0, 0, 0};
 int bDuration[3] = {0, 0, 0};
 int bNo[3] = {0, 0, 0};
+int bCNo[3] = {0, 0, 0};
 int bTimeStamp[3] = {0, 0, 0};
 int bCondition[3] = {0, 0, 0};
+int bNCondition[3] = {0, 0, 0};
 int bBAlpha[3] = {0, 0, 0};
 int bCAlpha[3] = {0, 0, 0};
 int bCTimer[3] = {15, 15, 0};
@@ -75,6 +77,7 @@ int pTWidth=0;
 float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 int logoisWhite=0;
+char tFName[128];
 
 /* Define Global Textures */
 SDL_Surface *orb_logo;
@@ -1230,10 +1233,18 @@ void doDisplay() {
 
 		if (ltm->tm_min < 10)
 			{
-			printf("Performing 15s Timer Check - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+			if (ltm->tm_sec < 10)
+				printf("Performing 15s Timer Check - %i:0%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+			else
+				printf("Performing 15s Timer Check - %i:0%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			}
 		else
-			printf("Performing 15s Timer Check - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+			{
+			if (ltm->tm_sec < 10)
+				printf("Performing 15s Timer Check - %i:%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+			else
+				printf("Performing 15s Timer Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+			}
 
 		/* Determine if Logo is White or Black */
 		if (FileExists("/screen/white"))
@@ -1265,6 +1276,7 @@ void doDisplay() {
 							bCondition[0] = 1;
 						else
 							bCondition[0] = 3;
+
 						bTimeStamp[0] = tTS;
 
 						/* Parse other files */
@@ -1336,6 +1348,7 @@ void doDisplay() {
 							bCondition[1] = 1;
 						else
 							bCondition[1] = 3;
+
 						bTimeStamp[1] = tTS;
 
 						/* Parse other files */
@@ -1407,6 +1420,7 @@ void doDisplay() {
 							bCondition[2] = 1;
 						else
 							bCondition[2] = 3;
+
 						bTimeStamp[2] = tTS;
 
 						/* Parse other files */
@@ -1465,10 +1479,20 @@ void doDisplay() {
 		if (bCondition[0] == 1)
 		{
 			/* Load Texture */
-			boardTex_A = IMG_Load("/screen/boards/1/1.png");
+			bCNo[0]++;
+			if (bCNo[0] > bNo[0])
+				bCNo[0] = 1;
+			sprintf(tFName, "/screen/boards/1/%i.png", bCNo[0]);
+			SDL_FreeSurface(boardTex_A);
+			boardTex_A = IMG_Load(tFName);
 			bVisible[0] = 1;
-			bCondition[0] = 2;
-			printf("Tex Loaded\n");
+			if (bNCondition[0] != 0)
+				bCondition[0] = bNCondition[0];
+			else
+				bCondition[0] = 2;
+			bNCondition[0] = 0;
+			bCTimer[1] = 0;
+			printf("Tex Loaded %s\n", tFName);
 		}
 		if (bCondition[0] == 2)
 		{
@@ -1539,7 +1563,7 @@ void doDisplay() {
 			{
 				bCAlpha[0] = bCAlpha[0] + 15;
 				dAnim[2] = 1;
-				if (bCAlpha[1] > 255)
+				if (bCAlpha[0] > 255)
 				{
 					bCAlpha[0] = 255;
 					bCondition[0] = 5;
@@ -1556,19 +1580,21 @@ void doDisplay() {
 		if (bCondition[0] == 6)
 		{
 			/* Fade out (then load new pane) */
-			if (bCAlpha[1] != 0)
+			if (bCAlpha[0] != 0)
 			{
 				bCAlpha[0] = bCAlpha[0] - 15;
 				dAnim[2] = 1;
 				if (bCAlpha[0] < 0)
 				{
 					bCAlpha[0] = 0;
-					bCondition[0] = 5;
+					bCondition[0] = 1;
+					bNCondition[0] = 5;
 					dAnim[2] = 0;
 					bScroll[0] = 0;
 				}
 			} else {
-				bCondition[0] = 5;
+				bCondition[0] = 1;
+				bNCondition[0] = 5;
 				dAnim[2] = 0;
 				bScroll[0] = 0;
 			}
@@ -1622,16 +1648,201 @@ void doDisplay() {
 		}
 	}
 
+	/* Board 2 */
+	if (bTimeStamp[1] != 0)
+	{
+		if (bCondition[1] == 1)
+		{
+			/* Load Texture */
+			bCNo[1]++;
+			if (bCNo[1] > bNo[1])
+				bCNo[1] = 1;
+			sprintf(tFName, "/screen/boards/2/%i.png", bCNo[1]);
+			SDL_FreeSurface(boardTex_B);
+			boardTex_B = IMG_Load(tFName);
+			bVisible[1] = 1;
+			if (bNCondition[1] != 0)
+				bCondition[1] = bNCondition[1];
+			else
+				bCondition[1] = 2;
+			bNCondition[1] = 0;
+			bCTimer[2] = 0;
+			printf("Tex Loaded %s\n", tFName);
+		}
+		if (bCondition[1] == 2)
+		{
+			/* Fade in (New Board) */
+			if (bBAlpha[1] != 255)
+			{
+				bBAlpha[1] = bBAlpha[1] + 15;
+				dAnim[3] = 1;
+				if (bBAlpha[1] > 255)
+				{
+					bBAlpha[1] = 255;
+					bCondition[1] = 0;
+					dAnim[3] = 0;
+				}
+			} else {
+				bCondition[1] = 0;
+				dAnim[3] = 0;
+			}
+			bCAlpha[1] = bBAlpha[1];
+		}
+		if (bCondition[1] == 3)
+		{
+			/* Fade out (New Board) */
+			if (bBAlpha[1] != 0)
+			{
+				bBAlpha[1] = bBAlpha[1] - 15;
+				dAnim[3] = 1;
+				if (bBAlpha[1] < 0)
+				{
+					bBAlpha[1] = 0;
+					bCondition[1] = 1;
+					dAnim[3] = 0;
+					bScroll[1] = 0;
+				}
+			} else {
+				bCondition[1] = 1;
+				dAnim[3] = 0;
+				bScroll[1] = 0;
+			}
+			bCAlpha[1] = bBAlpha[1];
+		}
+
+		if (bCondition[1] == 4)
+		{
+			/* Fade out (Content Scroll Reached) */
+			if (bCAlpha[1] != 0)
+			{
+				bCAlpha[1] = bCAlpha[1] - 15;
+				dAnim[3] = 1;
+				if (bCAlpha[1] < 0)
+				{
+					bCAlpha[1] = 0;
+					bCondition[1] = 5;
+					dAnim[3] = 0;
+					bScroll[1] = 0;
+				}
+			} else {
+				bCondition[1] = 5;
+				dAnim[3] = 0;
+				bScroll[1] = 0;
+			}
+		}
+
+		if (bCondition[1] == 5)
+		{
+			/* Fade in (Content Scroll Reached) */
+			if (bCAlpha[1] != 255)
+			{
+				bCAlpha[1] = bCAlpha[1] + 15;
+				dAnim[3] = 1;
+				if (bCAlpha[1] > 255)
+				{
+					bCAlpha[1] = 255;
+					bCondition[1] = 5;
+					dAnim[3] = 0;
+					bScroll[1] = 0;
+				}
+			} else {
+				bCondition[1] = 0;
+				dAnim[3] = 0;
+				bScroll[1] = 0;
+			}
+		}
+
+		if (bCondition[1] == 6)
+		{
+			/* Fade out (then load new pane) */
+			if (bCAlpha[1] != 0)
+			{
+				bCAlpha[1] = bCAlpha[1] - 15;
+				dAnim[3] = 1;
+				if (bCAlpha[1] < 0)
+				{
+					bCAlpha[1] = 0;
+					bCondition[1] = 1;
+					bNCondition[1] = 5;
+					dAnim[3] = 0;
+					bScroll[1] = 0;
+				}
+			} else {
+				bCondition[1] = 1;
+				bNCondition[1] = 5;
+				dAnim[3] = 0;
+				bScroll[1] = 0;
+			}
+		}
+
+		if (bCondition[1] == 7)
+		{
+			/* Fade in (new pane loaded) */
+			if (bCAlpha[1] != 255)
+			{
+				bCAlpha[1] = bCAlpha[1] + 15;
+				dAnim[3] = 1;
+				if (bCAlpha[1] > 255)
+				{
+					bCAlpha[1] = 255;
+					bCondition[1] = 5;
+					dAnim[3] = 0;
+					bScroll[1] = 0;
+				}
+			} else {
+				bCondition[1] = 0;
+				dAnim[3] = 0;
+				bScroll[1] = 0;
+			}
+		}
+	} else {
+		/* No Board.  Fade old if present */
+		if (bCondition[1] == 3)
+		{
+			if (bBAlpha[1] != 0)
+			{
+				bBAlpha[1] = bBAlpha[1] - 15;
+				dAnim[3] = 1;
+				if (bBAlpha[1] < 0)
+				{
+					bBAlpha[1] = 0;
+					bCondition[1] = 0;
+					bVisible[1] = 0;
+					dAnim[3] = 0;
+					bScroll[1] = 0;
+					SDL_FreeSurface(boardTex_B);
+				}
+			} else {
+				bCondition[1] = 0;
+				bVisible[1] = 0;
+				dAnim[3] = 0;
+				bScroll[1] = 0;
+				SDL_FreeSurface(boardTex_B);
+			}
+			bCAlpha[1] = bBAlpha[1];
+		}
+	}
+
 	/* Board 3 */
 	if (bTimeStamp[2] != 0)
 	{
 		if (bCondition[2] == 1)
 		{
 			/* Load Texture */
-			boardTex_C = IMG_Load("/screen/boards/3/1.png");
+			bCNo[2]++;
+			if (bCNo[2] > bNo[2])
+				bCNo[2] = 1;
+			sprintf(tFName, "/screen/boards/3/%i.png", bCNo[2]);
+			SDL_FreeSurface(boardTex_C);
+			boardTex_C = IMG_Load(tFName);
 			bVisible[2] = 1;
-			bCondition[2] = 2;
-			printf("Tex Loaded\n");
+			if (bNCondition[2] != 0)
+				bCondition[2] = bNCondition[2];
+			else
+				bCondition[2] = 2;
+			bNCondition[2] = 0;
+			bCTimer[3] = 0;
+			printf("Tex Loaded %s\n", tFName);
 		}
 		if (bCondition[2] == 2)
 		{
@@ -1702,7 +1913,7 @@ void doDisplay() {
 			{
 				bCAlpha[2] = bCAlpha[2] + 15;
 				dAnim[4] = 1;
-				if (bCAlpha[1] > 255)
+				if (bCAlpha[2] > 255)
 				{
 					bCAlpha[2] = 255;
 					bCondition[2] = 5;
@@ -1719,19 +1930,21 @@ void doDisplay() {
 		if (bCondition[2] == 6)
 		{
 			/* Fade out (then load new pane) */
-			if (bCAlpha[1] != 0)
+			if (bCAlpha[2] != 0)
 			{
 				bCAlpha[2] = bCAlpha[2] - 15;
 				dAnim[4] = 1;
 				if (bCAlpha[2] < 0)
 				{
 					bCAlpha[2] = 0;
-					bCondition[2] = 5;
+					bCondition[2] = 1;
+					bNCondition[2] = 5;
 					dAnim[4] = 0;
 					bScroll[2] = 0;
 				}
 			} else {
-				bCondition[2] = 5;
+				bCondition[2] = 1;
+				bNCondition[2] = 5;
 				dAnim[4] = 0;
 				bScroll[2] = 0;
 			}
@@ -1793,13 +2006,21 @@ void doDisplay() {
 		/* Only scroll when Alpha = 255 */
 		if ((bBAlpha[0] == 255) && (bCAlpha[0] == 255))
 		{
-			if ((boardTex_A->h > 588) && (bScroll[0] / 3) < (boardTex_A->h-588))
+			if (boardTex_A->h > 588)
 			{
 				/* We have to scroll, it's taller than 588 pixels high */
-				if (bCTimer[1] > 14)
+				if ((bCTimer[1] > 14)  && (bCondition[0] == 0))
 				{
 					dAnim[2] = 1;
 					bScroll[0]++;
+				}				
+			} else {
+				/* It's not a scrolling image, so we use the timer variable */
+				if (bCTimer[1] > bDuration[0])
+				{
+					bCTimer[1] = 0;
+					if (bNo[0] > 1)
+						bCondition[0] = 6;
 				}
 			}
 
@@ -1808,14 +2029,21 @@ void doDisplay() {
 				/* Instead of eventually hitting an upper limit on the scroll
 				   we loop the scroll value to keep things clean */
 				bScroll[0] = 3 * (boardTex_A->h - 588);
-				bCTimer[1] = 0;
-			}
-
-			if ((bScroll[0] / 3) == (boardTex_A->h-588))
-			{
-				dAnim[2] = 0;
+				if (bCTimer[1] > 15)
+				{
+					bCTimer[1] = 0;
+					dAnim[2] = 0;
+				}
+				
 				if (bCTimer[1] > 14)
-					bCondition[0] = 4;
+				{
+					bCTimer[1] = 0;
+					if (bNo[0] > 1)
+						bCondition[0] = 6;
+					else
+						bCondition[0] = 4;
+					dAnim[2] = 0;
+				}
 			}
 		}
 		/* Draw Board */
@@ -1823,7 +2051,7 @@ void doDisplay() {
 				1,
 				(1280/2)-(boardTex_A->w)-12,
 				78,
-				609,
+				1280-19-19,
 				588,
 				bScroll[0] / 3,
 				1.0f,
@@ -1839,40 +2067,62 @@ void doDisplay() {
 	{
 		/* Scrolling */
 		/* Only scroll when Alpha = 255 */
-		if (bBAlpha[2] == 255)
+		if ((bBAlpha[1] == 255) && (bCAlpha[1] == 255))
 		{
 			if (boardTex_B->h > 588)
 			{
 				/* We have to scroll, it's taller than 588 pixels high */
-				dAnim[3] = 1;
-				bScroll[1]++;
+				if ((bCTimer[2] > 14)  && (bCondition[1] == 0))
+				{
+					dAnim[3] = 1;
+					bScroll[1]++;
+				}				
+			} else {
+				/* It's not a scrolling image, so we use the timer variable */
+				if (bCTimer[2] > bDuration[1])
+				{
+					bCTimer[2] = 0;
+					if (bNo[1] > 1)
+						bCondition[1] = 6;
+				}
 			}
 
-			if ((bScroll[1]*2) > (boardTex_B->h))
+			if ((bScroll[1] / 3) > (boardTex_B->h-588))
 			{
 				/* Instead of eventually hitting an upper limit on the scroll
 				   we loop the scroll value to keep things clean */
-				dAnim[3] = 0;
-				bScroll[1] = bScroll[1] - (boardTex_B->h * 2);
+				bScroll[1] = 3 * (boardTex_B->h - 588);
+				if (bCTimer[2] > 15)
+				{
+					bCTimer[2] = 0;
+					dAnim[3] = 0;
+				}
+				
+				if (bCTimer[2] > 14)
+				{
+					bCTimer[2] = 0;
+					if (bNo[1] > 1)
+						bCondition[1] = 6;
+					else
+						bCondition[1] = 4;
+					dAnim[3] = 0;
+				}
 			}
-
-			/* Draw Board */
-			drawInfoBox(boardTex_B,
-					1,
-					(1280/2)+12,
-					78,
-					609,
-					588,
-					bScroll[1] / 2,
-					1.0f,
-					1.0f,
-					1.0f,
-					255,
-					bBAlpha[1],
-					bCAlpha[1]);
 		}
-		else
-			dAnim[3] = 0;
+		/* Draw Board */
+		drawInfoBox(boardTex_B,
+				1,
+				(1280/2)+12,
+				78,
+				609,
+				588,
+				bScroll[1] / 3,
+				1.0f,
+				1.0f,
+				1.0f,
+				255,
+				bBAlpha[1],
+				bCAlpha[1]);
 	}
 
 	/* Process FS Board */
@@ -1890,6 +2140,14 @@ void doDisplay() {
 					dAnim[4] = 1;
 					bScroll[2]++;
 				}				
+			} else {
+				/* It's not a scrolling image, so we use the timer variable */
+				if (bCTimer[3] > bDuration[2])
+				{
+					bCTimer[3] = 0;
+					if (bNo[2] > 1)
+						bCondition[2] = 6;
+				}
 			}
 
 			if ((bScroll[2] / 3) > (boardTex_C->h-588))
@@ -1906,7 +2164,10 @@ void doDisplay() {
 				if (bCTimer[3] > 14)
 				{
 					bCTimer[3] = 0;
-					bCondition[2] = 4;
+					if (bNo[2] > 1)
+						bCondition[2] = 6;
+					else
+						bCondition[2] = 4;
 					dAnim[4] = 0;
 				}
 			}
