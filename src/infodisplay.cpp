@@ -1305,6 +1305,7 @@ void doDisplay() {
 						fclose(fp);
 
 						bNo[0] = tTS;
+						bCNo[0] = 0;
 					}
 				} else {
 					/* Board Not Active */
@@ -1377,6 +1378,7 @@ void doDisplay() {
 						fclose(fp);
 
 						bNo[1] = tTS;
+						bCNo[1] = 0;
 					}
 				} else {
 					/* Board Not Active */
@@ -1449,6 +1451,7 @@ void doDisplay() {
 						fclose(fp);
 
 						bNo[2] = tTS;
+						bCNo[2] = 0;
 					}
 				} else {
 					/* Board Not Active */
