@@ -2,7 +2,7 @@
 //          Name: infodisplay.cpp
 //        Author: Paul Wollaston
 // Project Start: 25/11/11
-// Last Modified: 03/12/12
+// Last Modified: 04/12/12
 //   Description: Display agregated data in an easy-to-read format with
 //                ability to be flexible with what is shown.
 //-------------------------------------------------------------------------
@@ -1270,7 +1270,6 @@ void doDisplay() {
 						tTS = strtol(str,NULL,0);
 					}
 					fclose(fp);
-
 					if (bTimeStamp[0] != tTS)
 					{
 						/* Transition to new Board */
@@ -1620,14 +1619,12 @@ void doDisplay() {
 					bVisible[0] = 0;
 					dAnim[2] = 0;
 					bScroll[0] = 0;
-					SDL_FreeSurface(boardTex_A);
 				}
 			} else {
 				bCondition[0] = 0;
 				bVisible[0] = 0;
 				dAnim[2] = 0;
 				bScroll[0] = 0;
-				SDL_FreeSurface(boardTex_A);
 			}
 			bCAlpha[0] = bBAlpha[0];
 		}
@@ -1775,14 +1772,12 @@ void doDisplay() {
 					bVisible[1] = 0;
 					dAnim[3] = 0;
 					bScroll[1] = 0;
-					SDL_FreeSurface(boardTex_B);
 				}
 			} else {
 				bCondition[1] = 0;
 				bVisible[1] = 0;
 				dAnim[3] = 0;
 				bScroll[1] = 0;
-				SDL_FreeSurface(boardTex_B);
 			}
 			bCAlpha[1] = bBAlpha[1];
 		}
@@ -1930,14 +1925,12 @@ void doDisplay() {
 					bVisible[2] = 0;
 					dAnim[4] = 0;
 					bScroll[2] = 0;
-					SDL_FreeSurface(boardTex_C);
 				}
 			} else {
 				bCondition[2] = 0;
 				bVisible[2] = 0;
 				dAnim[4] = 0;
 				bScroll[2] = 0;
-				SDL_FreeSurface(boardTex_C);
 			}
 			bCAlpha[2] = bBAlpha[2];
 		}
@@ -1996,7 +1989,7 @@ void doDisplay() {
 				1,
 				(1280/2)-(boardTex_A->w)-12,
 				78,
-				1280-19-19,
+				609,
 				588,
 				bScroll[0] / 3,
 				1.0f,
@@ -2080,7 +2073,7 @@ void doDisplay() {
 			if (boardTex_C->h > 588)
 			{
 				/* We have to scroll, it's taller than 588 pixels high */
-				if ((bCTimer[3] > 14)  && (bCondition[2] == 0))
+				if ((bCTimer[3] > 29)  && (bCondition[2] == 0))
 				{
 					dAnim[4] = 1;
 					bScroll[2]++;
@@ -2100,13 +2093,13 @@ void doDisplay() {
 				/* Instead of eventually hitting an upper limit on the scroll
 				   we loop the scroll value to keep things clean */
 				bScroll[2] = 3 * (boardTex_C->h - 588);
-				if (bCTimer[3] > 15)
+				if (bCTimer[3] > 30)
 				{
 					bCTimer[3] = 0;
 					dAnim[4] = 0;
 				}
 				
-				if (bCTimer[3] > 14)
+				if (bCTimer[3] > 29)
 				{
 					bCTimer[3] = 0;
 					if (bNo[2] > 1)
