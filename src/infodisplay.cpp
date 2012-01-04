@@ -159,6 +159,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			int calpha);
 
 bool FileExists( const char* FileName );
+void doBoardAnims(int boardNumber);
 void doDisplay();
 bool init();
 
@@ -796,6 +797,161 @@ bool drawInfoBox(SDL_Surface *tpoint,
 	/* Clean up */
 	glDeleteTextures(1, &TextureID);
 	return true;
+}
+
+void doBoardAnims(int boardNumber)
+{
+	if (bTimeStamp[boardNumber-1] != 0)
+	{
+		if (bCondition[boardNumber-1] == 1)
+		{
+			/* Load Texture */
+			bCNo[boardNumber-1]++;
+			if (bCNo[boardNumber-1] > bNo[boardNumber-1])
+				bCNo[boardNumber-1] = 1;
+			sprintf(tFName, "/screen/boards/%i/%i.png", boardNumber, bCNo[boardNumber-1]);
+			SDL_FreeSurface(boardTex_C);
+			boardTex_C = IMG_Load(tFName);
+			bVisible[boardNumber-1] = 1;
+			if (bNCondition[boardNumber-1] != 0)
+				bCondition[boardNumber-1] = bNCondition[boardNumber-1];
+			else
+				bCondition[boardNumber-1] = 2;
+			bNCondition[boardNumber-1] = 0;
+			bCTimer[boardNumber] = 0;
+			printf("Tex Loaded %s\n", tFName);
+		}
+		if (bCondition[boardNumber-1] == 2)
+		{
+			/* Fade in (New Board) */
+			if (bBAlpha[boardNumber-1] != 255)
+			{
+				bBAlpha[boardNumber-1] = bBAlpha[boardNumber-1] + 15;
+				dAnim[boardNumber+1] = 1;
+				if (bBAlpha[boardNumber-1] > 255)
+				{
+					bBAlpha[boardNumber-1] = 255;
+					bCondition[boardNumber-1] = 0;
+					dAnim[boardNumber+1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 0;
+				dAnim[boardNumber+1] = 0;
+			}
+			bCAlpha[boardNumber-1] = bBAlpha[boardNumber-1];
+		}
+		if (bCondition[boardNumber-1] == 3)
+		{
+			/* Fade out (New Board) */
+			if (bBAlpha[boardNumber-1] != 0)
+			{
+				bBAlpha[boardNumber-1] = bBAlpha[boardNumber-1] - 15;
+				dAnim[boardNumber+1] = 1;
+				if (bBAlpha[boardNumber-1] < 0)
+				{
+					bBAlpha[boardNumber-1] = 0;
+					bCondition[boardNumber-1] = 1;
+					dAnim[boardNumber+1] = 0;
+					bScroll[boardNumber-1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 1;
+				dAnim[boardNumber+1] = 0;
+				bScroll[boardNumber-1] = 0;
+			}
+			bCAlpha[boardNumber-1] = bBAlpha[boardNumber-1];
+		}
+
+		if (bCondition[boardNumber-1] == 4)
+		{
+			/* Fade out (Content Scroll Reached) */
+			if (bCAlpha[boardNumber-1] != 0)
+			{
+				bCAlpha[boardNumber-1] = bCAlpha[boardNumber-1] - 15;
+				dAnim[boardNumber+1] = 1;
+				if (bCAlpha[boardNumber-1] < 0)
+				{
+					bCAlpha[boardNumber-1] = 0;
+					bCondition[boardNumber-1] = 5;
+					dAnim[boardNumber+1] = 0;
+					bScroll[boardNumber-1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 5;
+				dAnim[boardNumber+1] = 0;
+				bScroll[boardNumber-1] = 0;
+			}
+		}
+
+		if (bCondition[boardNumber-1] == 5)
+		{
+			/* Fade in (Content Scroll Reached) */
+			if (bCAlpha[boardNumber-1] != 255)
+			{
+				bCAlpha[boardNumber-1] = bCAlpha[boardNumber-1] + 15;
+				dAnim[boardNumber+1] = 1;
+				if (bCAlpha[boardNumber-1] > 255)
+				{
+					bCAlpha[boardNumber-1] = 255;
+					bCondition[boardNumber-1] = 5;
+					dAnim[boardNumber+1] = 0;
+					bScroll[boardNumber-1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 0;
+				dAnim[boardNumber+1] = 0;
+				bScroll[boardNumber-1] = 0;
+			}
+		}
+
+		if (bCondition[boardNumber-1] == 6)
+		{
+			/* Fade out (then load new pane) */
+			if (bCAlpha[boardNumber-1] != 0)
+			{
+				bCAlpha[boardNumber-1] = bCAlpha[boardNumber-1] - 15;
+				dAnim[boardNumber+1] = 1;
+				if (bCAlpha[boardNumber-1] < 0)
+				{
+					bCAlpha[boardNumber-1] = 0;
+					bCondition[boardNumber-1] = 1;
+					bNCondition[boardNumber-1] = 5;
+					dAnim[boardNumber+1] = 0;
+					bScroll[boardNumber-1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 1;
+				bNCondition[boardNumber-1] = 5;
+				dAnim[boardNumber+1] = 0;
+				bScroll[boardNumber-1] = 0;
+			}
+		}
+
+	} else {
+		/* No Board.  Fade old if present */
+		if (bCondition[boardNumber-1] == 3)
+		{
+			if (bBAlpha[boardNumber-1] != 0)
+			{
+				bBAlpha[boardNumber-1] = bBAlpha[boardNumber-1] - 15;
+				dAnim[boardNumber+1] = 1;
+				if (bBAlpha[boardNumber-1] < 0)
+				{
+					bBAlpha[boardNumber-1] = 0;
+					bCondition[boardNumber-1] = 0;
+					bVisible[boardNumber-1] = 0;
+					dAnim[boardNumber+1] = 0;
+					bScroll[boardNumber-1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 0;
+				bVisible[boardNumber-1] = 0;
+				dAnim[boardNumber+1] = 0;
+				bScroll[boardNumber-1] = 0;
+			}
+			bCAlpha[boardNumber-1] = bBAlpha[boardNumber-1];
+		}
+	}
 }
 
 bool init() {
@@ -1477,464 +1633,9 @@ void doDisplay() {
 	}
 
 	/* Process Board Animation/Texture Loading */
-	/* Board 1 */
-	if (bTimeStamp[0] != 0)
-	{
-		if (bCondition[0] == 1)
-		{
-			/* Load Texture */
-			bCNo[0]++;
-			if (bCNo[0] > bNo[0])
-				bCNo[0] = 1;
-			sprintf(tFName, "/screen/boards/1/%i.png", bCNo[0]);
-			SDL_FreeSurface(boardTex_A);
-			boardTex_A = IMG_Load(tFName);
-			bVisible[0] = 1;
-			if (bNCondition[0] != 0)
-				bCondition[0] = bNCondition[0];
-			else
-				bCondition[0] = 2;
-			bNCondition[0] = 0;
-			bCTimer[1] = 0;
-			printf("Tex Loaded %s\n", tFName);
-		}
-		if (bCondition[0] == 2)
-		{
-			/* Fade in (New Board) */
-			if (bBAlpha[0] != 255)
-			{
-				bBAlpha[0] = bBAlpha[0] + 15;
-				dAnim[2] = 1;
-				if (bBAlpha[0] > 255)
-				{
-					bBAlpha[0] = 255;
-					bCondition[0] = 0;
-					dAnim[2] = 0;
-				}
-			} else {
-				bCondition[0] = 0;
-				dAnim[2] = 0;
-			}
-			bCAlpha[0] = bBAlpha[0];
-		}
-		if (bCondition[0] == 3)
-		{
-			/* Fade out (New Board) */
-			if (bBAlpha[0] != 0)
-			{
-				bBAlpha[0] = bBAlpha[0] - 15;
-				dAnim[2] = 1;
-				if (bBAlpha[0] < 0)
-				{
-					bBAlpha[0] = 0;
-					bCondition[0] = 1;
-					dAnim[2] = 0;
-					bScroll[0] = 0;
-				}
-			} else {
-				bCondition[0] = 1;
-				dAnim[2] = 0;
-				bScroll[0] = 0;
-			}
-			bCAlpha[0] = bBAlpha[0];
-		}
-
-		if (bCondition[0] == 4)
-		{
-			/* Fade out (Content Scroll Reached) */
-			if (bCAlpha[0] != 0)
-			{
-				bCAlpha[0] = bCAlpha[0] - 15;
-				dAnim[2] = 1;
-				if (bCAlpha[0] < 0)
-				{
-					bCAlpha[0] = 0;
-					bCondition[0] = 5;
-					dAnim[2] = 0;
-					bScroll[0] = 0;
-				}
-			} else {
-				bCondition[0] = 5;
-				dAnim[2] = 0;
-				bScroll[0] = 0;
-			}
-		}
-
-		if (bCondition[0] == 5)
-		{
-			/* Fade in (Content Scroll Reached) */
-			if (bCAlpha[0] != 255)
-			{
-				bCAlpha[0] = bCAlpha[0] + 15;
-				dAnim[2] = 1;
-				if (bCAlpha[0] > 255)
-				{
-					bCAlpha[0] = 255;
-					bCondition[0] = 5;
-					dAnim[2] = 0;
-					bScroll[0] = 0;
-				}
-			} else {
-				bCondition[0] = 0;
-				dAnim[2] = 0;
-				bScroll[0] = 0;
-			}
-		}
-
-		if (bCondition[0] == 6)
-		{
-			/* Fade out (then load new pane) */
-			if (bCAlpha[0] != 0)
-			{
-				bCAlpha[0] = bCAlpha[0] - 15;
-				dAnim[2] = 1;
-				if (bCAlpha[0] < 0)
-				{
-					bCAlpha[0] = 0;
-					bCondition[0] = 1;
-					bNCondition[0] = 5;
-					dAnim[2] = 0;
-					bScroll[0] = 0;
-				}
-			} else {
-				bCondition[0] = 1;
-				bNCondition[0] = 5;
-				dAnim[2] = 0;
-				bScroll[0] = 0;
-			}
-		}
-
-	} else {
-		/* No Board.  Fade old if present */
-		if (bCondition[0] == 3)
-		{
-			if (bBAlpha[0] != 0)
-			{
-				bBAlpha[0] = bBAlpha[0] - 15;
-				dAnim[2] = 1;
-				if (bBAlpha[0] < 0)
-				{
-					bBAlpha[0] = 0;
-					bCondition[0] = 0;
-					bVisible[0] = 0;
-					dAnim[2] = 0;
-					bScroll[0] = 0;
-				}
-			} else {
-				bCondition[0] = 0;
-				bVisible[0] = 0;
-				dAnim[2] = 0;
-				bScroll[0] = 0;
-			}
-			bCAlpha[0] = bBAlpha[0];
-		}
-	}
-
-	/* Board 2 */
-	if (bTimeStamp[1] != 0)
-	{
-		if (bCondition[1] == 1)
-		{
-			/* Load Texture */
-			bCNo[1]++;
-			if (bCNo[1] > bNo[1])
-				bCNo[1] = 1;
-			sprintf(tFName, "/screen/boards/2/%i.png", bCNo[1]);
-			SDL_FreeSurface(boardTex_B);
-			boardTex_B = IMG_Load(tFName);
-			bVisible[1] = 1;
-			if (bNCondition[1] != 0)
-				bCondition[1] = bNCondition[1];
-			else
-				bCondition[1] = 2;
-			bNCondition[1] = 0;
-			bCTimer[2] = 0;
-			printf("Tex Loaded %s\n", tFName);
-		}
-		if (bCondition[1] == 2)
-		{
-			/* Fade in (New Board) */
-			if (bBAlpha[1] != 255)
-			{
-				bBAlpha[1] = bBAlpha[1] + 15;
-				dAnim[3] = 1;
-				if (bBAlpha[1] > 255)
-				{
-					bBAlpha[1] = 255;
-					bCondition[1] = 0;
-					dAnim[3] = 0;
-				}
-			} else {
-				bCondition[1] = 0;
-				dAnim[3] = 0;
-			}
-			bCAlpha[1] = bBAlpha[1];
-		}
-		if (bCondition[1] == 3)
-		{
-			/* Fade out (New Board) */
-			if (bBAlpha[1] != 0)
-			{
-				bBAlpha[1] = bBAlpha[1] - 15;
-				dAnim[3] = 1;
-				if (bBAlpha[1] < 0)
-				{
-					bBAlpha[1] = 0;
-					bCondition[1] = 1;
-					dAnim[3] = 0;
-					bScroll[1] = 0;
-				}
-			} else {
-				bCondition[1] = 1;
-				dAnim[3] = 0;
-				bScroll[1] = 0;
-			}
-			bCAlpha[1] = bBAlpha[1];
-		}
-
-		if (bCondition[1] == 4)
-		{
-			/* Fade out (Content Scroll Reached) */
-			if (bCAlpha[1] != 0)
-			{
-				bCAlpha[1] = bCAlpha[1] - 15;
-				dAnim[3] = 1;
-				if (bCAlpha[1] < 0)
-				{
-					bCAlpha[1] = 0;
-					bCondition[1] = 5;
-					dAnim[3] = 0;
-					bScroll[1] = 0;
-				}
-			} else {
-				bCondition[1] = 5;
-				dAnim[3] = 0;
-				bScroll[1] = 0;
-			}
-		}
-
-		if (bCondition[1] == 5)
-		{
-			/* Fade in (Content Scroll Reached) */
-			if (bCAlpha[1] != 255)
-			{
-				bCAlpha[1] = bCAlpha[1] + 15;
-				dAnim[3] = 1;
-				if (bCAlpha[1] > 255)
-				{
-					bCAlpha[1] = 255;
-					bCondition[1] = 5;
-					dAnim[3] = 0;
-					bScroll[1] = 0;
-				}
-			} else {
-				bCondition[1] = 0;
-				dAnim[3] = 0;
-				bScroll[1] = 0;
-			}
-		}
-
-		if (bCondition[1] == 6)
-		{
-			/* Fade out (then load new pane) */
-			if (bCAlpha[1] != 0)
-			{
-				bCAlpha[1] = bCAlpha[1] - 15;
-				dAnim[3] = 1;
-				if (bCAlpha[1] < 0)
-				{
-					bCAlpha[1] = 0;
-					bCondition[1] = 1;
-					bNCondition[1] = 5;
-					dAnim[3] = 0;
-					bScroll[1] = 0;
-				}
-			} else {
-				bCondition[1] = 1;
-				bNCondition[1] = 5;
-				dAnim[3] = 0;
-				bScroll[1] = 0;
-			}
-		}
-
-	} else {
-		/* No Board.  Fade old if present */
-		if (bCondition[1] == 3)
-		{
-			if (bBAlpha[1] != 0)
-			{
-				bBAlpha[1] = bBAlpha[1] - 15;
-				dAnim[3] = 1;
-				if (bBAlpha[1] < 0)
-				{
-					bBAlpha[1] = 0;
-					bCondition[1] = 0;
-					bVisible[1] = 0;
-					dAnim[3] = 0;
-					bScroll[1] = 0;
-				}
-			} else {
-				bCondition[1] = 0;
-				bVisible[1] = 0;
-				dAnim[3] = 0;
-				bScroll[1] = 0;
-			}
-			bCAlpha[1] = bBAlpha[1];
-		}
-	}
-
-	/* Board 3 */
-	if (bTimeStamp[2] != 0)
-	{
-		if (bCondition[2] == 1)
-		{
-			/* Load Texture */
-			bCNo[2]++;
-			if (bCNo[2] > bNo[2])
-				bCNo[2] = 1;
-			sprintf(tFName, "/screen/boards/3/%i.png", bCNo[2]);
-			SDL_FreeSurface(boardTex_C);
-			boardTex_C = IMG_Load(tFName);
-			bVisible[2] = 1;
-			if (bNCondition[2] != 0)
-				bCondition[2] = bNCondition[2];
-			else
-				bCondition[2] = 2;
-			bNCondition[2] = 0;
-			bCTimer[3] = 0;
-			printf("Tex Loaded %s\n", tFName);
-		}
-		if (bCondition[2] == 2)
-		{
-			/* Fade in (New Board) */
-			if (bBAlpha[2] != 255)
-			{
-				bBAlpha[2] = bBAlpha[2] + 15;
-				dAnim[4] = 1;
-				if (bBAlpha[2] > 255)
-				{
-					bBAlpha[2] = 255;
-					bCondition[2] = 0;
-					dAnim[4] = 0;
-				}
-			} else {
-				bCondition[2] = 0;
-				dAnim[4] = 0;
-			}
-			bCAlpha[2] = bBAlpha[2];
-		}
-		if (bCondition[2] == 3)
-		{
-			/* Fade out (New Board) */
-			if (bBAlpha[2] != 0)
-			{
-				bBAlpha[2] = bBAlpha[2] - 15;
-				dAnim[4] = 1;
-				if (bBAlpha[2] < 0)
-				{
-					bBAlpha[2] = 0;
-					bCondition[2] = 1;
-					dAnim[4] = 0;
-					bScroll[2] = 0;
-				}
-			} else {
-				bCondition[2] = 1;
-				dAnim[4] = 0;
-				bScroll[2] = 0;
-			}
-			bCAlpha[2] = bBAlpha[2];
-		}
-
-		if (bCondition[2] == 4)
-		{
-			/* Fade out (Content Scroll Reached) */
-			if (bCAlpha[2] != 0)
-			{
-				bCAlpha[2] = bCAlpha[2] - 15;
-				dAnim[4] = 1;
-				if (bCAlpha[2] < 0)
-				{
-					bCAlpha[2] = 0;
-					bCondition[2] = 5;
-					dAnim[4] = 0;
-					bScroll[2] = 0;
-				}
-			} else {
-				bCondition[2] = 5;
-				dAnim[4] = 0;
-				bScroll[2] = 0;
-			}
-		}
-
-		if (bCondition[2] == 5)
-		{
-			/* Fade in (Content Scroll Reached) */
-			if (bCAlpha[2] != 255)
-			{
-				bCAlpha[2] = bCAlpha[2] + 15;
-				dAnim[4] = 1;
-				if (bCAlpha[2] > 255)
-				{
-					bCAlpha[2] = 255;
-					bCondition[2] = 5;
-					dAnim[4] = 0;
-					bScroll[2] = 0;
-				}
-			} else {
-				bCondition[2] = 0;
-				dAnim[4] = 0;
-				bScroll[2] = 0;
-			}
-		}
-
-		if (bCondition[2] == 6)
-		{
-			/* Fade out (then load new pane) */
-			if (bCAlpha[2] != 0)
-			{
-				bCAlpha[2] = bCAlpha[2] - 15;
-				dAnim[4] = 1;
-				if (bCAlpha[2] < 0)
-				{
-					bCAlpha[2] = 0;
-					bCondition[2] = 1;
-					bNCondition[2] = 5;
-					dAnim[4] = 0;
-					bScroll[2] = 0;
-				}
-			} else {
-				bCondition[2] = 1;
-				bNCondition[2] = 5;
-				dAnim[4] = 0;
-				bScroll[2] = 0;
-			}
-		}
-
-	} else {
-		/* No Board.  Fade old if present */
-		if (bCondition[2] == 3)
-		{
-			if (bBAlpha[2] != 0)
-			{
-				bBAlpha[2] = bBAlpha[2] - 15;
-				dAnim[4] = 1;
-				if (bBAlpha[2] < 0)
-				{
-					bBAlpha[2] = 0;
-					bCondition[2] = 0;
-					bVisible[2] = 0;
-					dAnim[4] = 0;
-					bScroll[2] = 0;
-				}
-			} else {
-				bCondition[2] = 0;
-				bVisible[2] = 0;
-				dAnim[4] = 0;
-				bScroll[2] = 0;
-			}
-			bCAlpha[2] = bBAlpha[2];
-		}
-	}
+	doBoardAnims(1);
+	doBoardAnims(2);
+	doBoardAnims(3);
 
 	/* Draw Boards */
 	/* Process LH Board */
