@@ -1108,6 +1108,7 @@ bool init() {
 	if (FileExists("/screen/full")) {
 		/* We're running full screen on the target, so use full screen */
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+		SDL_ShowCursor(SDL_DISABLE);
 	} else {
 		/* We're running in a window (no fullscreen flag set) so don't pass SDL_FULLSCREEN */
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_OPENGL);
@@ -1197,11 +1198,6 @@ bool init() {
 	wTex_snow = IMG_Load("/screen/textures/weather/snow.png");
 	wTex_hot = IMG_Load("/screen/textures/weather/hot.png");
 	wTex_thunderstorm = IMG_Load("/screen/textures/weather/thunderstorm.png");
-
-	/* This is a testing texture */
-	boardTex_B = IMG_Load("/screen/boards/2/1.png");
-
-	SDL_ShowCursor(SDL_DISABLE);
 
 	glEnable(GL_BLEND);
 	glClearColor(0, 0, 0, 1);
