@@ -80,45 +80,45 @@ int logoisWhite=0;
 char tFName[128];
 
 /* Define Global Textures */
-SDL_Surface *orb_logo;
-SDL_Surface *orb_bl;
-SDL_Surface *orb_bt;
-SDL_Surface *orb_bcrnr;
-SDL_Surface *orb_wl;
-SDL_Surface *orb_wt;
-SDL_Surface *orb_wcrnr;
-SDL_Surface *orb_tl;
-SDL_Surface *orb_tt;
-SDL_Surface *orb_tcrnr;
-SDL_Surface *orb_boxb;
-SDL_Surface *orb_boxw;
-SDL_Surface *wTex_chance_of_storm;
-SDL_Surface *wTex_mostly_sunny;
-SDL_Surface *wTex_dust;
-SDL_Surface *wTex_mostly_cloudy;
-SDL_Surface *wTex_cloudy;
-SDL_Surface *wTex_chance_of_tstorm;
-SDL_Surface *wTex_partly_cloudy;
-SDL_Surface *wTex_storm;
-SDL_Surface *wTex_sunny;
-SDL_Surface *wTex_cold;
-SDL_Surface *wTex_windy;
-SDL_Surface *wTex_flurries;
-SDL_Surface *wTex_chance_of_snow;
-SDL_Surface *wTex_chance_of_rain;
-SDL_Surface *wTex_fog;
-SDL_Surface *wTex_icy;
-SDL_Surface *wTex_sleet;
-SDL_Surface *wTex_rain;
-SDL_Surface *wTex_mist;
-SDL_Surface *wTex_haze;
-SDL_Surface *wTex_smoke;
-SDL_Surface *wTex_snow;
-SDL_Surface *wTex_hot;
-SDL_Surface *wTex_thunderstorm;
-SDL_Surface *boardTex_A;
-SDL_Surface *boardTex_B;
-SDL_Surface *boardTex_C;
+SDL_Surface* orb_logo;
+SDL_Surface* orb_bl;
+SDL_Surface* orb_bt;
+SDL_Surface* orb_bcrnr;
+SDL_Surface* orb_wl;
+SDL_Surface* orb_wt;
+SDL_Surface* orb_wcrnr;
+SDL_Surface* orb_tl;
+SDL_Surface* orb_tt;
+SDL_Surface* orb_tcrnr;
+SDL_Surface* orb_boxb;
+SDL_Surface* orb_boxw;
+SDL_Surface* wTex_chance_of_storm;
+SDL_Surface* wTex_mostly_sunny;
+SDL_Surface* wTex_dust;
+SDL_Surface* wTex_mostly_cloudy;
+SDL_Surface* wTex_cloudy;
+SDL_Surface* wTex_chance_of_tstorm;
+SDL_Surface* wTex_partly_cloudy;
+SDL_Surface* wTex_storm;
+SDL_Surface* wTex_sunny;
+SDL_Surface* wTex_cold;
+SDL_Surface* wTex_windy;
+SDL_Surface* wTex_flurries;
+SDL_Surface* wTex_chance_of_snow;
+SDL_Surface* wTex_chance_of_rain;
+SDL_Surface* wTex_fog;
+SDL_Surface* wTex_icy;
+SDL_Surface* wTex_sleet;
+SDL_Surface* wTex_rain;
+SDL_Surface* wTex_mist;
+SDL_Surface* wTex_haze;
+SDL_Surface* wTex_smoke;
+SDL_Surface* wTex_snow;
+SDL_Surface* wTex_hot;
+SDL_Surface* wTex_thunderstorm;
+SDL_Surface* boardTex_A;
+SDL_Surface* boardTex_B;
+SDL_Surface* boardTex_C;
 
 /* Function Declerations */
 int calcDay_Dec31(int yyyy);
@@ -126,10 +126,10 @@ int dayInYear(int dd, int mm);
 void dayInStr (char daysInWord[], int days);
 void monthInStr (char monthsInWord[], int days);
 void nthInStr (char dowInWord[], int monthday);
-bool drawText(const char *text,
-			TTF_Font *font,
+bool drawText(const char* text,
+			TTF_Font*& font,
 			SDL_Color color,
-			SDL_Rect *location,
+			SDL_Rect*& location,
 			int alignment,
 			int cr,
 			int cg,
@@ -138,13 +138,13 @@ bool drawText(const char *text,
 			int px,
 			int py);
 
-bool drawTexture(SDL_Surface *tpoint,
+bool drawTexture(SDL_Surface*& tpoint,
 			int px,
 			int py,
 			int alpha,
 			int scale);
 
-bool drawInfoBox(SDL_Surface *tpoint,
+bool drawInfoBox(SDL_Surface*& tpoint,
 			int bcol,
 			int px,
 			int py,
@@ -158,7 +158,7 @@ bool drawInfoBox(SDL_Surface *tpoint,
 			int balpha,
 			int calpha);
 
-bool FileExists( const char* FileName );
+bool FileExists(const char* FileName);
 void doBoardAnims(int boardNumber);
 void doDisplay();
 bool init();
@@ -350,8 +350,8 @@ bool FileExists( const char* FileName )
 	return false;
 }
 
-bool drawText(const char *text,
-			TTF_Font *fntChosen,
+bool drawText(const char* text,
+			TTF_Font*& fntChosen,
 			int alignment,
 			int cr,
 			int cg,
@@ -360,7 +360,7 @@ bool drawText(const char *text,
 			int px,
 			int py)
 {
-	SDL_Surface *initial;
+	SDL_Surface* initial;
 	SDL_Color color;
 	SDL_Rect location;
 	int w,h,ax,ay;
@@ -434,7 +434,7 @@ bool drawText(const char *text,
 	return true;
 }
 
-bool drawTexture(SDL_Surface *tpoint,
+bool drawTexture(SDL_Surface*& tpoint,
 			int px,
 			int py,
 			int alpha,
@@ -509,7 +509,7 @@ bool drawTexture(SDL_Surface *tpoint,
 	return true;
 }
 
-bool drawInfoBox(SDL_Surface *tpoint,
+bool drawInfoBox(SDL_Surface*& tpoint,
 			int bcol,
 			int px,
 			int py,
@@ -530,9 +530,9 @@ bool drawInfoBox(SDL_Surface *tpoint,
 
 	GLuint TextureID = 0;
 	glGenTextures(1, &TextureID);
-	SDL_Surface *brdr_top;
-	SDL_Surface *brdr_left;
-	SDL_Surface *brdr_crnr;
+	SDL_Surface* brdr_top;
+	SDL_Surface* brdr_left;
+	SDL_Surface* brdr_crnr;
 
 	/* We don't want the border to have less opacity than the contents, so match contents to border if required */
 	if (balpha < calpha)
@@ -796,10 +796,13 @@ bool drawInfoBox(SDL_Surface *tpoint,
 
 	/* Clean up */
 	glDeleteTextures(1, &TextureID);
+//	SDL_FreeSurface(brdr_top);
+//	SDL_FreeSurface(brdr_left);
+//	SDL_FreeSurface(brdr_crnr);
 	return true;
 }
 
-void doBoardAnims(int boardNumber)
+void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
 {
 	if (bTimeStamp[boardNumber-1] != 0)
 	{
@@ -810,8 +813,8 @@ void doBoardAnims(int boardNumber)
 			if (bCNo[boardNumber-1] > bNo[boardNumber-1])
 				bCNo[boardNumber-1] = 1;
 			sprintf(tFName, "/screen/boards/%i/%i.png", boardNumber, bCNo[boardNumber-1]);
-			SDL_FreeSurface(boardTex_C);
-			boardTex_C = IMG_Load(tFName);
+			SDL_FreeSurface(tpoint);
+			tpoint = IMG_Load(tFName);
 			bVisible[boardNumber-1] = 1;
 			if (bNCondition[boardNumber-1] != 0)
 				bCondition[boardNumber-1] = bNCondition[boardNumber-1];
@@ -1633,9 +1636,9 @@ void doDisplay() {
 	}
 
 	/* Process Board Animation/Texture Loading */
-	doBoardAnims(1);
-	doBoardAnims(2);
-	doBoardAnims(3);
+	doBoardAnims(1, boardTex_A);
+	doBoardAnims(2, boardTex_B);
+	doBoardAnims(3, boardTex_C);
 
 	/* Draw Boards */
 	/* Process LH Board */
