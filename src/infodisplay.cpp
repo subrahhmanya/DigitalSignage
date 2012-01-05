@@ -27,7 +27,7 @@
 /* Display Properties */
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
-const int SCREEN_BPP = 24;
+const int SCREEN_BPP = 32;
 int SCREEN_TARGET_FPS = 5;
 
 /* Define Main Screen Surface */
@@ -1096,14 +1096,16 @@ bool init() {
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-//	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 	if (FileExists("/screen/full")) {
 		/* We're running full screen on the target, so use full screen */
@@ -1216,7 +1218,7 @@ bool init() {
 	glLoadIdentity();
 
 	SDL_WM_SetCaption("Info Display", NULL);
-
+	printf("GL Version %s\n", glGetString(GL_VERSION));
 	return true;
 }
 
