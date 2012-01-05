@@ -159,7 +159,8 @@ bool drawInfoBox(SDL_Surface*& tpoint,
 			int calpha);
 
 bool FileExists(const char* FileName);
-void doBoardAnims(int boardNumber);
+void getBoardInfo(int boardNumber);
+void doBoardAnims(int boardNumber, SDL_Surface*& tpoint);
 void doDisplay();
 bool init();
 
@@ -402,7 +403,6 @@ bool drawText(const char* text,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	/* prepare to render our texture */
-//	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
 
@@ -478,7 +478,6 @@ bool drawTexture(SDL_Surface*& tpoint,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	/* prepare to render our texture */
-//	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
 
@@ -796,10 +795,87 @@ bool drawInfoBox(SDL_Surface*& tpoint,
 
 	/* Clean up */
 	glDeleteTextures(1, &TextureID);
-//	SDL_FreeSurface(brdr_top);
-//	SDL_FreeSurface(brdr_left);
-//	SDL_FreeSurface(brdr_crnr);
 	return true;
+}
+
+void getBoardInfo(int boardNumber)
+{
+	sprintf(tFName, "/screen/boards/%i/bTimeStamp", boardNumber);
+	if (FileExists(tFName)) {
+		sprintf(tFName, "/screen/boards/%i/bDuration", boardNumber);
+		if (FileExists(tFName)) {
+			sprintf(tFName, "/screen/boards/%i/bNum", boardNumber);
+			if (FileExists(tFName)) {
+				/* Board Active, pull data to variables */
+				char str[20];
+				int tTS=0;
+				FILE *fp;
+				sprintf(tFName, "/screen/boards/%i/bTimeStamp", boardNumber);
+				fp = fopen(tFName, "r");
+				while(fgets(str,sizeof(str),fp) != NULL)
+				{
+					/* strip trailing '\n' if it exists */
+					int len = strlen(str)-1;
+					if(str[len] == '\n') 
+						str[len] = 0;
+					tTS = strtol(str,NULL,0);
+				}
+				fclose(fp);
+				if (bTimeStamp[boardNumber-1] != tTS)
+				{
+					/* Transition to new Board */
+					if (bTimeStamp[boardNumber-1] == 0)
+						bCondition[boardNumber-1] = 1;
+					else
+						bCondition[boardNumber-1] = 3;
+
+					bTimeStamp[boardNumber-1] = tTS;
+
+					/* Parse other files */
+					sprintf(tFName, "/screen/boards/%i/bDuration", boardNumber);
+					fp = fopen(tFName, "r");
+					while(fgets(str,sizeof(str),fp) != NULL)
+					{
+						/* strip trailing '\n' if it exists */
+						int len = strlen(str)-1;
+						if(str[len] == '\n') 
+							str[len] = 0;
+						tTS = strtol(str,NULL,0);
+					}
+					fclose(fp);
+
+					bDuration[boardNumber-1] = tTS;
+
+					sprintf(tFName, "/screen/boards/%i/bNum", boardNumber);
+					fp = fopen(tFName, "r");
+					while(fgets(str,sizeof(str),fp) != NULL)
+					{
+						/* strip trailing '\n' if it exists */
+						int len = strlen(str)-1;
+						if(str[len] == '\n') 
+							str[len] = 0;
+						tTS = strtol(str,NULL,0);
+					}
+					fclose(fp);
+
+					bNo[boardNumber-1] = tTS;
+					bCNo[boardNumber-1] = 0;
+				}
+			} else {
+				/* Board Not Active */
+				bTimeStamp[boardNumber-1]=0;
+				bCondition[boardNumber-1]=3;
+			}
+		} else {
+			/* Board Not Active */
+			bTimeStamp[boardNumber-1]=0;
+			bCondition[boardNumber-1]=3;
+		}
+	} else {
+		/* Board Not Active */
+		bTimeStamp[boardNumber-1]=0;
+		bCondition[boardNumber-1]=3;
+	}
 }
 
 void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
@@ -1411,223 +1487,10 @@ void doDisplay() {
 		else
 			logoisWhite=0;
 
-		/* LH Board Check */
-		if (FileExists("/screen/boards/1/bTimeStamp")) {
-			if (FileExists("/screen/boards/1/bDuration")) {
-				if (FileExists("/screen/boards/1/bNum")) {
-					/* Board Active, pull data to variables */
-					char str[20];
-					int tTS=0;
-					FILE *fp;
-					fp = fopen("/screen/boards/1/bTimeStamp", "r");
-					while(fgets(str,sizeof(str),fp) != NULL)
-					{
-						/* strip trailing '\n' if it exists */
-						int len = strlen(str)-1;
-						if(str[len] == '\n') 
-							str[len] = 0;
-						tTS = strtol(str,NULL,0);
-					}
-					fclose(fp);
-					if (bTimeStamp[0] != tTS)
-					{
-						/* Transition to new Board */
-						if (bTimeStamp[0] == 0)
-							bCondition[0] = 1;
-						else
-							bCondition[0] = 3;
-
-						bTimeStamp[0] = tTS;
-
-						/* Parse other files */
-						fp = fopen("/screen/boards/1/bDuration", "r");
-						while(fgets(str,sizeof(str),fp) != NULL)
-						{
-							/* strip trailing '\n' if it exists */
-							int len = strlen(str)-1;
-							if(str[len] == '\n') 
-								str[len] = 0;
-							tTS = strtol(str,NULL,0);
-						}
-						fclose(fp);
-
-						bDuration[0] = tTS;
-
-						fp = fopen("/screen/boards/1/bNum", "r");
-						while(fgets(str,sizeof(str),fp) != NULL)
-						{
-							/* strip trailing '\n' if it exists */
-							int len = strlen(str)-1;
-							if(str[len] == '\n') 
-								str[len] = 0;
-							tTS = strtol(str,NULL,0);
-						}
-						fclose(fp);
-
-						bNo[0] = tTS;
-						bCNo[0] = 0;
-					}
-				} else {
-					/* Board Not Active */
-					bTimeStamp[0]=0;
-					bCondition[0]=3;
-				}
-			} else {
-				/* Board Not Active */
-				bTimeStamp[0]=0;
-				bCondition[0]=3;
-			}
-		} else {
-			/* Board Not Active */
-			bTimeStamp[0]=0;
-			bCondition[0]=3;
-		}
-
-		/* RH Board Check */
-		if (FileExists("/screen/boards/2/bTimeStamp")) {
-			if (FileExists("/screen/boards/2/bDuration")) {
-				if (FileExists("/screen/boards/2/bNum")) {
-					/* Board Active, pull data to variables */
-					char str[20];
-					int tTS=0;
-					FILE *fp;
-					fp = fopen("/screen/boards/2/bTimeStamp", "r");
-					while(fgets(str,sizeof(str),fp) != NULL)
-					{
-						/* strip trailing '\n' if it exists */
-						int len = strlen(str)-1;
-						if(str[len] == '\n') 
-							str[len] = 0;
-						tTS = strtol(str,NULL,0);
-					}
-					fclose(fp);
-
-					if (bTimeStamp[1] != tTS)
-					{
-						/* Transition to new Board */
-						if (bTimeStamp[1] == 0)
-							bCondition[1] = 1;
-						else
-							bCondition[1] = 3;
-
-						bTimeStamp[1] = tTS;
-
-						/* Parse other files */
-						fp = fopen("/screen/boards/2/bDuration", "r");
-						while(fgets(str,sizeof(str),fp) != NULL)
-						{
-							/* strip trailing '\n' if it exists */
-							int len = strlen(str)-1;
-							if(str[len] == '\n') 
-								str[len] = 0;
-							tTS = strtol(str,NULL,0);
-						}
-						fclose(fp);
-
-						bDuration[1] = tTS;
-
-						fp = fopen("/screen/boards/2/bNum", "r");
-						while(fgets(str,sizeof(str),fp) != NULL)
-						{
-							/* strip trailing '\n' if it exists */
-							int len = strlen(str)-1;
-							if(str[len] == '\n') 
-								str[len] = 0;
-							tTS = strtol(str,NULL,0);
-						}
-						fclose(fp);
-
-						bNo[1] = tTS;
-						bCNo[1] = 0;
-					}
-				} else {
-					/* Board Not Active */
-					bTimeStamp[1]=0;
-					bCondition[1]=3;
-				}
-			} else {
-				/* Board Not Active */
-				bTimeStamp[1]=0;
-				bCondition[1]=3;
-			}
-		} else {
-			/* Board Not Active */
-			bTimeStamp[1]=0;
-			bCondition[1]=3;
-		}
-
-		/* FS Board Check */
-		if (FileExists("/screen/boards/3/bTimeStamp")) {
-			if (FileExists("/screen/boards/3/bDuration")) {
-				if (FileExists("/screen/boards/3/bNum")) {
-					/* Board Active, pull data to variables */
-					char str[20];
-					int tTS=0;
-					FILE *fp;
-					fp = fopen("/screen/boards/3/bTimeStamp", "r");
-					while(fgets(str,sizeof(str),fp) != NULL)
-					{
-						/* strip trailing '\n' if it exists */
-						int len = strlen(str)-1;
-						if(str[len] == '\n') 
-							str[len] = 0;
-						tTS = strtol(str,NULL,0);
-					}
-					fclose(fp);
-
-					if (bTimeStamp[2] != tTS)
-					{
-						/* Transition to new Board */
-						if (bTimeStamp[2] == 0)
-							bCondition[2] = 1;
-						else
-							bCondition[2] = 3;
-
-						bTimeStamp[2] = tTS;
-
-						/* Parse other files */
-						fp = fopen("/screen/boards/3/bDuration", "r");
-						while(fgets(str,sizeof(str),fp) != NULL)
-						{
-							/* strip trailing '\n' if it exists */
-							int len = strlen(str)-1;
-							if(str[len] == '\n') 
-								str[len] = 0;
-							tTS = strtol(str,NULL,0);
-						}
-						fclose(fp);
-
-						bDuration[2] = tTS;
-
-						fp = fopen("/screen/boards/3/bNum", "r");
-						while(fgets(str,sizeof(str),fp) != NULL)
-						{
-							/* strip trailing '\n' if it exists */
-							int len = strlen(str)-1;
-							if(str[len] == '\n') 
-								str[len] = 0;
-							tTS = strtol(str,NULL,0);
-						}
-						fclose(fp);
-
-						bNo[2] = tTS;
-						bCNo[2] = 0;
-					}
-				} else {
-					/* Board Not Active */
-					bTimeStamp[2]=0;
-					bCondition[2]=3;
-				}
-			} else {
-				/* Board Not Active */
-				bTimeStamp[2]=0;
-				bCondition[2]=3;
-			}
-		} else {
-			/* Board Not Active */
-			bTimeStamp[2]=0;
-			bCondition[2]=3;
-		}
+		/* Board Check */
+		getBoardInfo(1);
+		getBoardInfo(2);
+		getBoardInfo(3);
 
 		if ((bTimeStamp[0]==0) && (bTimeStamp[1]==0) && (bTimeStamp[2]==0))
 			printf("*No Boards Defined!\n");
