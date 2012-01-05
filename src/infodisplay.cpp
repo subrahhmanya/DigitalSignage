@@ -56,6 +56,7 @@ int bCNo[3] = {0, 0, 0};
 int bTimeStamp[3] = {0, 0, 0};
 int bCondition[3] = {0, 0, 0};
 int bNCondition[3] = {0, 0, 0};
+int bAlert[3] = {0, 0, 0};
 int bBAlpha[3] = {0, 0, 0};
 int bCAlpha[3] = {0, 0, 0};
 int bCTimer[3] = {15, 15, 0};
@@ -230,7 +231,7 @@ static void parseWeather(xmlNode * a_node)
 					printf("*UPDATE* Item: %s \tData: %s\n",
 						cur_node->name, wWind);
 				}
-				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence. 
+				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence.
 				   This way, even if only part of the data was missed, we still declare as Dirty */
 				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0) && (tFarenheight != 0) && (tCondition != 0))
 					wOK = true;
@@ -465,15 +466,15 @@ bool drawTexture(SDL_Surface*& tpoint,
 
 	glGenTextures(1, &TextureID);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
- 
+
 	int Mode = GL_RGB;
- 
+
 	if(tpoint->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
- 
+
 	glTexImage2D(GL_TEXTURE_2D, 0, Mode, w, h, 0, Mode, GL_UNSIGNED_BYTE, tpoint->pixels);
- 
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -816,7 +817,7 @@ void getBoardInfo(int boardNumber)
 				{
 					/* strip trailing '\n' if it exists */
 					int len = strlen(str)-1;
-					if(str[len] == '\n') 
+					if(str[len] == '\n')
 						str[len] = 0;
 					tTS = strtol(str,NULL,0);
 				}
@@ -838,7 +839,7 @@ void getBoardInfo(int boardNumber)
 					{
 						/* strip trailing '\n' if it exists */
 						int len = strlen(str)-1;
-						if(str[len] == '\n') 
+						if(str[len] == '\n')
 							str[len] = 0;
 						tTS = strtol(str,NULL,0);
 					}
@@ -852,7 +853,7 @@ void getBoardInfo(int boardNumber)
 					{
 						/* strip trailing '\n' if it exists */
 						int len = strlen(str)-1;
-						if(str[len] == '\n') 
+						if(str[len] == '\n')
 							str[len] = 0;
 						tTS = strtol(str,NULL,0);
 					}
@@ -860,6 +861,23 @@ void getBoardInfo(int boardNumber)
 
 					bNo[boardNumber-1] = tTS;
 					bCNo[boardNumber-1] = 0;
+
+					sprintf(tFName, "/screen/boards/%i/bAlert", boardNumber);
+					fp = fopen(tFName, "r");
+					while(fgets(str,sizeof(str),fp) != NULL)
+					{
+						/* strip trailing '\n' if it exists */
+						int len = strlen(str)-1;
+						if(str[len] == '\n')
+							str[len] = 0;
+						tTS = strtol(str,NULL,0);
+					}
+					fclose(fp);
+
+					if (tTS == 1)
+						bAlert[boardNumber-1] = -1;
+					else
+						bAlert[boardNumber-1] = 0;
 				}
 			} else {
 				/* Board Not Active */
@@ -885,9 +903,27 @@ void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
 		if (bCondition[boardNumber-1] == 1)
 		{
 			/* Load Texture */
-			bCNo[boardNumber-1]++;
+			if (bAlert[boardNumber-1] != 0)
+			{
+				if (bAlert[boardNumber-1] == -1)
+				{
+					/* We're in root (showing normal slide) so switch to Alert slide (Slide 0)*/
+					bAlert[boardNumber-1] = bCNo[boardNumber-1] + 1;
+					bCNo[boardNumber-1] = 0;
+				} else {
+					/* We're currently showing an alert slide, so change to Normal */
+					bCNo[boardNumber-1] = bAlert[boardNumber-1];
+					bAlert[boardNumber-1] = -1;
+				}
+			} else
+				bCNo[boardNumber-1]++;
+
 			if (bCNo[boardNumber-1] > bNo[boardNumber-1])
 				bCNo[boardNumber-1] = 1;
+
+			if (bAlert[boardNumber-1] > bNo[boardNumber-1])
+				bAlert[boardNumber-1] = 1;
+
 			sprintf(tFName, "/screen/boards/%i/%i.png", boardNumber, bCNo[boardNumber-1]);
 			SDL_FreeSurface(tpoint);
 			tpoint = IMG_Load(tFName);
@@ -1165,7 +1201,7 @@ bool init() {
 	/* This is a testing texture */
 	boardTex_B = IMG_Load("/screen/boards/2/1.png");
 
-	SDL_ShowCursor(SDL_DISABLE); 
+	SDL_ShowCursor(SDL_DISABLE);
 
 	glEnable(GL_BLEND);
 	glClearColor(0, 0, 0, 1);
@@ -1215,7 +1251,7 @@ void doDisplay() {
 		days++;
 
 	/* Get string values for Day and Year */
-	dayInStr(daysInWord, days);	
+	dayInStr(daysInWord, days);
 	monthInStr(monthsInWord, ltm->tm_mon);
 	nthInStr(nthsInWord, ltm->tm_mday);
 
@@ -1478,7 +1514,7 @@ void doDisplay() {
 	}
 
 	/* Draw Boards */
-	/* We need to pull and process all information from /screen/boards 
+	/* We need to pull and process all information from /screen/boards
 	   Also checki any other information we need on the 15s Interval */
 	if (bCTimer[0] > 14) {
 		/* Do the check every 15 seconds */
@@ -1535,7 +1571,7 @@ void doDisplay() {
 				{
 					dAnim[2] = 1;
 					bScroll[0]++;
-				}				
+				}
 			} else {
 				/* It's not a scrolling image, so we use the timer variable */
 				if (bCTimer[1] > bDuration[0])
@@ -1556,7 +1592,7 @@ void doDisplay() {
 					bCTimer[1] = 0;
 					dAnim[2] = 0;
 				}
-				
+
 				if (bCTimer[1] > 14)
 				{
 					bCTimer[1] = 0;
@@ -1598,7 +1634,7 @@ void doDisplay() {
 				{
 					dAnim[3] = 1;
 					bScroll[1]++;
-				}				
+				}
 			} else {
 				/* It's not a scrolling image, so we use the timer variable */
 				if (bCTimer[2] > bDuration[1])
@@ -1619,7 +1655,7 @@ void doDisplay() {
 					bCTimer[2] = 0;
 					dAnim[3] = 0;
 				}
-				
+
 				if (bCTimer[2] > 14)
 				{
 					bCTimer[2] = 0;
@@ -1661,13 +1697,13 @@ void doDisplay() {
 				{
 					dAnim[4] = 1;
 					bScroll[2]++;
-				}				
+				}
 			} else {
 				/* It's not a scrolling image, so we use the timer variable */
 				if (bCTimer[3] > bDuration[2])
 				{
 					bCTimer[3] = 0;
-					if (bNo[2] > 1)
+					if ((bNo[2] > 1) || (bAlert != 0))
 						bCondition[2] = 6;
 				}
 			}
@@ -1682,11 +1718,11 @@ void doDisplay() {
 					bCTimer[3] = 0;
 					dAnim[4] = 0;
 				}
-				
+
 				if (bCTimer[3] > 29)
 				{
 					bCTimer[3] = 0;
-					if (bNo[2] > 1)
+					if ((bNo[2] > 1) || (bAlert != 0))
 						bCondition[2] = 6;
 					else
 						bCondition[2] = 4;
