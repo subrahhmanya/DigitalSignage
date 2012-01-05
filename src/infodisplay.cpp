@@ -720,7 +720,7 @@ bool drawInfoBox(SDL_Surface*& tpoint,
 			th = orb_boxw->h;
 
 			Mode = GL_RGB;
-			if(orb_boxb->format->BytesPerPixel == 4) {
+			if(orb_boxw->format->BytesPerPixel == 4) {
 				Mode = GL_RGBA;
 			}
 
@@ -738,13 +738,13 @@ bool drawInfoBox(SDL_Surface*& tpoint,
 			   That is why the TexCoords specify different corners
 			   than the Vertex coors seem to. */
 			glTexCoord2f(0.0f, 1.0f);
-				glVertex2f(px, py);
+				glVertex2f(px+4, py+4);
 			glTexCoord2f(1.0f, 1.0f);
-				glVertex2f(px + w, py);
+				glVertex2f(px + w - 4, py+4);
 			glTexCoord2f(1.0f, 0.0f);
-				glVertex2f(px + w, py + h);
+				glVertex2f(px + w - 4, py + h - 4);
 			glTexCoord2f(0.0f, 0.0f);
-				glVertex2f(px, py + h);
+				glVertex2f(px+4, py + h - 4);
 		glEnd();
 		/* Bad things happen if we delete the texture before it finishes */
 		glFinish();
@@ -910,14 +910,13 @@ void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
 				if (bBAlpha[boardNumber-1] > 255)
 				{
 					bBAlpha[boardNumber-1] = 255;
-					bCondition[boardNumber-1] = 0;
+					bCondition[boardNumber-1] = 5;
 					dAnim[boardNumber+1] = 0;
 				}
 			} else {
-				bCondition[boardNumber-1] = 0;
+				bCondition[boardNumber-1] = 5;
 				dAnim[boardNumber+1] = 0;
 			}
-			bCAlpha[boardNumber-1] = bBAlpha[boardNumber-1];
 		}
 		if (bCondition[boardNumber-1] == 3)
 		{
@@ -1010,6 +1009,24 @@ void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
 		/* No Board.  Fade old if present */
 		if (bCondition[boardNumber-1] == 3)
 		{
+			if (bCAlpha[boardNumber-1] != 0)
+			{
+				bCAlpha[boardNumber-1] = bCAlpha[boardNumber-1] - 15;
+				dAnim[boardNumber+1] = 1;
+				if (bCAlpha[boardNumber-1] < 0)
+				{
+					bCAlpha[boardNumber-1] = 0;
+					bCondition[boardNumber-1] = 4;
+					dAnim[boardNumber+1] = 0;
+				}
+			} else {
+				bCondition[boardNumber-1] = 4;
+				dAnim[boardNumber+1] = 0;
+			}
+		}
+
+		if (bCondition[boardNumber-1] == 4)
+		{
 			if (bBAlpha[boardNumber-1] != 0)
 			{
 				bBAlpha[boardNumber-1] = bBAlpha[boardNumber-1] - 15;
@@ -1028,7 +1045,7 @@ void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
 				dAnim[boardNumber+1] = 0;
 				bScroll[boardNumber-1] = 0;
 			}
-			bCAlpha[boardNumber-1] = bBAlpha[boardNumber-1];
+			bCAlpha[boardNumber-1] = 0; /* Needs to be this to fade correctly */
 		}
 	}
 }
