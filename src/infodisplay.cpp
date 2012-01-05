@@ -1105,8 +1105,6 @@ bool init() {
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-
 	if (FileExists("/screen/full")) {
 		/* We're running full screen on the target, so use full screen */
 		screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
