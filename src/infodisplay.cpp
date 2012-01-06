@@ -1588,7 +1588,7 @@ void doDisplay() {
 				if (bCTimer[1] > bDuration[0])
 				{
 					bCTimer[1] = 0;
-					if (bNo[0] > 1)
+					if ((bNo[0] > 1) || (bAlert[0] != 0))
 						bCondition[0] = 6;
 				}
 			}
@@ -1607,7 +1607,7 @@ void doDisplay() {
 				if (bCTimer[1] > 14)
 				{
 					bCTimer[1] = 0;
-					if (bNo[0] > 1)
+					if ((bNo[0] > 1) || (bAlert[0] != 0))
 						bCondition[0] = 6;
 					else
 						bCondition[0] = 4;
@@ -1651,7 +1651,7 @@ void doDisplay() {
 				if (bCTimer[2] > bDuration[1])
 				{
 					bCTimer[2] = 0;
-					if (bNo[1] > 1)
+					if ((bNo[1] > 1) || (bAlert[1] != 0))
 						bCondition[1] = 6;
 				}
 			}
@@ -1670,7 +1670,7 @@ void doDisplay() {
 				if (bCTimer[2] > 14)
 				{
 					bCTimer[2] = 0;
-					if (bNo[1] > 1)
+					if ((bNo[1] > 1) || (bAlert[1] != 0))
 						bCondition[1] = 6;
 					else
 						bCondition[1] = 4;
@@ -1714,7 +1714,7 @@ void doDisplay() {
 				if (bCTimer[3] > bDuration[2])
 				{
 					bCTimer[3] = 0;
-					if ((bNo[2] > 1) || (bAlert != 0))
+					if ((bNo[2] > 1) || (bAlert[2] != 0))
 						bCondition[2] = 6;
 				}
 			}
@@ -1733,7 +1733,7 @@ void doDisplay() {
 				if (bCTimer[3] > 29)
 				{
 					bCTimer[3] = 0;
-					if ((bNo[2] > 1) || (bAlert != 0))
+					if ((bNo[2] > 1) || (bAlert[2] != 0))
 						bCondition[2] = 6;
 					else
 						bCondition[2] = 4;
