@@ -1512,22 +1512,22 @@ void doDisplay() {
 	/* Draw Boards */
 	/* We need to pull and process all information from /screen/boards
 	   Also checki any other information we need on the 15s Interval */
-	if (bCTimer[0] > 14) {
+	if (bCTimer[0] > 4) {
 		/* Do the check every 15 seconds */
 
 		if (ltm->tm_min < 10)
 			{
 			if (ltm->tm_sec < 10)
-				printf("Performing 15s Timer Check - %i:0%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				printf("Performing 5s Timer Check - %i:0%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			else
-				printf("Performing 15s Timer Check - %i:0%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				printf("Performing 5s Timer Check - %i:0%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			}
 		else
 			{
 			if (ltm->tm_sec < 10)
-				printf("Performing 15s Timer Check - %i:%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				printf("Performing 5s Timer Check - %i:%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			else
-				printf("Performing 15s Timer Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				printf("Performing 5s Timer Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			}
 
 		/* Determine if Logo is White or Black */
@@ -1540,6 +1540,21 @@ void doDisplay() {
 		getBoardInfo(1);
 		getBoardInfo(2);
 		getBoardInfo(3);
+
+		if (bTimeStamp[2] != 0)
+		{
+			/* Make sure only Full Screen board is displayed if others are also present */
+			if (bTimeStamp[0] != 0)
+			{
+				bTimeStamp[0] = 0;
+				bCondition[0] = 3;
+			}
+			if (bTimeStamp[1] != 0)
+			{
+				bTimeStamp[1] = 0;
+				bCondition[1] = 3;
+			}
+		}
 
 		if ((bTimeStamp[0]==0) && (bTimeStamp[1]==0) && (bTimeStamp[2]==0))
 			printf("*No Boards Defined!\n");
