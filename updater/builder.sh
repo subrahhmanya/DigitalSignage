@@ -6,6 +6,7 @@
         gitUrl="git://github.com/PaulW/infodisplay.git"
         scrroot="/screen/"
         srcroot="${scrroot}src/infodisplay/"
+	webroot="/var/www/"
 
 function logOut {
         echo "$logName $(date +%s): $1"
@@ -25,6 +26,12 @@ else
 	cp CutyCapt ${scrroot} > /dev/null 2>&1
 	rm CutyCapt > /dev/null 2>&1
 fi
+
+#Compile and install tinymce
+logout "Building TinyMCE..."
+cd ${srcroot}ext-libs/tinymce > /dev/null 2>&1
+ant > /dev/null 2>&1
+cp jscripts ${webroot} > /dev/null 2>&1
 
 #We're updating - kill previous infodisplay
 killall -9 infodisplay > /dev/null 2>&1
