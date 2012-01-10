@@ -28,7 +28,7 @@ else
 fi
 
 #Compile and install tinymce
-logout "Building TinyMCE..."
+logOut "Building TinyMCE..."
 cd ${srcroot}ext-libs/tinymce > /dev/null 2>&1
 ant > /dev/null 2>&1
 cp jscripts ${webroot} > /dev/null 2>&1
