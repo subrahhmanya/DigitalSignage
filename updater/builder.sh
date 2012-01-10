@@ -42,7 +42,7 @@ fi
 logOut "Building TinyMCE..."
 cd ${scrroot}/tinymce > /dev/null 2>&1
 ant > /dev/null 2>&1
-cp jscripts ${webroot} > /dev/null 2>&1
+cp -a jscripts ${webroot} > /dev/null 2>&1
 
 #We're updating - kill previous infodisplay
 killall -9 infodisplay > /dev/null 2>&1
