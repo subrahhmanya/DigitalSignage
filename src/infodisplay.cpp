@@ -77,6 +77,7 @@ float wCelcius=0.0;
 int tFarenheight, tCondition, tHumidity, tIcon, tWind;
 int logoisWhite=0;
 char tFName[128];
+bool dDebug = false;
 
 /* Define Global Textures */
 SDL_Surface* orb_logo;
@@ -177,7 +178,7 @@ static void parseWeather(xmlNode * a_node)
 				{
 					sprintf(wCondition, "%s", cur_node->properties->children->content);
 					tCondition=1;
-					printf("*UPDATE* Item: %s \tData: %s\n", cur_node->name, wCondition);
+					if (dDebug) printf("*UPDATE* Item: %s \tData: %s\n", cur_node->name, wCondition);
 				}
 			}
 
@@ -188,7 +189,7 @@ static void parseWeather(xmlNode * a_node)
 				{
 					wFarenheight = strtol(tWord,NULL,0);
 					tFarenheight = wFarenheight;
-					printf("*UPDATE* Item: %s \t\tData: %i\n",
+					if (dDebug) printf("*UPDATE* Item: %s \t\tData: %i\n",
 						cur_node->name, wFarenheight);
 				}
 			}
@@ -199,7 +200,7 @@ static void parseWeather(xmlNode * a_node)
 				{
 					tHumidity=1;
 					sprintf(wHumidity, "%s", cur_node->properties->children->content);
-					printf("*UPDATE* Item: %s \tData: %s\n", cur_node->name, wHumidity);
+					if (dDebug) printf("*UPDATE* Item: %s \tData: %s\n", cur_node->name, wHumidity);
 				}
 			}
 
@@ -209,7 +210,7 @@ static void parseWeather(xmlNode * a_node)
 				{
 					tIcon=1;
 					sprintf(wIcon, "%s", cur_node->properties->children->content);
-					printf("*UPDATE* Item: %s \t\tData: %s\n", cur_node->name, wIcon);
+					if (dDebug) printf("*UPDATE* Item: %s \t\tData: %s\n", cur_node->name, wIcon);
 				}
 			}
 
@@ -226,7 +227,7 @@ static void parseWeather(xmlNode * a_node)
 							if (wIWind == 0)
 								wIWind = atoi(&wWind[i]);
 					}
-					printf("*UPDATE* Item: %s \tData: %s\n",
+					if (dDebug) printf("*UPDATE* Item: %s \tData: %s\n",
 						cur_node->name, wWind);
 				}
 				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence.
@@ -932,7 +933,7 @@ void doBoardAnims(int boardNumber, SDL_Surface*& tpoint)
 				bCondition[boardNumber-1] = 2;
 			bNCondition[boardNumber-1] = 0;
 			bCTimer[boardNumber] = 0;
-			printf("Tex Loaded %s\n", tFName);
+			if (dDebug) printf("Tex Loaded %s\n", tFName);
 		}
 		if (bCondition[boardNumber-1] == 2)
 		{
@@ -1214,7 +1215,7 @@ bool init() {
 	glLoadIdentity();
 
 	SDL_WM_SetCaption("Info Display", NULL);
-	printf("GL Version %s\n", glGetString(GL_VERSION));
+	if (dDebug) printf("GL Version %s\n", glGetString(GL_VERSION));
 	return true;
 }
 
@@ -1297,10 +1298,10 @@ void doDisplay() {
 
 			if (ltm->tm_min < 10)
 				{
-				printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+				if (dDebug) printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
 				}
 			else
-				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+				if (dDebug) printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 
 			/* Hour is odd, we call check */
 			tFarenheight=0;
@@ -1332,7 +1333,7 @@ void doDisplay() {
 					wLastCheckH = 0;
 			} else {
 				/* Update last check interval (we want to check in another minute) */
-				printf("NO DATA/NET CONNECTION\n");
+				if (dDebug) printf("NO DATA/NET CONNECTION\n");
 				wLastCheckH = 0;
 				wOK = false;
 			}
@@ -1516,16 +1517,16 @@ void doDisplay() {
 		if (ltm->tm_min < 10)
 			{
 			if (ltm->tm_sec < 10)
-				printf("Performing 5s Timer Check - %i:0%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				if (dDebug) printf("Performing 5s Timer Check - %i:0%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			else
-				printf("Performing 5s Timer Check - %i:0%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				if (dDebug) printf("Performing 5s Timer Check - %i:0%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			}
 		else
 			{
 			if (ltm->tm_sec < 10)
-				printf("Performing 5s Timer Check - %i:%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				if (dDebug) printf("Performing 5s Timer Check - %i:%i:0%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			else
-				printf("Performing 5s Timer Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+				if (dDebug) printf("Performing 5s Timer Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			}
 
 		/* Determine if Logo is White or Black */
@@ -1555,7 +1556,7 @@ void doDisplay() {
 		}
 
 		if ((bTimeStamp[0]==0) && (bTimeStamp[1]==0) && (bTimeStamp[2]==0))
-			printf("*No Boards Defined!\n");
+			if (dDebug) printf("*No Boards Defined!\n");
 
 		bCTimer[0]=0;
 	}
