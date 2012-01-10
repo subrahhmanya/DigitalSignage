@@ -1,0 +1,3 @@
+[submodule "ext-libs/tinymce"]
+	path = ext-libs/tinymce
+	url = git@github.com:PaulW/tinymce.git
