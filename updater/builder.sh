@@ -15,17 +15,12 @@ function logOut {
 #Let's compile some required binaries.  We do this every time, just incase.
 
 #Compile CutyCapt
-if [ -f ${scrroot}CutyCapt ]
-then
-	logOut "Skipping CutyCapt Compilation - already latest."
-else
-	logOut "Compiling CutyCapt..."
-	cd ${srcroot}ext-libs/CutyCapt > /dev/null 2>&1
-	qmake > /dev/null 2>&1
-	make > /dev/null 2>&1
-	cp CutyCapt ${scrroot} > /dev/null 2>&1
-	rm CutyCapt > /dev/null 2>&1
-fi
+logOut "Compiling CutyCapt..."
+cd ${srcroot}ext-libs/CutyCapt > /dev/null 2>&1
+qmake > /dev/null 2>&1
+make > /dev/null 2>&1
+cp CutyCapt ${scrroot} > /dev/null 2>&1
+rm CutyCapt > /dev/null 2>&1
 
 #Compile and install tinymce
 logOut "Getting TinyMCE..."
