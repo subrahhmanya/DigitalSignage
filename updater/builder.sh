@@ -3,7 +3,7 @@
 # Static Variables
         logName="[InfoUpdater]"
         verUrl="https://raw.github.com/PaulW/infodisplay/master/version"
-        gitUrl="git://github.com/PaulW/infodisplay.git"
+        tmcegitUrl="git://github.com/PaulW/tinymce.git"
         scrroot="/screen/"
         srcroot="${scrroot}src/infodisplay/"
 	webroot="/var/www/"
@@ -28,8 +28,19 @@ else
 fi
 
 #Compile and install tinymce
+logOut "Getting TinyMCE..."
+cd ${scrroot}
+if [ ! -d tinymce ] ; then
+	#No TinyMCE Source
+	git clone ${tmcegitUrl} > /dev/null 2>&1
+else
+	#Update TinyMCE
+	mkdir tinymce > /dev/null 2>&1
+	cd tinymce > /dev/null 2>&1
+	git pull > /dev/null 2>&1
+fi
 logOut "Building TinyMCE..."
-cd ${srcroot}ext-libs/tinymce > /dev/null 2>&1
+cd ${scrroot}/tinymce > /dev/null 2>&1
 ant > /dev/null 2>&1
 cp jscripts ${webroot} > /dev/null 2>&1
 
