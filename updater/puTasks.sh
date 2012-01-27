@@ -1,7 +1,7 @@
 #!/bin/bash
 #Build things
 # Static Variables
-	logName="[InfoUpdater]"
+	logName="[Info-Updater]"
 	scrroot="/screen/"
 	srcroot="${scrroot}src/orbital_infodisplay/"
 
