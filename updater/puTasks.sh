@@ -33,7 +33,7 @@ cd ${srcroot} > /dev/null 2>&1
 make > /dev/null 2>&1
 
 #Move new binary and associated files...
-logOut "Copying new infodisplay files..>"
+logOut "Copying new infodisplay files..."
 cp ${srcroot}infodisplay ${scrroot} > /dev/null 2>&1
 rm ${srcroot}infodisplay > /dev/null 2>&1
 cp ${srcroot}updater/runcheck.sh ${scrroot} > /dev/null 2>&1
