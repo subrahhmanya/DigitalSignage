@@ -1425,9 +1425,9 @@ void doDisplay() {
 
 		/* Draw weather condition icon */
 		if (wCelcius <= 3.0)
-			drawTexture(wTex_cold, pCIW+12, 5, (255-wFadeV[1]),4);
+			drawTexture(wTex_cold, pCIW+12, 5, (255-wFadeV[1]),1);
 		else if (wCelcius >= 25.0)
-			drawTexture(wTex_hot, pCIW+12, 5, (255-wFadeV[1]),4);
+			drawTexture(wTex_hot, pCIW+12, 5, (255-wFadeV[1]),1);
 
 		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0 )
 			drawTexture(wTex_chance_of_storm, pCIW+12, 5, wFadeV[1],1);
