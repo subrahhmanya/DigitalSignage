@@ -1,8 +1,6 @@
 //-------------------------------------------------------------------------
 //          Name: infodisplay.cpp
 //        Author: Paul Wollaston
-// Project Start: 25/11/11
-// Last Modified: 04/12/12
 //   Description: Display agregated data in an easy-to-read format with
 //                ability to be flexible with what is shown.
 //-------------------------------------------------------------------------
@@ -1432,67 +1430,67 @@ void doDisplay() {
 			drawTexture(wTex_hot, pCIW+12, 5, (255-wFadeV[1]),4);
 
 		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_storm, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_chance_of_storm, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0 )
-			drawTexture(wTex_mostly_sunny, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_mostly_sunny, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0 )
-			drawTexture(wTex_dust, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_dust, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0 )
-			drawTexture(wTex_mostly_cloudy, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_mostly_cloudy, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0 )
-			drawTexture(wTex_cloudy, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_cloudy, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_tstorm, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_chance_of_tstorm, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) ==0 )
-			drawTexture(wTex_partly_cloudy, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_partly_cloudy, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0 )
-			drawTexture(wTex_storm, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_storm, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0 )
-			drawTexture(wTex_sunny, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_sunny, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0 )
-			drawTexture(wTex_flurries, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_flurries, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_snow, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_chance_of_snow, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0 )
-			drawTexture(wTex_chance_of_rain, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_chance_of_rain, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0 )
-			drawTexture(wTex_fog, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_fog, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0 )
-			drawTexture(wTex_icy, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_icy, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0 )
-			drawTexture(wTex_sleet, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_sleet, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0 )
-			drawTexture(wTex_rain, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_rain, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0 )
-			drawTexture(wTex_mist, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_mist, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0 )
-			drawTexture(wTex_haze, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_haze, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0 )
-			drawTexture(wTex_smoke, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_smoke, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0 )
-			drawTexture(wTex_snow, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_snow, pCIW+12, 5, wFadeV[1],1);
 
 		if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0 )
-			drawTexture(wTex_thunderstorm, pCIW+12, 5, wFadeV[1],4);
+			drawTexture(wTex_thunderstorm, pCIW+12, 5, wFadeV[1],1);
 
 		/* Draw Leaves over Weather Icon if wind is 20mph+ */
 		if (wIWind >= 20)
@@ -1757,7 +1755,7 @@ void doDisplay() {
 	}
 
 	/* Orbital Logo above everything else */
-	int logoScale=130;
+	int logoScale=255;
 	if (logoisWhite==0) {
 		drawInfoBox(orb_logo,
 				1,
