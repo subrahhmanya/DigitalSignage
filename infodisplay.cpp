@@ -1494,7 +1494,7 @@ void doDisplay() {
 
 		/* Draw Leaves over Weather Icon if wind is 20mph+ */
 		if (wIWind >= 20)
-			drawTexture(wTex_windy, pCIW+12, 5, 255, 4);
+			drawTexture(wTex_windy, pCIW+12, 5, 255, 1);
 
 		switch(wCurDisp)
 		{
