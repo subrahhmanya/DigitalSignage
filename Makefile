@@ -1,4 +1,4 @@
-SAMPLE = infodisplay
+MAIN = infodisplay
 
 CC ?= g++
 
@@ -11,13 +11,13 @@ COPTS ?= -g $$(pkg-config --cflags libxml++-2.6)
 
 LIBS = -Wunused -L/usr/X11R6/lib -lGL -lSDL -lSDL_image -lSDL_ttf -lxml2 -lXext -lX11 -lm -L${libdir}
 
-all : $(SAMPLE)
+all : $(MAIN)
 
 clean : 
-	rm -f $(SAMPLE)
+	rm -f $(MAIN)
 
-run : $(SAMPLE)
-	./$(SAMPLE)
+run : $(MAIN)
+	./$(MAIN)
 
-$(SAMPLE) : $(SAMPLE).cpp
+$(MAIN) : $(MAIN).cpp
 	$(CC) -o $@ $(COPTS) $< $(LIBS)

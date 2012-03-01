@@ -1256,7 +1256,7 @@ void doDisplay() {
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
 
 	/* Add one day if the year is leap year and desired date is after February */
-	if ((!((1900 + ltm->tm_year) % 4) && ((1900 + ltm->tm_year) % 100) || !((1900 + ltm->tm_year) % 400)) && ltm->tm_mon > 2)
+	if ((1900+ltm->tm_year)%4 == 0 && ((1900+ltm->tm_year)%100 != 0 || (1900+ltm->tm_year)%400 == 0) && ltm->tm_mon > 1)
 		days++;
 
 	/* Get string values for Day and Year */
