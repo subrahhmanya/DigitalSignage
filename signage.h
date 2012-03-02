@@ -54,9 +54,9 @@ private:
 	char wCondition[32], wHumidity[32], wIcon[64], wWind[32];
 	int wLastCheckH;
 	int wLastCheckM;
-	int wUpdateTimer[5];
+	int wUpdateTimer[32];
 	float wCelcius;
-	char wTemp[8];
+	char wTemp[32];
 	int iPlayerScale, iPlayerPosX, iPlayerPosY;
 	tm *ltm;
 

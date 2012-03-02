@@ -144,10 +144,20 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	/* Set Start Clock for FPS Calculations */
 	startclock = SDL_GetTicks();
 
+	/* Preset variables */
+	tFarenheight = 0;
+	tCondition = 0;
+	tHumidity = 0;
+	tIcon = 0;
+	tWind = 0;
+	wFarenheight = 0;
+	wIWind = 0;
+
 	/* Test iPlayer Feed */
 	iPlayerScale = 255;
 	iPlayerPosX = 20;
 	iPlayerPosY = 45;
+
 	createiPlayer(width, height, iPlayerPosX, iPlayerPosY, iPlayerScale);
 }
 
@@ -258,6 +268,7 @@ void Signage::Update() {
 			/* Calculate Weather */
 			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
+			printf("%i %f %s\n", wFarenheight, wCelcius, wTemp);
 		}
 	}
 }
@@ -275,13 +286,26 @@ void Signage::Draw() {
 
 	/* Draw Time */
 	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 1262, 8);
+
 	if (bV1) {
-		drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1268 - pTWidth + 44, 11);
+		if (ltm->tm_hour > 9)
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 49, 11);
+		else
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 29, 11);
 	}
+
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1160, 32);
 
+	/* Draw Weather */
+	if (!wOK)
+		{
+
+		} else {
+			drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
+		}
+
 	/* iPlayer Testing - Box is 688x384, iPlayer pos is 20x60 */
-	drawInfoBox(0, 2, iPlayerPosX, 720 - ((384.0/255.0)*iPlayerScale) - iPlayerPosY, 688, 384, 0, 384, 1.0f, 1.0f, 1.0f, iPlayerScale, 255, 255);
+	drawInfoBox(0, 2, iPlayerPosX, 720 - ((384.0 / 255.0) * iPlayerScale) - iPlayerPosY, 688, 384, 0, 384, 1.0f, 1.0f, 1.0f, iPlayerScale, 255, 255);
 
 	/* Draw FPS */
 	deltaclock = SDL_GetTicks() - startclock;
