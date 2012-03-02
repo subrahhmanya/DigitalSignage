@@ -9,11 +9,15 @@
 #define SIGNAGE_H_
 
 #include "textures.h"
+
+#include <X11/Xlib.h>
+
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
+#include <SDL/SDL_syswm.h>
 
 /* Include libxml */
 #include <libxml/parser.h>
@@ -53,8 +57,11 @@ private:
 	int wUpdateTimer[5];
 	float wCelcius;
 	char wTemp[8];
-
 	tm *ltm;
+
+	/* MPlayer Integration */
+	Window play_win;
+	FILE *mplayer_fp;
 
 	void drawInfoBox(GLuint TextureID, int bcol, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
 			int balpha, int calpha);
@@ -67,6 +74,11 @@ private:
 	void monthInStr(char monthsInWord[], int month);
 	void nthInStr(char dowInWord[], int monthday);
 	void parseWeather(xmlNode * a_node);
+	void createiPlayer(int width, int height, int x, int y, int scale);
+	Window create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height);
+	Window create_sdl_x11_subwindow(int x, int y, int width, int height);
+	SDL_SysWMinfo get_sdl_wm_info(void);
+	void create_iplayer(const char *streamid, Window win, FILE **mplayer_fp);
 };
 
 #endif /* SIGNAGE_H_ */

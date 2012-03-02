@@ -42,11 +42,11 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	if (fullscreen) {
 		/* We're running full screen on the target, so use full screen */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 		SDL_ShowCursor(SDL_DISABLE);
 	} else {
 		/* We're running in a window (no fullscreen flag set) so don't pass SDL_FULLSCREEN */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_HWSURFACE | SDL_OPENGL);
 	}
 
 	//go through and get the values to see if everything was set
@@ -143,6 +143,9 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	}
 	/* Set Start Clock for FPS Calculations */
 	startclock = SDL_GetTicks();
+
+	/* Test iPlayer Feed */
+	createiPlayer(width, height, 20, 60, 255);
 }
 
 void Signage::HandleEvents(Signage* signage) {
@@ -270,12 +273,12 @@ void Signage::Draw() {
 	/* Draw Time */
 	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 1262, 8);
 	if (bV1) {
-		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1268 - pTWidth + 44, 11);
-		else
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1268 - pTWidth + 26, 11);
+		drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1268 - pTWidth + 44, 11);
 	}
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1160, 32);
+
+	/* iPlayer Testing - Box is 688x384, iPlayer pos is 20x60 */
+	drawInfoBox(0, 2, 20, 720-384-60, 688, 384, 0, 384, 1.0f,1.0f,1.0f, 255,255,255);
 
 	/* Draw FPS */
 	deltaclock = SDL_GetTicks() - startclock;
@@ -291,6 +294,10 @@ void Signage::Draw() {
 
 void Signage::Clean() {
 	/* Delete Any and All Testures */
+	printf("Destroying mplayer reference...");
+	system("killall -9 get_iplayer");
+	system("killall -9 mplayer");
+	system("killall -9 rtmpdump");
 	int n;
 	for (n = 0; n < 12; n++) {
 		printf("Destroying Texture layout[%i]... ", n);
@@ -801,4 +808,101 @@ void Signage::parseWeather(xmlNode * a_node) {
 		}
 		parseWeather(cur_node->children);
 	}
+}
+
+Window Signage::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height) {
+	Window win;
+	int winbgcol;
+
+	if (!dpy)
+		return 0;
+
+	winbgcol = WhitePixel (dpy, DefaultScreen (dpy));
+
+	win = XCreateSimpleWindow(dpy, parent, x, y, width, height, 0, winbgcol, winbgcol);
+
+	if (!win)
+		return 0;
+
+	if (!XSelectInput(dpy, win, StructureNotifyMask))
+		return 0;
+
+	if (!XMapWindow(dpy, win))
+		return 0;
+
+	while (1) {
+		XEvent e;
+		XNextEvent(dpy, &e);
+		if (e.type == MapNotify && e.xmap.window == win)
+			break;
+	}
+
+	XSelectInput(dpy, win, NoEventMask);
+
+	return win;
+}
+
+Window Signage::create_sdl_x11_subwindow(int x, int y, int width, int height) {
+	SDL_SysWMinfo sdl_info;
+	Window play_win;
+
+	sdl_info = get_sdl_wm_info();
+	if (!sdl_info.version.major)
+		return 0;
+
+	sdl_info.info.x11.lock_func();
+
+	play_win = create_x11_subwindow(sdl_info.info.x11.display, sdl_info.info.x11.window, x, y, width, height);
+
+	sdl_info.info.x11.unlock_func();
+
+	return play_win;
+}
+
+SDL_SysWMinfo Signage::get_sdl_wm_info(void) {
+	SDL_SysWMinfo sdl_info;
+
+	memset(&sdl_info, 0, sizeof(sdl_info));
+
+	SDL_VERSION (&sdl_info.version);
+	if (SDL_GetWMInfo(&sdl_info) <= 0 || sdl_info.subsystem != SDL_SYSWM_X11) {
+		fprintf(stderr, "This is not X11\n");
+
+		memset(&sdl_info, 0, sizeof(sdl_info));
+		return sdl_info;
+	}
+
+	return sdl_info;
+}
+
+void Signage::create_iplayer(const char *streamid, Window win, FILE **mplayer_fp) {
+	char cmdline[1024];
+
+	snprintf(
+			cmdline,
+			1024,
+			"/screen/src/orbital_get_iplayer/get_iplayer --stream --type=livetv %s --player=\"mplayer -quiet -really-quiet -nokeepaspect -framedrop -wid 0x%lx -\"",
+			streamid, win);
+	printf("%s\n", cmdline);
+	*mplayer_fp = popen(cmdline, "w");
+}
+
+void Signage::createiPlayer(int width, int height, int x, int y, int scale) {
+	/* MPLAYER Testing */
+	/* Default IPlayer Feed - 688x384 */
+	int mplayer_t_width = 688;
+	int mplayer_t_height = 384;
+	int mplayer_pos_x = (x / 1280.0) * width;
+	int mplayer_pos_y = (y / 720.0) * height;
+	int mplayer_width = (((mplayer_t_width / 1280.0) * width) / 255.0) * scale;
+	int mplayer_height = (((mplayer_t_height / 720.0) * height) / 255.0) * scale;
+	printf("MPLAYER Window X,Y - WxH = %i,%i - %ix%i\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
+	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
+	if (!play_win) {
+		fprintf(stderr, "Cannot create X11 window\n");
+		m_bRunning = false;
+	}
+
+	mplayer_fp = NULL;
+	create_iplayer("80001", play_win, &mplayer_fp);
 }
