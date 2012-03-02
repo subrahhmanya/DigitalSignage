@@ -57,6 +57,7 @@ private:
 	int wUpdateTimer[5];
 	float wCelcius;
 	char wTemp[8];
+	int iPlayerScale, iPlayerPosX, iPlayerPosY;
 	tm *ltm;
 
 	/* MPlayer Integration */
@@ -78,7 +79,7 @@ private:
 	Window create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height);
 	Window create_sdl_x11_subwindow(int x, int y, int width, int height);
 	SDL_SysWMinfo get_sdl_wm_info(void);
-	void create_iplayer(const char *streamid, Window win, FILE **mplayer_fp);
+	void create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp);
 };
 
 #endif /* SIGNAGE_H_ */

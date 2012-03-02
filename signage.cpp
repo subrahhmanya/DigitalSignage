@@ -145,7 +145,10 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	startclock = SDL_GetTicks();
 
 	/* Test iPlayer Feed */
-	createiPlayer(width, height, 20, 60, 255);
+	iPlayerScale = 255;
+	iPlayerPosX = 20;
+	iPlayerPosY = 45;
+	createiPlayer(width, height, iPlayerPosX, iPlayerPosY, iPlayerScale);
 }
 
 void Signage::HandleEvents(Signage* signage) {
@@ -278,7 +281,7 @@ void Signage::Draw() {
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1160, 32);
 
 	/* iPlayer Testing - Box is 688x384, iPlayer pos is 20x60 */
-	drawInfoBox(0, 2, 20, 720-384-60, 688, 384, 0, 384, 1.0f,1.0f,1.0f, 255,255,255);
+	drawInfoBox(0, 2, iPlayerPosX, 720 - ((384.0/255.0)*iPlayerScale) - iPlayerPosY, 688, 384, 0, 384, 1.0f, 1.0f, 1.0f, iPlayerScale, 255, 255);
 
 	/* Draw FPS */
 	deltaclock = SDL_GetTicks() - startclock;
@@ -875,14 +878,14 @@ SDL_SysWMinfo Signage::get_sdl_wm_info(void) {
 	return sdl_info;
 }
 
-void Signage::create_iplayer(const char *streamid, Window win, FILE **mplayer_fp) {
+void Signage::create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp) {
 	char cmdline[1024];
 
 	snprintf(
 			cmdline,
 			1024,
-			"/screen/src/orbital_get_iplayer/get_iplayer --stream --type=livetv %s --player=\"mplayer -quiet -really-quiet -nokeepaspect -framedrop -wid 0x%lx -\"",
-			streamid, win);
+			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -quiet -really-quiet -noconsolecontrols -nokeepaspect -framedrop -cache %i -wid 0x%lx -\"",
+			quality, streamid, cache, win);
 	printf("%s\n", cmdline);
 	*mplayer_fp = popen(cmdline, "w");
 }
@@ -904,5 +907,18 @@ void Signage::createiPlayer(int width, int height, int x, int y, int scale) {
 	}
 
 	mplayer_fp = NULL;
-	create_iplayer("80001", play_win, &mplayer_fp);
+	// Determine Quality Automatically....
+	// flashlow   - 400x225 @ 396kbps  (300v, 96a)
+	// flashstd   - 640x360 @ 496kbps  (400v, 96a)
+	// flashhigh  - 640x360 @ 800kbps  (704v, 96a)
+	// flashvhigh - 688x384 @ 1500kbps (1372v, 128a)
+	if (mplayer_width <= 400)
+		create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
+	if ((mplayer_width > 400) && (mplayer_width <= 600))
+		create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
+	if ((mplayer_width > 600) && (mplayer_width <= 800))
+		create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
+	if (mplayer_width > 800)
+		create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);
+
 }
