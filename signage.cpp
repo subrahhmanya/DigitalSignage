@@ -153,11 +153,12 @@ void Signage::Init(const char* title, int width, int height, int bpp,
 	wIWind = 0;
 
 	/* Test iPlayer Feed */
-	iPlayerScale = 120;
+	iPlayerScale = 427;
 	iPlayerPosX = 60;
 	iPlayerPosY = 10;
 
-	createiPlayer(4, width, height, iPlayerPosX, iPlayerPosY, iPlayerScale);
+	/* iPlayer Testing - Soon to be in a class */
+	createiPlayer(8, width, height, iPlayerPosX, iPlayerPosY, iPlayerScale);
 
 	/* FPS Timer */
 	counter = fps_counter();
@@ -974,13 +975,15 @@ void Signage::createiPlayer(int maxqual, int width, int height, int x, int y,
 	// flashstd   - 640x360 @ 496kbps  (400v, 96a)
 	// flashhigh  - 640x360 @ 800kbps  (704v, 96a)
 	// flashvhigh - 688x384 @ 1500kbps (1372v, 128a)
-	if ((mplayer_width <= 400) || (maxqual == 1))
+	if ((mplayer_width <= 400) || (maxqual <= 1))
 		create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
-	else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2))
+	else if (((mplayer_width > 400) && (mplayer_width <= 600))
+			|| (maxqual == 2))
 		create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
-	else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3))
+	else if (((mplayer_width > 600) && (mplayer_width <= 800))
+			|| (maxqual == 3))
 		create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
-	else if ((mplayer_width > 800) || (maxqual == 4))
+	else if ((mplayer_width > 800) || (maxqual >= 4))
 		create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);
 
 }
