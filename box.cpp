@@ -13,17 +13,20 @@ Box::Box() {
 }
 
 bool Box::doDraw() {
-	/* iPlayer Testing - Soon to be in a class */
-	if (sType >= 3)
-		if (!ipVis)
-			createiPlayer(sType-2, bW, bH, bX, bY, bScale);
-
 	drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, 255);
 	return true;
 }
 
 void Box::doUpdate() {
 	/* Update Routine */
+
+	/* mplayer/iPlayer check
+	 * mPlayer will have sType of 2
+	 * iPlayer will have sType of 3+ */
+	if (sType >= 3)
+		if (!ipVis)
+			createiPlayer(sType - 2, bW, bH, bX, bY, bScale);
+
 	if ((sType >= 3) && (ipVis)) {
 		/* Check for getiPlayer Instance, restart if required. */
 		FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
@@ -89,6 +92,8 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 	int h = (miny / 255.0) * scale;
 
 	if (bVis) {
+		/* We only want to draw the border of each frame if this is set.
+		 * Otherwise, we are most likely drawing just an overlaying texture object */
 		glColor4f(br, bg, bb, (float) balpha / 255.0);
 		/* Draw Left & Right Sides of Box */
 		glBindTexture(GL_TEXTURE_2D, layout[0].gltex());
