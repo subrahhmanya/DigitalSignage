@@ -44,6 +44,9 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_HWSURFACE | SDL_OPENGL);
 	}
 
+	sWidth = width;
+	sHeight = height;
+
 	//go through and get the values to see if everything was set
 	int red, green, blue, alpha, doublebuf;
 	SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &red);
@@ -178,12 +181,13 @@ void Signage::Update() {
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create(true, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), 200, 1);
+		iBoxes[0].Create(true, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth,
+				sHeight, 200, 1);
 	else
 		iBoxes[0].doUpdate();
 
 	if (!iBoxes[1].isCreated())
-		iBoxes[1].Create(true, 0, 2, 50, 65, 688, 384, 255, 6);
+		iBoxes[1].Create(true, 0, 2, 50, 65, 688, 384, sWidth, sHeight, 255, 6);
 	else
 		iBoxes[1].doUpdate();
 

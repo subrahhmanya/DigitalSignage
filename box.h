@@ -21,7 +21,7 @@
 class Box {
 public:
 	Box();
-	void Create(bool btype, GLuint TextureID, int bcol, int px, int py, int w, int h, int scale, int sourceType);
+	void Create(bool btype, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType);
 	bool doDraw();
 	void doUpdate();
 	bool isCreated() {
@@ -39,6 +39,7 @@ private:
 	int bH;
 	int bScale;
 	int sType;
+	int sWidth, sHeight;
 
 	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
 			int balpha, int calpha);

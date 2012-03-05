@@ -48,7 +48,7 @@ void Box::doUpdate() {
 	}
 }
 
-void Box::Create(bool btype, GLuint TextureID, int bcol, int px, int py, int w, int h, int scale, int sourceType) {
+void Box::Create(bool btype, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType) {
 	if (bcol == 1) {
 		layout[0].Load("/screen/textures/orb_bl.png");
 		layout[1].Load("/screen/textures/orb_bt.png");
@@ -71,6 +71,8 @@ void Box::Create(bool btype, GLuint TextureID, int bcol, int px, int py, int w, 
 	bY = py;
 	bW = w;
 	bH = h;
+	sWidth = aw;
+	sHeight = ah;
 	bScale = scale;
 	m_bRunning = true;
 	glTex = TextureID;
@@ -323,10 +325,15 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	/* Default IPlayer Feed - 688x384 */
 	printf("%i, %i, %i, %i, %i, %i\n", maxqual, width, height, x, y, scale);
 	ipVis = true;
-	int mplayer_pos_x = x;
-	int mplayer_pos_y = (720 - y) - ((height / 255.0) * scale);
-	int mplayer_width = (width / 255.0) * scale;
-	int mplayer_height = (height / 255.0) * scale;
+
+	int mplayer_t_width = 688;
+	int mplayer_t_height = 384;
+	y = (720 - y) - ((height / 255.0) * scale);
+	int mplayer_pos_y = (y / 720.0) * sHeight;
+	int mplayer_pos_x = (x / 1280.0) * sWidth;
+	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
+	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
+
 	printf("MPLAYER Window X,Y - WxH = %i,%i - %ix%i\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win) {
