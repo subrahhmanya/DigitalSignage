@@ -53,7 +53,10 @@ private:
 	int sWidth, sHeight;
 	bool bV1, wOK;
 	char nthsInWord[8], dateString[32];
-	char wCondition[32], wHumidity[32], wIcon[64], wWind[32];
+	char wCondition[32], wHumidity[32], wIcon[64], wWind[32], wOIcon[64];
+	int wFadeA[5];
+	int wFadeV[5];
+	int wCurDisp;
 	int wLastCheckH;
 	int wLastCheckM;
 	int wUpdateTimer[32];
@@ -73,6 +76,7 @@ private:
 	void monthInStr(char monthsInWord[], int month);
 	void nthInStr(char dowInWord[], int monthday);
 	void parseWeather(xmlNode * a_node);
+	void drawTexture(GLuint TextureID, int px, int py, int alpha, int scale);
 };
 
 #endif /* SIGNAGE_H_ */

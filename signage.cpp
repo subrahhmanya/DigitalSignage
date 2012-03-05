@@ -16,6 +16,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
+	wCurDisp = 0;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -181,15 +182,15 @@ void Signage::Update() {
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create(true, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth,
-				sHeight, 200, 1);
+		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth, sHeight, 200,
+				1);
 	else
 		iBoxes[0].doUpdate();
 
-	if (!iBoxes[1].isCreated())
-		iBoxes[1].Create(true, 0, 2, 50, 65, 688, 384, sWidth, sHeight, 255, 6);
-	else
-		iBoxes[1].doUpdate();
+		if (!iBoxes[1].isCreated())
+			iBoxes[1].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
+		else
+			iBoxes[1].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
@@ -265,9 +266,86 @@ void Signage::Update() {
 				wOK = false;
 			}
 			/* Calculate Weather */
+			//wFarenheight=100;
 			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
 			printf("%i %f %s\n", wFarenheight, wCelcius, wTemp);
+		}
+	}
+	if (wOK) {
+		/* Do Looping Weather Animations */
+		if (now > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
+		{
+			if ((wCelcius <= 3.0) || (wCelcius >= 25.0)) {
+				wUpdateTimer[1] = now;
+				switch (wFadeA[1]) {
+				case 0:
+					wFadeA[1] = 1;
+					;
+					break;
+				case 1:
+					wFadeA[1] = 2;
+					;
+					break;
+				case 2:
+					wFadeA[1] = 1;
+					;
+					break;
+				}
+			} else
+				wFadeA[1] = 0;
+		}
+
+		if (now > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
+		{
+			wUpdateTimer[0] = now;
+			wFadeA[0] = 1;
+		}
+
+		/* Process Alternating Condition Icon */
+		if ((wFadeA[1] == 1) || (wFadeA[1] == 2)) {
+			switch (wFadeA[1]) {
+			case 1:
+				wFadeV[1] = wFadeV[1] - 15;
+				;
+				break;
+			case 2:
+				wFadeV[1] = wFadeV[1] + 15;
+				;
+				break;
+			}
+
+			if ((wFadeV[1] > 255) && (wFadeA[1] == 2)) {
+				wFadeV[1] = 255;
+			}
+			if ((wFadeV[1] < 0) && (wFadeA[1] == 1)) {
+				wFadeV[1] = 0;
+			}
+		}
+
+		/* Process Fading Weather Info */
+		if ((wFadeA[0] == 1) || (wFadeA[0] == 2)) {
+			switch (wFadeA[0]) {
+			case 1:
+				wFadeV[0] = wFadeV[0] - 15;
+				;
+				break;
+			case 2:
+				wFadeV[0] = wFadeV[0] + 15;
+				;
+				break;
+			}
+			if (wFadeV[0] < 0) {
+				wFadeA[0] = 2;
+				wFadeV[0] = 0;
+				wCurDisp++;
+				if (wCurDisp == 3)
+					wCurDisp = 0;
+			}
+			if (wFadeV[0] > 255) {
+				wFadeV[0] = 255;
+				wFadeA[0] = 0;
+			}
 		}
 	}
 }
@@ -298,16 +376,102 @@ void Signage::Draw() {
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1160, 32);
 
 	/* Draw Weather */
-	if (!wOK) {
+	if (wOK) {
+		pTWidth = 0;
 
+		if (wCelcius <= 3.0)
+			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 16, 8);
+		else if (wCelcius >= 25.0)
+			drawText(wTemp, fntCGothic[5], 1, 255, 0, 0, 255, 16, 8);
+		else
+			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
+
+		switch (wCurDisp) {
+		case 0:
+			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], pTWidth + 16, 8);
+			;
+			break;
+		case 1:
+			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], pTWidth + 16, 8);
+			;
+			break;
+		case 2:
+			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], pTWidth + 16, 8);
+			;
+			break;
+		}
+
+		/* Draw weather condition icon */
+		if (wCelcius <= 3.0)
+			drawTexture(wTex_cold, pCIW+12, 5, (255-wFadeV[1]),1);
+		else if (wCelcius >= 25.0)
+			drawTexture(wTex_hot, pCIW+12, 5, (255-wFadeV[1]),1);
+
+		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0 )
+			drawTexture(wTex_chance_of_storm, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0 )
+			drawTexture(wTex_mostly_sunny, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0 )
+			drawTexture(wTex_dust, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0 )
+			drawTexture(wTex_mostly_cloudy, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0 )
+			drawTexture(wTex_cloudy, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0 )
+			drawTexture(wTex_chance_of_tstorm, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) ==0 )
+			drawTexture(wTex_partly_cloudy, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0 )
+			drawTexture(wTex_storm, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0 )
+			drawTexture(wTex_sunny, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0 )
+			drawTexture(wTex_flurries, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0 )
+			drawTexture(wTex_chance_of_snow, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0 )
+			drawTexture(wTex_chance_of_rain, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0 )
+			drawTexture(wTex_fog, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0 )
+			drawTexture(wTex_icy, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0 )
+			drawTexture(wTex_sleet, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0 )
+			drawTexture(wTex_rain, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0 )
+			drawTexture(wTex_mist, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0 )
+			drawTexture(wTex_haze, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0 )
+			drawTexture(wTex_smoke, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0 )
+			drawTexture(wTex_snow, pCIW+12, 5, wFadeV[1],1);
+
+		if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0 )
+			drawTexture(wTex_thunderstorm, pCIW+12, 5, wFadeV[1],1);
 	} else {
 		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
 	}
-
-	/* iPlayer Testing - Box is 688x384, iPlayer pos is 20x60 */
-	//drawInfoBox(0, 2, iPlayerPosX, 720 - ((384.0 / 255.0) * iPlayerScale)
-	//		- iPlayerPosY, 688, 384, 0, 384, 1.0f, 1.0f, 1.0f, iPlayerScale,
-	//		255, 255);
 
 	/* Draw FPS */
 	int currentFPS = 0;
@@ -679,4 +843,31 @@ void Signage::parseWeather(xmlNode * a_node) {
 		}
 		parseWeather(cur_node->children);
 	}
+}
+void Signage::drawTexture(GLuint TextureID,
+			int px,
+			int py,
+			int alpha,
+			int scale)
+{
+
+	glBindTexture(GL_TEXTURE_2D, TextureID);
+	glColor4f(1.0f, 1.0f, 1.0f, (float)alpha/255.0);
+
+	/* Draw a quad at location */
+	glBegin(GL_QUADS);
+		/* Recall that the origin is in the lower-left corner
+		   That is why the TexCoords specify different corners
+		   than the Vertex coors seem to. */
+		glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(ax, ay);
+		glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(ax + (w/scale), ay);
+		glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(ax + (w/scale), ay + (h/scale));
+		glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(ax, ay + (h/scale));
+	glEnd();
+	/* Bad things happen if we delete the texture before it finishes */
+	glFinish();
 }

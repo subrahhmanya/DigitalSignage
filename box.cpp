@@ -48,25 +48,33 @@ void Box::doUpdate() {
 	}
 }
 
-void Box::Create(bool btype, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType) {
+void Box::Destroy() {
+	m_bRunning = false;
+	glTex = 0;
+}
+
+void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType) {
+	bType = false;
 	if (bcol == 1) {
+		bType = true;
 		layout[0].Load("/screen/textures/orb_bl.png");
 		layout[1].Load("/screen/textures/orb_bt.png");
 		layout[2].Load("/screen/textures/orb_bcrnr.png");
 		layout[3].Load("/screen/textures/orb_boxb.png");
 	} else if (bcol == 2) {
+		bType = true;
 		layout[0].Load("/screen/textures/orb_wl.png");
 		layout[1].Load("/screen/textures/orb_wt.png");
 		layout[2].Load("/screen/textures/orb_wcrnr.png");
 		layout[3].Load("/screen/textures/orb_boxw.png");
 	} else if (bcol == 3) {
+		bType = true;
 		layout[0].Load("/screen/textures/orb_tl.png");
 		layout[1].Load("/screen/textures/orb_tt.png");
 		layout[2].Load("/screen/textures/orb_tcrnr.png");
-		layout[3].Load("/screen/textures/orb_boxt.png");
 	}
-	bType = btype;
 	sType = sourceType;
+	bCol = bcol;
 	bX = px;
 	bY = py;
 	bW = w;
@@ -82,9 +90,11 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 		int balpha, int calpha) {
 
 	/* Box Types (bcol)
-	 1 = Black BG
-	 2 = White BG
-	 3 = Transparent BG */
+	 * 1 = Black BG
+	 * 2 = White BG
+	 * 3 = Transparent BG
+	 *
+	 * Any other setting will result in *no* border */
 
 	/* We don't want the border to have less opacity than the contents, so match contents to border if required */
 	if (balpha < calpha)
@@ -198,19 +208,21 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 		glEnd();
 		glFinish();
 
-		/* Draw Background */
-		glBindTexture(GL_TEXTURE_2D, layout[3].gltex());
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(px + 4, py + 4);
-		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(px + w - 4, py + 4);
-		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(px + w - 4, py + h - 4);
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(px + 4, py + h - 4);
-		glEnd();
-		glFinish();
+		if (bCol != 3) {
+			/* Draw Background */
+			glBindTexture(GL_TEXTURE_2D, layout[3].gltex());
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(px + 4, py + 4);
+			glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(px + w - 4, py + 4);
+			glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(px + w - 4, py + h - 4);
+			glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(px + 4, py + h - 4);
+			glEnd();
+			glFinish();
+		}
 	}
 	if (TextureID != 0) {
 		/* Draw Image Texture */
