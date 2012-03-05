@@ -4,18 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../box.cpp \
 ../fps_counter.cpp \
 ../main.cpp \
 ../signage.cpp \
 ../textures.cpp 
 
 OBJS += \
+./box.o \
 ./fps_counter.o \
 ./main.o \
 ./signage.o \
 ./textures.o 
 
 CPP_DEPS += \
+./box.d \
 ./fps_counter.d \
 ./main.d \
 ./signage.d \

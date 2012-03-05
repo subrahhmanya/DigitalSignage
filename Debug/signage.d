@@ -1,5 +1,5 @@
-signage.d: ../signage.cpp ../signage.h ../textures.h ../fps_counter.h \
- /usr/include/libxml2/libxml/parser.h \
+signage.d: ../signage.cpp ../signage.h ../textures.h ../box.h \
+ ../fps_counter.h /usr/include/libxml2/libxml/parser.h \
  /usr/include/libxml2/libxml/xmlversion.h \
  /usr/include/libxml2/libxml/xmlexports.h \
  /usr/include/libxml2/libxml/tree.h \
@@ -21,6 +21,8 @@ signage.d: ../signage.cpp ../signage.h ../textures.h ../fps_counter.h \
 ../signage.h:
 
 ../textures.h:
+
+../box.h:
 
 ../fps_counter.h:
 
