@@ -22,5 +22,7 @@ int main(int argc, char* argv[]) {
 	/* Cleanup Engine */
 	signage.Clean();
 
+	printf("OrbitalDigitalSignage has cleanly exited.\n");
+
 	return 0;
 }

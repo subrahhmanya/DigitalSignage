@@ -10,16 +10,21 @@
 
 /* Signage constructor */
 Box::Box() {
+	glTex = 0;
+	m_bRunning = false;
+	bType = false;
+	bCol = 0;
+	bX = 0;
+	bY = 0;
+	bW = 0;
+	bH = 0;
+	bScale = 0;
+	sType = 0;
+	sWidth = 0;
+	sHeight = 0;
 }
 
-bool Box::doDraw() {
-	drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, 255);
-	return true;
-}
-
-void Box::doUpdate() {
-	/* Update Routine */
-
+bool Box::doDraw(int aOverride) {
 	/* mplayer/iPlayer check
 	 * mPlayer will have sType of 2
 	 * iPlayer will have sType of 3+ */
@@ -46,11 +51,72 @@ void Box::doUpdate() {
 		}
 		pclose(fp);
 	}
+	if (aOverride != -1)
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, aOverride);
+	else
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, 255);
+	return true;
+}
+
+void Box::doUpdate() {
+	/* Update Routine */
 }
 
 void Box::Destroy() {
-	m_bRunning = false;
+	if ((sType >= 3) && (ipVis)) {
+		printf(" - Destroying iplayer/mplayer reference...\n");
+		system("killall -9 mplayer");
+		system("killall -9 rtmpdump");
+		system("killall -9 get_iplayer");
+		FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
+		char buff[1024];
+		if (!fgets(buff, sizeof buff, fp) != NULL) {
+			/* get_iplayer isn't running - Close current window and set ipVis to false
+			 * iPlayer Window will automatically re-launch when closed. */
+			SDL_SysWMinfo sdl_info;
+
+			sdl_info = get_sdl_wm_info();
+			sdl_info.info.x11.lock_func();
+
+			destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
+
+			sdl_info.info.x11.unlock_func();
+			ipVis = false;
+		}
+		pclose(fp);
+	}
 	glTex = 0;
+	m_bRunning = false;
+	bType = false;
+	bCol = 0;
+	bX = 0;
+	bY = 0;
+	bW = 0;
+	bH = 0;
+	bScale = 0;
+	sType = 0;
+	sWidth = 0;
+	sHeight = 0;
+	if (layout[0].width() != 0)
+	{
+		printf(" - BoxTex1 Destroyed ");
+		layout[0].Destroy();
+	}
+	if (layout[1].width() != 0)
+	{
+		printf(" - BoxTex2 Destroyed ");
+		layout[1].Destroy();
+	}
+	if (layout[2].width() != 0)
+	{
+		printf(" - BoxTex3 Destroyed ");
+		layout[2].Destroy();
+	}
+	if (layout[3].width() != 0)
+	{
+		printf(" - BoxTex4 Destroyed ");
+		layout[3].Destroy();
+	}
 }
 
 void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType) {
@@ -226,9 +292,8 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 	}
 	if (TextureID != 0) {
 		/* Draw Image Texture */
+		glColor4f(br, bg, bb, (float) calpha / 255.0);
 		glBindTexture(GL_TEXTURE_2D, TextureID);
-		glColor4f(br, bg, bb, (float) balpha / 255.0);
-		glColor4f(1.0f, 1.0f, 1.0f, (float) calpha / 255.0);
 
 		int hs = (absh / 255.0) * scale;
 
@@ -335,7 +400,6 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int scale) {
 	/* MPLAYER Testing */
 	/* Default IPlayer Feed - 688x384 */
-	printf("%i, %i, %i, %i, %i, %i\n", maxqual, width, height, x, y, scale);
 	ipVis = true;
 
 	int mplayer_t_width = 688;
@@ -345,8 +409,6 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	int mplayer_pos_x = (x / 1280.0) * sWidth;
 	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
 	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
-
-	printf("MPLAYER Window X,Y - WxH = %i,%i - %ix%i\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win) {
 		fprintf(stderr, "Cannot create X11 window\n");

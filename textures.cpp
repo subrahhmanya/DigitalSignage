@@ -9,6 +9,10 @@
 
 /* Texture constructor */
 Texture::Texture() {
+	gltexi = 0;
+	widthi = 0;
+	heighti = 0;
+	mode = 0;
 }
 
 void Texture::Destroy() {

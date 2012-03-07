@@ -22,17 +22,35 @@ class Box {
 public:
 	Box();
 	void Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType);
-	bool doDraw();
+	bool doDraw(int aOverride);
 	void doUpdate();
+	void rePos(int x, int y) {
+		bX = x;
+		bY = y;
+	}
 	bool isCreated() {
 		return m_bRunning;
 	}
+	int width() {
+		if (bType)
+			return bW;
+		else
+			return bW;
+	}
+	int height() {
+		if (bType)
+			return 16 + bH;
+		else
+			return bH;
+	}
+	int scale() {
+		return bScale;
+	}
 	void Destroy();
 private:
-	bool m_bRunning;
 	Texture layout[4];
 	GLuint glTex;
-	bool bType;
+	bool m_bRunning, bType;
 	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight;
 
 	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,

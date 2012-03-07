@@ -49,11 +49,11 @@ private:
 	Texture weather[24];
 	Box iBoxes[12];
 	TTF_Font *fntCGothic[10];
-	int pTWidth, tC1, tFarenheight, tCondition, tHumidity, tIcon, tWind, wFarenheight, wIWind;
+	int pTWidth, pTHeight, tC1, tFarenheight, tCondition, tHumidity, tIcon, tWind, wFarenheight, wIWind;
 	int sWidth, sHeight;
 	bool bV1, wOK;
 	char nthsInWord[8], dateString[32];
-	char wCondition[32], wHumidity[32], wIcon[64], wWind[32], wOIcon[64];
+	char wCondition[32], wHumidity[32], wIcon[64], wOIcon[64], wWind[32];
 	int wFadeA[5];
 	int wFadeV[5];
 	int wCurDisp;
@@ -76,7 +76,6 @@ private:
 	void monthInStr(char monthsInWord[], int month);
 	void nthInStr(char dowInWord[], int monthday);
 	void parseWeather(xmlNode * a_node);
-	void drawTexture(GLuint TextureID, int px, int py, int alpha, int scale);
 };
 
 #endif /* SIGNAGE_H_ */
