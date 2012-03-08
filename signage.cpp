@@ -9,7 +9,8 @@
 #include "textures.h"
 
 /* Signage constructor */
-Signage::Signage() {
+Signage::Signage()
+{
 	/* Preset variables */
 	bool IS_RUNNING = true;
 	wLastCheckH = 99;
@@ -44,7 +45,9 @@ Signage::Signage() {
 	wCelcius = 0.0;
 }
 
-void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen) {
+void Signage::Init(const char* title, int width, int height, int bpp,
+		bool fullscreen)
+{
 
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
@@ -68,13 +71,18 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	if (fullscreen) {
+	if (fullscreen)
+	{
 		/* We're running full screen on the target, so use full screen */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT
+				| SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 		SDL_ShowCursor(SDL_DISABLE);
-	} else {
+	}
+	else
+	{
 		/* We're running in a window (no fullscreen flag set) so don't pass SDL_FULLSCREEN */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT
+				| SDL_HWSURFACE | SDL_OPENGL);
 	}
 
 	sWidth = width;
@@ -87,18 +95,23 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blue);
 	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alpha);
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &doublebuf);
-	printf("Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", red, green, blue, alpha,
-			(doublebuf == 1 ? "Yes" : "No"));
+	printf(
+			"Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n",
+			red, green, blue, alpha, (doublebuf == 1 ? "Yes" : "No"));
 
 	//print video card memory
 	const SDL_VideoInfo* info = SDL_GetVideoInfo();
-	if (info->video_mem == 0) {
+	if (info->video_mem == 0)
+	{
 		printf("**Unable to detect how much Video Memory is available**\n");
-	} else {
+	}
+	else
+	{
 		printf("Video Memory (in MB): %d\n", info->video_mem);
 	}
 
-	if (screen == NULL) {
+	if (screen == NULL)
+	{
 		fprintf(stderr, "Video mode set failed: %s\n", SDL_GetError());
 		m_bRunning = false;
 	}
@@ -128,12 +141,18 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	/* Load Fonts */
 	int n;
 
-	for (n = 0; n < 11; n++) {
-		printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, 12 + (n * 4));
+	for (n = 0; n < 11; n++)
+	{
+		printf(
+				"Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ",
+				n, 12 + (n * 4));
 		fntCGothic[n] = TTF_OpenFont("/screen/fonts/cgothic.ttf", 12 + (n * 4));
-		if (fntCGothic[n] == NULL) {
+		if (fntCGothic[n] == NULL)
+		{
 			fprintf(stderr, "FAILED -  %s\n", SDL_GetError());
-		} else {
+		}
+		else
+		{
 			printf("OK\n");
 		}
 	}
@@ -144,17 +163,21 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	counter.cap_on();
 }
 
-void Signage::HandleEvents(Signage* signage) {
+void Signage::HandleEvents(Signage* signage)
+{
 	SDL_Event event;
 
-	if (SDL_PollEvent(&event)) {
-		switch (event.type) {
+	if (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
 		case SDL_QUIT:
 			signage->Quit();
 			break;
 
 		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym) {
+			switch (event.key.keysym.sym)
+			{
 			case SDLK_ESCAPE:
 				signage->Quit();
 				break;
@@ -164,7 +187,8 @@ void Signage::HandleEvents(Signage* signage) {
 	}
 }
 
-void Signage::Update() {
+void Signage::Update()
+{
 	/* Process and Time String */
 	int days;
 	char daysInWord[8];
@@ -177,30 +201,12 @@ void Signage::Update() {
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth,
-				sHeight, 200, 1);
+		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width()
+				/ 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(),
+				sWidth, sHeight, 200, 1);
 	else
 		iBoxes[0].doUpdate();
 
-	int nx = 0;
-	int ny = 0;
-	int bb = 1;
-	for (int t = 4; t < 120; t++) {
-		if (!iBoxes[t].isCreated())
-			iBoxes[t].Create(pLogo.gltex(), bb, 10 + (nx*(pLogo.width()-90)), 65 + (ny*(pLogo.height())), pLogo.width(), pLogo.height(),
-					sWidth, sHeight, 125, 1);
-		else
-			iBoxes[t].doUpdate();
-		ny++;
-		if (ny==14){
-			if (bb==1)
-				bb = 2;
-			else
-				bb = 1;
-			ny = 0;
-			nx++;
-		}
-	}
 	/* iPlayer Specific Box */
 	//if (!iBoxes[10].isCreated())
 	//	iBoxes[10].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
@@ -211,7 +217,8 @@ void Signage::Update() {
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
 
 	/* Add one day if the year is leap year and desired date is after February */
-	if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0 || (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
+	if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0
+			|| (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
 		days++;
 	if (days == 7)
 		days = 0;
@@ -226,7 +233,8 @@ void Signage::Update() {
 		sprintf(mins, "%i", ltm->tm_min);
 
 	/* Create the Date/Time String - We want blinking : */
-	if (tC1 != ltm->tm_sec) {
+	if (tC1 != ltm->tm_sec)
+	{
 		if (bV1)
 			bV1 = false;
 		else
@@ -234,18 +242,25 @@ void Signage::Update() {
 
 		tC1 = ltm->tm_sec;
 	}
-	sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+	sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins,
+			daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 	/* Process Weather Information */
 	/* Do Weather Check (update once every 15 minutes) */
-	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0)) {
-		if (wLastCheckM != ltm->tm_min) {
+	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min
+			== 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
+	{
+		if (wLastCheckM != ltm->tm_min)
+		{
 			/* Update last check interval */
 			wLastCheckM = ltm->tm_min;
 
-			if (ltm->tm_min < 10) {
+			if (ltm->tm_min < 10)
+			{
 				printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
-			} else {
+			}
+			else
+			{
 				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 			}
 			/* Hour is odd, we call check */
@@ -254,6 +269,7 @@ void Signage::Update() {
 			tHumidity = 0;
 			tIcon = 0;
 			tWind = 0;
+			wFadeTI = 0;
 			wOK = false; /* New Check - default wOK to false (so data regarded dirty first) */
 			xmlDoc *doc = NULL;
 			xmlNode *root_element = NULL;
@@ -261,8 +277,10 @@ void Signage::Update() {
 			LIBXML_TEST_VERSION // Macro to check API for match with
 			// the DLL we are using
 			/*parse the file and get the DOM */
-			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
-			if (doc) {
+			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN",
+					NULL, 0);
+			if (doc)
+			{
 
 				/*Get the root element node */
 				root_element = xmlDocGetRootElement(doc);
@@ -270,11 +288,14 @@ void Signage::Update() {
 				xmlFreeDoc(doc); // free document
 				xmlCleanupParser(); // Free globals
 				/* Update last check interval */
+				wFarenheight = 100.0f;
 				if (wOK)
 					wLastCheckH = ltm->tm_hour;
 				else
 					wLastCheckH = -5;
-			} else {
+			}
+			else
+			{
 				/* Update last check interval (we want to check in another minute) */
 				printf("NO DATA/NET CONNECTION\n");
 				wLastCheckH = -5;
@@ -282,11 +303,13 @@ void Signage::Update() {
 			}
 			/* Calculate Weather */
 			//wFarenheight=100;
-			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
+			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5)
+					/ 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
 		}
 	}
-	if (wOK) {
+	if (wOK)
+	{
 		/* Set the Weather Icon */
 		/*		if (wCelcius <= 3.0)
 		 drawTexture(wTex_cold, pCIW+12, 5, (255-wFadeV[1]),1);
@@ -339,9 +362,11 @@ void Signage::Update() {
 		/* Do Looping Weather Animations */
 		if (now > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
 		{
-			if ((wCelcius <= 3.0) || (wCelcius >= 25.0)) {
+			if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
+			{
 				wUpdateTimer[1] = now;
-				switch (wFadeA[1]) {
+				switch (wFadeA[1])
+				{
 				case 0:
 					wFadeA[1] = 1;
 					;
@@ -355,7 +380,8 @@ void Signage::Update() {
 					;
 					break;
 				}
-			} else
+			}
+			else
 				wFadeA[1] = 0;
 		}
 
@@ -365,9 +391,16 @@ void Signage::Update() {
 			wFadeA[0] = 1;
 		}
 
-		/* Process Alternating Condition Icon */
-		if ((wFadeA[1] == 1) || (wFadeA[1] == 2)) {
-			switch (wFadeA[1]) {
+		/* Weather Icon Fading Transition */
+		if ((tIcon != tOIcon) && (wFadeA[1] == 0))
+		{
+			wUpdateTimer[1] = now;
+			wFadeA[1] = 1;
+		}
+		if ((wFadeA[1] == 1) || (wFadeA[1] == 2))
+		{
+			switch (wFadeA[1])
+			{
 			case 1:
 				wFadeV[1] = wFadeV[1] - 15;
 				;
@@ -377,18 +410,48 @@ void Signage::Update() {
 				;
 				break;
 			}
-
-			if ((wFadeV[1] > 255) && (wFadeA[1] == 2)) {
-				wFadeV[1] = 255;
-			}
-			if ((wFadeV[1] < 0) && (wFadeA[1] == 1)) {
+			if (wFadeV[1] < 0)
+			{
+				wFadeA[1] = 2;
 				wFadeV[1] = 0;
+				iBoxes[1].Destroy();
+				char tBuff[1024] = "";
+				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
+				{
+					if (wFadeTI == 1)
+					{
+						if (wCelcius <= 3.0)
+							sprintf(tBuff, "/screen/textures/weather/9.png");
+						else
+							sprintf(tBuff, "/screen/textures/weather/22.png");
+					}
+					else
+						sprintf(tBuff, "/screen/textures/weather/%i.png", tIcon);
+					if (wFadeTI == 1)
+							wFadeTI = 0;
+					else
+						wFadeTI = 1;
+				}
+				else
+					sprintf(tBuff, "/screen/textures/weather/%i.png", tIcon);
+				weather[0].Load(tBuff);
+				iBoxes[1].Create(weather[0].gltex(), 4, 16 + pTWidth + 4, 0,
+						weather[0].width(), weather[0].height(), sWidth, sHeight,
+						255, 1);
+			}
+			if (wFadeV[1] > 255)
+			{
+				wFadeV[1] = 255;
+				wFadeA[1] = 0;
+				tOIcon = tIcon;
 			}
 		}
 
 		/* Process Fading Weather Info */
-		if ((wFadeA[0] == 1) || (wFadeA[0] == 2)) {
-			switch (wFadeA[0]) {
+		if ((wFadeA[0] == 1) || (wFadeA[0] == 2))
+		{
+			switch (wFadeA[0])
+			{
 			case 1:
 				wFadeV[0] = wFadeV[0] - 15;
 				;
@@ -398,76 +461,52 @@ void Signage::Update() {
 				;
 				break;
 			}
-			if (wFadeV[0] < 0) {
+			if (wFadeV[0] < 0)
+			{
 				wFadeA[0] = 2;
 				wFadeV[0] = 0;
 				wCurDisp++;
 				if (wCurDisp == 3)
 					wCurDisp = 0;
 			}
-			if (wFadeV[0] > 255) {
+			if (wFadeV[0] > 255)
+			{
 				wFadeV[0] = 255;
 				wFadeA[0] = 0;
 			}
 		}
 
-		//		if (!iBoxes[1].isCreated())
-		//iBoxes[1].Create(weather.gltex(), 4, 16 + pTWidth + 4, 0, weather.width(), weather.height(), sWidth, sHeight, 255, 1);
-
-		/* Weather Icon Fading Transition */
-		if ((tIcon != tOIcon) && (wFadeA[2] == 0))
-			wFadeA[2] = 1;
-		if ((wFadeA[2] == 1) || (wFadeA[2] == 2)) {
-			switch (wFadeA[2]) {
-			case 1:
-				wFadeV[2] = wFadeV[2] - 15;
-				;
-				break;
-			case 2:
-				wFadeV[2] = wFadeV[2] + 15;
-				;
-				break;
-			}
-			if (wFadeV[2] < 0) {
-				wFadeA[2] = 2;
-				wFadeV[2] = 0;
-				iBoxes[1].Destroy();
-				char tBuff[1024] = "";
-				sprintf(tBuff, "/screen/textures/weather/%i.png", tIcon);
-				weather.Load(tBuff);
-				iBoxes[1].Create(weather.gltex(), 4, 16 + pTWidth + 4, 0, weather.width(), weather.height(), sWidth, sHeight, 255, 1);
-			}
-			if (wFadeV[2] > 255) {
-				wFadeV[2] = 255;
-				wFadeA[2] = 0;
-				tOIcon = tIcon;
-			}
-		}
 	}
 }
 
-void Signage::Draw() {
+void Signage::Draw()
+{
 	// Draw something with Logotex
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
 	/* Draw Title */
-	drawText("Notification Centre", fntCGothic[7], 3, 255, 255, 255, 255, 1280, 680);
+	drawText("Notification Centre", fntCGothic[7], 3, 255, 255, 255, 255, 1280,
+			680);
 
 	/* Draw Time */
 	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 1262, 8);
 
-	if (bV1) {
+	if (bV1)
+	{
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 45, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth
+					+ 45, 11);
 		else
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 27, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth
+					+ 27, 11);
 	}
 
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1172, 32);
 
 	/* Draw Weather */
-	if (wOK) {
+	if (wOK)
+	{
 		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
@@ -480,32 +519,47 @@ void Signage::Draw() {
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
 		iBoxes[1].rePos(16 + pTWidth + 4, 0);
 
-		switch (wCurDisp) {
+		switch (wCurDisp)
+		{
 		case 0:
-			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 24, 8);
+			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
+					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
+							+ 24, 8);
 			;
 			break;
 		case 1:
-			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 24, 8);
+			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
+					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
+							+ 24, 8);
 			;
 			break;
 		case 2:
-			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 24, 8);
+			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
+					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
+							+ 24, 8);
 			;
 			break;
 		}
 
-	} else {
-		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
+	}
+	else
+	{
+		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255,
+				16, 8);
 	}
 
 	// Draw Boxes
-	for (int n = 0; n < 128; n++) {
-		if (iBoxes[n].isCreated()) {
-			if ((n == 1)) {
-				if (!iBoxes[n].doDraw(wFadeV[2]))
+	for (int n = 0; n < 128; n++)
+	{
+		if (iBoxes[n].isCreated())
+		{
+			if ((n == 1))
+			{
+				if (!iBoxes[n].doDraw(wFadeV[1]))
 					m_bRunning = false;
-			} else {
+			}
+			else
+			{
 				if (!iBoxes[n].doDraw(-1))
 					m_bRunning = false;
 			}
@@ -524,10 +578,13 @@ void Signage::Draw() {
 	SDL_GL_SwapBuffers();
 }
 
-void Signage::Clean() {
+void Signage::Clean()
+{
 	/* Destroy Boxes */
-	for (int n = 0; n < 128; n++) {
-		if (iBoxes[n].isCreated()) {
+	for (int n = 0; n < 128; n++)
+	{
+		if (iBoxes[n].isCreated())
+		{
 			printf("Destroying Box iBoxes[%i]...\n", n);
 			iBoxes[n].Destroy();
 		}
@@ -538,16 +595,19 @@ void Signage::Clean() {
 	pLogo.Destroy();
 
 	printf("Destroying Texture weather... ");
-	weather.Destroy();
+	weather[0].Destroy();
 	int n;
-	for (n = 0; n < 10; n++) {
+	for (n = 0; n < 10; n++)
+	{
 		printf("Destroying Font ftnCGothic[%i]... ", n);
 		TTF_CloseFont(fntCGothic[n]);
 		printf("OK\n");
 	}
 }
 
-void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py) {
+void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment,
+		int cr, int cg, int cb, int alpha, int px, int py)
+{
 	SDL_Surface* initial;
 	SDL_Color color;
 	SDL_Rect location;
@@ -575,11 +635,13 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	ax = location.x;
 	ay = location.y;
 
-	if (alignment == 2) {
+	if (alignment == 2)
+	{
 		ax = (location.x - w);
 		ay = location.y;
 	}
-	if (alignment == 3) {
+	if (alignment == 3)
+	{
 		ax = (location.x / 2) - (w / 2);
 		ay = location.y;
 	}
@@ -587,7 +649,8 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	/* Tell GL about our new texture */
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, initial->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			initial->pixels);
 
 	/* GL_NEAREST looks horrible, if scaled... */
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -627,14 +690,18 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	glDeleteTextures(1, &texture);
 }
 
-int Signage::calcDay_Dec31(int yyyy) {
+int Signage::calcDay_Dec31(int yyyy)
+{
 	int dayCode = 0;
-	dayCode = ((yyyy - 1) * 365 + (yyyy - 1) / 4 - (yyyy - 1) / 100 + (yyyy - 1) / 400) % 7;
+	dayCode = ((yyyy - 1) * 365 + (yyyy - 1) / 4 - (yyyy - 1) / 100
+			+ (yyyy - 1) / 400) % 7;
 	return dayCode;
 }
 
-int Signage::dayInYear(int dd, int mm) {
-	switch (mm) {
+int Signage::dayInYear(int dd, int mm)
+{
+	switch (mm)
+	{
 	case 11:
 		dd += 30;
 	case 10:
@@ -661,8 +728,10 @@ int Signage::dayInYear(int dd, int mm) {
 	return dd;
 }
 
-void Signage::dayInStr(char daysInWord[], int days) {
-	switch (days) {
+void Signage::dayInStr(char daysInWord[], int days)
+{
+	switch (days)
+	{
 	case 0:
 		strcpy(daysInWord, "Sun");
 		break;
@@ -687,8 +756,10 @@ void Signage::dayInStr(char daysInWord[], int days) {
 	}
 }
 
-void Signage::monthInStr(char monthsInWord[], int month) {
-	switch (month) {
+void Signage::monthInStr(char monthsInWord[], int month)
+{
+	switch (month)
+	{
 	case 0:
 		strcpy(monthsInWord, "Jan");
 		break;
@@ -728,8 +799,10 @@ void Signage::monthInStr(char monthsInWord[], int month) {
 	}
 }
 
-void Signage::nthInStr(char dowInWord[], int monthday) {
-	switch (monthday) {
+void Signage::nthInStr(char dowInWord[], int monthday)
+{
+	switch (monthday)
+	{
 	case 1:
 		strcpy(dowInWord, "st");
 		break;
@@ -826,50 +899,71 @@ void Signage::nthInStr(char dowInWord[], int monthday) {
 	}
 }
 
-void Signage::parseWeather(xmlNode * a_node) {
+void Signage::parseWeather(xmlNode * a_node)
+{
 	xmlNode *cur_node = NULL;
 	char tWord[16];
-	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
-		if (cur_node->type == XML_ELEMENT_NODE) {
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition")) {
-				if (tCondition == 0) {
-					sprintf(wCondition, "%s", cur_node->properties->children->content);
+	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
+	{
+		if (cur_node->type == XML_ELEMENT_NODE)
+		{
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition"))
+			{
+				if (tCondition == 0)
+				{
+					sprintf(wCondition, "%s",
+							cur_node->properties->children->content);
 					tCondition = 1;
-					printf("\tItem: %s \tData: %s\n", cur_node->name, wCondition);
+					printf("\tItem: %s \tData: %s\n", cur_node->name,
+							wCondition);
 				}
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f")) {
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f"))
+			{
 				sprintf(tWord, "%s", cur_node->properties->children->content);
-				if (tFarenheight == 0) {
+				if (tFarenheight == 0)
+				{
 					wFarenheight = strtol(tWord, NULL, 0);
 					tFarenheight = wFarenheight;
-					printf("\tItem: %s \t\tData: %i\n", cur_node->name, wFarenheight);
+					printf("\tItem: %s \t\tData: %i\n", cur_node->name,
+							wFarenheight);
 				}
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity")) {
-				if (tHumidity == 0) {
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity"))
+			{
+				if (tHumidity == 0)
+				{
 					tHumidity = 1;
-					sprintf(wHumidity, "%s", cur_node->properties->children->content);
-					printf("\tItem: %s \t\tData: %s\n", cur_node->name, wHumidity);
+					sprintf(wHumidity, "%s",
+							cur_node->properties->children->content);
+					printf("\tItem: %s \t\tData: %s\n", cur_node->name,
+							wHumidity);
 				}
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon")) {
-				if (tIcon == 0) {
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon"))
+			{
+				if (tIcon == 0)
+				{
 					tIcon = 1;
-					sprintf(wIcon, "%s", cur_node->properties->children->content);
+					sprintf(wIcon, "%s",
+							cur_node->properties->children->content);
 					printf("\tItem: %s \t\tData: %s\n", cur_node->name, wIcon);
 				}
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition")) {
-				if (tWind == 0) {
+			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition"))
+			{
+				if (tWind == 0)
+				{
 					tWind = 1;
-					sprintf(wWind, "%s", cur_node->properties->children->content);
+					sprintf(wWind, "%s",
+							cur_node->properties->children->content);
 					/* Get speed of wind and convert to int */
-					for (int i = 0; i < strlen(wWind); ++i) {
+					for (int i = 0; i < strlen(wWind); ++i)
+					{
 						if (isdigit(wWind[i]))
 							if (wIWind == 0)
 								wIWind = atoi(&wWind[i]);
@@ -878,7 +972,8 @@ void Signage::parseWeather(xmlNode * a_node) {
 				}
 				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence.
 				 This way, even if only part of the data was missed, we still declare as Dirty */
-				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0) && (tFarenheight != 0) && (tCondition != 0))
+				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0)
+						&& (tFarenheight != 0) && (tCondition != 0))
 					wOK = true;
 				else
 					wOK = false;

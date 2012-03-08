@@ -50,11 +50,11 @@ private:
 	SDL_Surface* screen;
 	bool m_bFullscreen, m_bRunning;
 	Texture pLogo;
-	Texture weather;
+	Texture weather[3];
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[10];
 	int pTWidth, pTHeight, tC1, tFarenheight, tCondition, tHumidity, tIcon,
-			tOIcon, tWind, wFarenheight, wIWind;
+			tOIcon, tWind, wFarenheight, wIWind, wFadeTI;
 	int sWidth, sHeight;
 	bool bV1, wOK;
 	char nthsInWord[8], dateString[32];
