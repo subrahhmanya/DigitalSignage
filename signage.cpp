@@ -11,7 +11,6 @@
 /* Signage constructor */
 Signage::Signage() {
 	/* Preset variables */
-
 	bool IS_RUNNING = true;
 	wLastCheckH = 99;
 	wLastCheckM = 99;
@@ -36,7 +35,8 @@ Signage::Signage() {
 	tFarenheight = 0;
 	tCondition = 0;
 	tHumidity = 0;
-	tIcon = 0;
+	tIcon = -1;
+	tOIcon = -2;
 	tWind = 0;
 	bV1 = false;
 	wOK = false;
@@ -124,31 +124,6 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	/* Load Default Texture Items */
 	pLogo.Load("/screen/textures/orblogo.png");
-	weather[0].Load("/screen/textures/weather/chance_of_storm.png");
-	weather[0].Load("/screen/textures/weather/chance_of_storm.png");
-	weather[1].Load("/screen/textures/weather/mostly_sunny.png");
-	weather[2].Load("/screen/textures/weather/dust.png");
-	weather[3].Load("/screen/textures/weather/mostly_cloudy.png");
-	weather[4].Load("/screen/textures/weather/cloudy.png");
-	weather[5].Load("/screen/textures/weather/chance_of_tstorm.png");
-	weather[6].Load("/screen/textures/weather/partly_cloudy.png");
-	weather[7].Load("/screen/textures/weather/storm.png");
-	weather[8].Load("/screen/textures/weather/sunny.png");
-	weather[9].Load("/screen/textures/weather/cold.png");
-	weather[10].Load("/screen/textures/weather/windy.png");
-	weather[11].Load("/screen/textures/weather/flurries.png");
-	weather[12].Load("/screen/textures/weather/chance_of_snow.png");
-	weather[13].Load("/screen/textures/weather/chance_of_rain.png");
-	weather[14].Load("/screen/textures/weather/fog.png");
-	weather[15].Load("/screen/textures/weather/icy.png");
-	weather[16].Load("/screen/textures/weather/sleet.png");
-	weather[17].Load("/screen/textures/weather/rain.png");
-	weather[18].Load("/screen/textures/weather/mist.png");
-	weather[19].Load("/screen/textures/weather/haze.png");
-	weather[20].Load("/screen/textures/weather/smoke.png");
-	weather[21].Load("/screen/textures/weather/snow.png");
-	weather[22].Load("/screen/textures/weather/hot.png");
-	weather[23].Load("/screen/textures/weather/thunderstorm.png");
 
 	/* Load Fonts */
 	int n;
@@ -182,6 +157,7 @@ void Signage::HandleEvents(Signage* signage) {
 			switch (event.key.keysym.sym) {
 			case SDLK_ESCAPE:
 				signage->Quit();
+				break;
 			}
 			break;
 		}
@@ -201,16 +177,35 @@ void Signage::Update() {
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth, sHeight, 200,
-				1);
+		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth,
+				sHeight, 200, 1);
 	else
 		iBoxes[0].doUpdate();
 
+	int nx = 0;
+	int ny = 0;
+	int bb = 1;
+	for (int t = 4; t < 120; t++) {
+		if (!iBoxes[t].isCreated())
+			iBoxes[t].Create(pLogo.gltex(), bb, 10 + (nx*(pLogo.width()-90)), 65 + (ny*(pLogo.height())), pLogo.width(), pLogo.height(),
+					sWidth, sHeight, 125, 1);
+		else
+			iBoxes[t].doUpdate();
+		ny++;
+		if (ny==14){
+			if (bb==1)
+				bb = 2;
+			else
+				bb = 1;
+			ny = 0;
+			nx++;
+		}
+	}
 	/* iPlayer Specific Box */
-	if (!iBoxes[10].isCreated())
-		iBoxes[10].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
-	else
-		iBoxes[10].doUpdate();
+	//if (!iBoxes[10].isCreated())
+	//	iBoxes[10].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
+	//else
+	//	iBoxes[10].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
@@ -415,6 +410,39 @@ void Signage::Update() {
 				wFadeA[0] = 0;
 			}
 		}
+
+//		if (!iBoxes[1].isCreated())
+			//iBoxes[1].Create(weather.gltex(), 4, 16 + pTWidth + 4, 0, weather.width(), weather.height(), sWidth, sHeight, 255, 1);
+
+		/* Weather Icon Fading Transition */
+		if ((tIcon != tOIcon) && (wFadeA[2] == 0))
+			wFadeA[2] = 1;
+		if ((wFadeA[2] == 1) || (wFadeA[2] == 2)) {
+			switch (wFadeA[2]) {
+			case 1:
+				wFadeV[2] = wFadeV[2] - 15;
+				;
+				break;
+			case 2:
+				wFadeV[2] = wFadeV[2] + 15;
+				;
+				break;
+			}
+			if (wFadeV[2] < 0) {
+				wFadeA[2] = 2;
+				wFadeV[2] = 0;
+				iBoxes[1].Destroy();
+				char tBuff[1024] = "";
+				sprintf(tBuff, "/screen/textures/weather/%i.png", tIcon);
+				weather.Load(tBuff);
+				iBoxes[1].Create(weather.gltex(), 4, 16 + pTWidth + 4, 0, weather.width(), weather.height(), sWidth, sHeight, 255, 1);
+			}
+			if (wFadeV[2] > 255) {
+				wFadeV[2] = 255;
+				wFadeA[2] = 0;
+				tOIcon = tIcon;
+			}
+		}
 	}
 }
 
@@ -449,14 +477,6 @@ void Signage::Draw() {
 		else
 			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
 
-		/* Draw weather condition icon */
-		if (strcmp(wOIcon, wIcon) != 0) {
-			iBoxes[1].Destroy();
-			iBoxes[1].Create(weather[tIcon].gltex(), 4, 16 + pTWidth + 4, 0, weather[tIcon].width(), weather[tIcon].height(), sWidth, sHeight, 255, 1);
-			strcpy(wOIcon, wIcon);
-			printf("%s - %s - %i\n", wIcon, wOIcon, tIcon);
-		}
-
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
 		iBoxes[1].rePos(16 + pTWidth + 4, 0);
 
@@ -480,10 +500,10 @@ void Signage::Draw() {
 	}
 
 	// Draw Boxes
-	for (int n = 0; n < 12; n++) {
+	for (int n = 0; n < 128; n++) {
 		if (iBoxes[n].isCreated()) {
 			if ((n == 1)) {
-				if (!iBoxes[n].doDraw(wFadeV[0]))
+				if (!iBoxes[n].doDraw(wFadeV[2]))
 					m_bRunning = false;
 			} else {
 				if (!iBoxes[n].doDraw(-1))
@@ -506,7 +526,7 @@ void Signage::Draw() {
 
 void Signage::Clean() {
 	/* Destroy Boxes */
-	for (int n = 0; n < 12; n++) {
+	for (int n = 0; n < 128; n++) {
 		if (iBoxes[n].isCreated()) {
 			printf("Destroying Box iBoxes[%i]...\n", n);
 			iBoxes[n].Destroy();
@@ -517,11 +537,9 @@ void Signage::Clean() {
 	printf("Destroying Texture pLogo... ");
 	pLogo.Destroy();
 
+	printf("Destroying Texture weather... ");
+	weather.Destroy();
 	int n;
-	for (n = 0; n < 24; n++) {
-		printf("Destroying Texture weather[%i]... ", n);
-		weather[n].Destroy();
-	}
 	for (n = 0; n < 10; n++) {
 		printf("Destroying Font ftnCGothic[%i]... ", n);
 		TTF_CloseFont(fntCGothic[n]);
@@ -606,7 +624,7 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 
 	/* Clean up */
 	SDL_FreeSurface(initial);
-	glDeleteTextures(2, &texture);
+	glDeleteTextures(1, &texture);
 }
 
 int Signage::calcDay_Dec31(int yyyy) {

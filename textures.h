@@ -16,7 +16,7 @@
 
 class Texture {
 public:
-	Texture();
+	Texture(void);
 	void Load(const char* fname);
 	void Destroy();
 	GLuint gltex() {
@@ -29,11 +29,12 @@ public:
 		return heighti;
 	}
 private:
-	SDL_Surface* sdltex;
 	GLuint gltexi;
 	int widthi;
 	int heighti;
 	int mode;
+	char tName[1024];
+	GLuint checkError(const char *context);
 };
 
 #endif /* TEXTURES_H_ */

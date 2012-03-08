@@ -10,7 +10,7 @@
 
 /* Signage constructor */
 Box::Box() {
-	glTex = 0;
+	glGenTextures(1, &glTex);
 	m_bRunning = false;
 	bType = false;
 	bCol = 0;
@@ -63,59 +63,57 @@ void Box::doUpdate() {
 }
 
 void Box::Destroy() {
-	if ((sType >= 3) && (ipVis)) {
-		printf(" - Destroying iplayer/mplayer reference...\n");
-		system("killall -9 mplayer");
-		system("killall -9 rtmpdump");
-		system("killall -9 get_iplayer");
-		FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
-		char buff[1024];
-		if (!fgets(buff, sizeof buff, fp) != NULL) {
-			/* get_iplayer isn't running - Close current window and set ipVis to false
-			 * iPlayer Window will automatically re-launch when closed. */
-			SDL_SysWMinfo sdl_info;
+	if (m_bRunning) {
+		if ((sType >= 3) && (ipVis)) {
+			printf(" - Destroying iplayer/mplayer reference...\n");
+			system("killall -9 mplayer");
+			system("killall -9 rtmpdump");
+			system("killall -9 get_iplayer");
+			FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
+			char buff[1024];
+			if (!fgets(buff, sizeof buff, fp) != NULL) {
+				/* get_iplayer isn't running - Close current window and set ipVis to false
+				 * iPlayer Window will automatically re-launch when closed. */
+				SDL_SysWMinfo sdl_info;
 
-			sdl_info = get_sdl_wm_info();
-			sdl_info.info.x11.lock_func();
+				sdl_info = get_sdl_wm_info();
+				sdl_info.info.x11.lock_func();
 
-			destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
+				destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
 
-			sdl_info.info.x11.unlock_func();
-			ipVis = false;
+				sdl_info.info.x11.unlock_func();
+				ipVis = false;
+			}
+			pclose(fp);
 		}
-		pclose(fp);
-	}
-	glTex = 0;
-	m_bRunning = false;
-	bType = false;
-	bCol = 0;
-	bX = 0;
-	bY = 0;
-	bW = 0;
-	bH = 0;
-	bScale = 0;
-	sType = 0;
-	sWidth = 0;
-	sHeight = 0;
-	if (layout[0].width() != 0)
-	{
-		printf(" - BoxTex1 Destroyed ");
-		layout[0].Destroy();
-	}
-	if (layout[1].width() != 0)
-	{
-		printf(" - BoxTex2 Destroyed ");
-		layout[1].Destroy();
-	}
-	if (layout[2].width() != 0)
-	{
-		printf(" - BoxTex3 Destroyed ");
-		layout[2].Destroy();
-	}
-	if (layout[3].width() != 0)
-	{
-		printf(" - BoxTex4 Destroyed ");
-		layout[3].Destroy();
+		glTex = 0;
+		m_bRunning = false;
+		bType = false;
+		bCol = 0;
+		bX = 0;
+		bY = 0;
+		bW = 0;
+		bH = 0;
+		bScale = 0;
+		sType = 0;
+		sWidth = 0;
+		sHeight = 0;
+		if (layout[0].width() != 0) {
+			printf(" - BoxTex1 ");
+			layout[0].Destroy();
+		}
+		if (layout[1].width() != 0) {
+			printf(" - BoxTex2 ");
+			layout[1].Destroy();
+		}
+		if (layout[2].width() != 0) {
+			printf(" - BoxTex3 ");
+			layout[2].Destroy();
+		}
+		if (layout[3].width() != 0) {
+			printf(" - BoxTex4 ");
+			layout[3].Destroy();
+		}
 	}
 }
 
