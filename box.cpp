@@ -9,7 +9,8 @@
 #include "textures.h"
 
 /* Signage constructor */
-Box::Box() {
+Box::Box()
+{
 	glGenTextures(1, &glTex);
 	m_bRunning = false;
 	bType = false;
@@ -24,7 +25,8 @@ Box::Box() {
 	sHeight = 0;
 }
 
-bool Box::doDraw(int aOverride) {
+bool Box::doDraw(int aOverride)
+{
 	/* mplayer/iPlayer check
 	 * mPlayer will have sType of 2
 	 * iPlayer will have sType of 3+ */
@@ -32,11 +34,13 @@ bool Box::doDraw(int aOverride) {
 		if (!ipVis)
 			createiPlayer(sType - 2, bW, bH, bX, bY, bScale);
 
-	if ((sType >= 3) && (ipVis)) {
+	if ((sType >= 3) && (ipVis))
+	{
 		/* Check for getiPlayer Instance, restart if required. */
 		FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
 		char buff[1024];
-		if (!fgets(buff, sizeof buff, fp) != NULL) {
+		if (!fgets(buff, sizeof buff, fp) != NULL)
+		{
 			/* get_iplayer isn't running - Close current window and set ipVis to false
 			 * iPlayer Window will automatically re-launch when closed. */
 			SDL_SysWMinfo sdl_info;
@@ -52,26 +56,33 @@ bool Box::doDraw(int aOverride) {
 		pclose(fp);
 	}
 	if (aOverride != -1)
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, aOverride);
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f,
+				bScale, 255, aOverride);
 	else
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, 255);
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f,
+				bScale, 255, 255);
 	return true;
 }
 
-void Box::doUpdate() {
+void Box::doUpdate()
+{
 	/* Update Routine */
 }
 
-void Box::Destroy() {
-	if (m_bRunning) {
-		if ((sType >= 3) && (ipVis)) {
+void Box::Destroy()
+{
+	if (m_bRunning)
+	{
+		if ((sType >= 3) && (ipVis))
+		{
 			printf(" - Destroying iplayer/mplayer reference...\n");
 			system("killall -9 mplayer");
 			system("killall -9 rtmpdump");
 			system("killall -9 get_iplayer");
 			FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
 			char buff[1024];
-			if (!fgets(buff, sizeof buff, fp) != NULL) {
+			if (!fgets(buff, sizeof buff, fp) != NULL)
+			{
 				/* get_iplayer isn't running - Close current window and set ipVis to false
 				 * iPlayer Window will automatically re-launch when closed. */
 				SDL_SysWMinfo sdl_info;
@@ -98,40 +109,51 @@ void Box::Destroy() {
 		sType = 0;
 		sWidth = 0;
 		sHeight = 0;
-		if (layout[0].width() != 0) {
+		if (layout[0].width() != 0)
+		{
 			printf(" - BoxTex1 ");
 			layout[0].Destroy();
 		}
-		if (layout[1].width() != 0) {
+		if (layout[1].width() != 0)
+		{
 			printf(" - BoxTex2 ");
 			layout[1].Destroy();
 		}
-		if (layout[2].width() != 0) {
+		if (layout[2].width() != 0)
+		{
 			printf(" - BoxTex3 ");
 			layout[2].Destroy();
 		}
-		if (layout[3].width() != 0) {
+		if (layout[3].width() != 0)
+		{
 			printf(" - BoxTex4 ");
 			layout[3].Destroy();
 		}
 	}
 }
 
-void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType) {
+void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h,
+		int aw, int ah, int scale, int sourceType)
+{
 	bType = false;
-	if (bcol == 1) {
+	if (bcol == 1)
+	{
 		bType = true;
 		layout[0].Load("/screen/textures/orb_bl.png");
 		layout[1].Load("/screen/textures/orb_bt.png");
 		layout[2].Load("/screen/textures/orb_bcrnr.png");
 		layout[3].Load("/screen/textures/orb_boxb.png");
-	} else if (bcol == 2) {
+	}
+	else if (bcol == 2)
+	{
 		bType = true;
 		layout[0].Load("/screen/textures/orb_wl.png");
 		layout[1].Load("/screen/textures/orb_wt.png");
 		layout[2].Load("/screen/textures/orb_wcrnr.png");
 		layout[3].Load("/screen/textures/orb_boxw.png");
-	} else if (bcol == 3) {
+	}
+	else if (bcol == 3)
+	{
 		bType = true;
 		layout[0].Load("/screen/textures/orb_tl.png");
 		layout[1].Load("/screen/textures/orb_tt.png");
@@ -150,8 +172,10 @@ void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int a
 	glTex = TextureID;
 }
 
-void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
-		int balpha, int calpha) {
+void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx,
+		int miny, int scrollv, int absh, float br, float bg, float bb,
+		int scale, int balpha, int calpha)
+{
 
 	/* Box Types (bcol)
 	 * 1 = Black BG
@@ -167,7 +191,8 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 	int w = (minx / 255.0) * scale;
 	int h = (miny / 255.0) * scale;
 
-	if (bVis) {
+	if (bVis)
+	{
 		/* We only want to draw the border of each frame if this is set.
 		 * Otherwise, we are most likely drawing just an overlaying texture object */
 		glColor4f(br, bg, bb, (float) balpha / 255.0);
@@ -272,7 +297,8 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 		glEnd();
 		glFinish();
 
-		if (bCol != 3) {
+		if (bCol != 3)
+		{
 			/* Draw Background */
 			glBindTexture(GL_TEXTURE_2D, layout[3].gltex());
 			glBegin(GL_QUADS);
@@ -288,7 +314,8 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 			glFinish();
 		}
 	}
-	if (TextureID != 0) {
+	if (TextureID != 0)
+	{
 		/* Draw Image Texture */
 		glColor4f(br, bg, bb, (float) calpha / 255.0);
 		glBindTexture(GL_TEXTURE_2D, TextureID);
@@ -314,11 +341,14 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 	}
 }
 
-void Box::destroy_x11_subwindow(Display *dpy, Window parent) {
+void Box::destroy_x11_subwindow(Display *dpy, Window parent)
+{
 	XDestroyWindow(dpy, parent);
 }
 
-Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height) {
+Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y,
+		int width, int height)
+{
 	Window win;
 	int winbgcol;
 
@@ -327,7 +357,8 @@ Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int 
 
 	winbgcol = WhitePixel(dpy, DefaultScreen(dpy));
 
-	win = XCreateSimpleWindow(dpy, parent, x, y, width, height, 0, winbgcol, winbgcol);
+	win = XCreateSimpleWindow(dpy, parent, x, y, width, height, 0, winbgcol,
+			winbgcol);
 
 	if (!win)
 		return 0;
@@ -338,7 +369,8 @@ Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int 
 	if (!XMapWindow(dpy, win))
 		return 0;
 
-	while (1) {
+	while (1)
+	{
 		XEvent e;
 		XNextEvent(dpy, &e);
 		if (e.type == MapNotify && e.xmap.window == win)
@@ -350,7 +382,8 @@ Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int 
 	return win;
 }
 
-Window Box::create_sdl_x11_subwindow(int x, int y, int width, int height) {
+Window Box::create_sdl_x11_subwindow(int x, int y, int width, int height)
+{
 	SDL_SysWMinfo sdl_info;
 	Window play_win;
 
@@ -360,20 +393,23 @@ Window Box::create_sdl_x11_subwindow(int x, int y, int width, int height) {
 
 	sdl_info.info.x11.lock_func();
 
-	play_win = create_x11_subwindow(sdl_info.info.x11.display, sdl_info.info.x11.window, x, y, width, height);
+	play_win = create_x11_subwindow(sdl_info.info.x11.display,
+			sdl_info.info.x11.window, x, y, width, height);
 
 	sdl_info.info.x11.unlock_func();
 
 	return play_win;
 }
 
-SDL_SysWMinfo Box::get_sdl_wm_info(void) {
+SDL_SysWMinfo Box::get_sdl_wm_info(void)
+{
 	SDL_SysWMinfo sdl_info;
 
 	memset(&sdl_info, 0, sizeof(sdl_info));
 
 	SDL_VERSION (&sdl_info.version);
-	if (SDL_GetWMInfo(&sdl_info) <= 0 || sdl_info.subsystem != SDL_SYSWM_X11) {
+	if (SDL_GetWMInfo(&sdl_info) <= 0 || sdl_info.subsystem != SDL_SYSWM_X11)
+	{
 		fprintf(stderr, "This is not X11\n");
 
 		memset(&sdl_info, 0, sizeof(sdl_info));
@@ -383,7 +419,9 @@ SDL_SysWMinfo Box::get_sdl_wm_info(void) {
 	return sdl_info;
 }
 
-void Box::create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp) {
+void Box::create_iplayer(const char *streamid, const char *quality, int cache,
+		Window win, FILE **mplayer_fp)
+{
 	char cmdline[1024];
 
 	snprintf(
@@ -395,7 +433,9 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 	*mplayer_fp = popen(cmdline, "w");
 }
 
-void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int scale) {
+void Box::createiPlayer(int maxqual, int width, int height, int x, int y,
+		int scale)
+{
 	/* MPLAYER Testing */
 	/* Default IPlayer Feed - 688x384 */
 	ipVis = true;
@@ -406,12 +446,17 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	int mplayer_pos_y = (y / 720.0) * sHeight;
 	int mplayer_pos_x = (x / 1280.0) * sWidth;
 	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
-	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
-	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
-	if (!play_win) {
+	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0)
+			* scale;
+	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y,
+			mplayer_width, mplayer_height);
+	if (!play_win)
+	{
 		fprintf(stderr, "Cannot create X11 window\n");
 		ipVis = false;
-	} else {
+	}
+	else
+	{
 		mplayer_fp = NULL;
 		// Determine Quality Automatically....
 		// flashlow   - 400x225 @ 396kbps  (300v, 96a)
@@ -420,9 +465,11 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 		// flashvhigh - 688x384 @ 1500kbps (1372v, 128a)
 		if ((mplayer_width <= 400) || (maxqual <= 1))
 			create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
-		else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2))
+		else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual
+				== 2))
 			create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
-		else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3))
+		else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual
+				== 3))
 			create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
 		else if ((mplayer_width > 800) || (maxqual >= 4))
 			create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);

@@ -14,18 +14,22 @@
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 
-class Texture {
+class Texture
+{
 public:
 	Texture(void);
 	void Load(const char* fname);
 	void Destroy();
-	GLuint gltex() {
+	GLuint gltex()
+	{
 		return gltexi;
 	}
-	int width() {
+	int width()
+	{
 		return widthi;
 	}
-	int height() {
+	int height()
+	{
 		return heighti;
 	}
 private:

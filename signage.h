@@ -28,18 +28,22 @@
 #include <string>
 #include <time.h>
 
-class Signage {
+class Signage
+{
 public:
 	Signage();
-	void Init(const char* title, int width, int height, int bpp, bool fullscreen);
+	void Init(const char* title, int width, int height, int bpp,
+			bool fullscreen);
 	void HandleEvents(Signage* signage);
 	void Update();
 	void Draw();
 	void Clean();
-	bool Running() {
+	bool Running()
+	{
 		return m_bRunning;
 	}
-	void Quit() {
+	void Quit()
+	{
 		m_bRunning = false;
 	}
 private:
@@ -49,12 +53,14 @@ private:
 	Texture weather;
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[10];
-	int pTWidth, pTHeight, tC1, tFarenheight, tCondition, tHumidity, tIcon, tOIcon, tWind, wFarenheight, wIWind;
+	int pTWidth, pTHeight, tC1, tFarenheight, tCondition, tHumidity, tIcon,
+			tOIcon, tWind, wFarenheight, wIWind;
 	int sWidth, sHeight;
 	bool bV1, wOK;
 	char nthsInWord[8], dateString[32];
 	char wCondition[32], wHumidity[32], wIcon[64], wWind[32];
-	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32];
+	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM,
+			wUpdateTimer[32];
 	float wCelcius;
 	char wTemp[32];
 	int iPlayerScale, iPlayerPosX, iPlayerPosY;
@@ -63,7 +69,8 @@ private:
 	/* FPS */
 	fps_counter counter;
 
-	void drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py);
+	void drawText(const char* text, TTF_Font*& fntChosen, int alignment,
+			int cr, int cg, int cb, int alpha, int px, int py);
 
 	int calcDay_Dec31(int yyyy);
 	int dayInYear(int dd, int mm);

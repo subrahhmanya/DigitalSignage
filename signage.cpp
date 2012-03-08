@@ -411,8 +411,8 @@ void Signage::Update() {
 			}
 		}
 
-//		if (!iBoxes[1].isCreated())
-			//iBoxes[1].Create(weather.gltex(), 4, 16 + pTWidth + 4, 0, weather.width(), weather.height(), sWidth, sHeight, 255, 1);
+		//		if (!iBoxes[1].isCreated())
+		//iBoxes[1].Create(weather.gltex(), 4, 16 + pTWidth + 4, 0, weather.width(), weather.height(), sWidth, sHeight, 255, 1);
 
 		/* Weather Icon Fading Transition */
 		if ((tIcon != tOIcon) && (wFadeA[2] == 0))

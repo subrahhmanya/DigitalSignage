@@ -9,7 +9,8 @@
 #define FPS_COUNTER_H_
 #include <SDL/SDL.h>
 
-class fps_counter {
+class fps_counter
+{
 private:
 	unsigned int app_ticks;//total ticks so far in this app
 	int frame_cap; //limit FPS to this
@@ -24,10 +25,12 @@ public:
 	void cap_off();
 	void tick();
 
-	float get_fps() {
+	float get_fps()
+	{
 		return last_fps;
 	}
-	float get_timeslice() {
+	float get_timeslice()
+	{
 		return last_timeslice;
 	}
 };

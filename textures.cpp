@@ -52,5 +52,5 @@ GLuint Texture::checkError(const char *context)
   if (err > 0 )  {
     printf("ERROR LOADING TEXTURE%s\n", glGetError());
   }
-  return err;
+	return err;
 }
