@@ -125,6 +125,7 @@ Signage::Signage()
 	tIcon = -1;
 	tOIcon = -2;
 	tWind = 0;
+	tSrS = 0;
 	bV1 = false;
 	wOK = false;
 	pTWidth = 0;
@@ -389,6 +390,7 @@ void Signage::Update()
 				wOK = false;
 			}
 			/* Calculate Weather */
+			//wFarenheight = 0;
 			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5)
 					/ 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
@@ -527,11 +529,49 @@ void Signage::Update()
 		smn = (settm - (double) shr) * 60;
 
 		char tBuff[64] = "";
-
-		if ((rhr >= ltm->tm_hour) && (rmn <= ltm->tm_min))
-			sprintf(tBuff, "/screen/textures/weather/day");
+		printf("%i:%i %i:%i %i:%i\n", rhr, rmn, shr, smn, ltm->tm_hour,
+				ltm->tm_min);
+		if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
+		{
+			if ((ltm->tm_hour - rhr) == 0)
+				if (rmn <= ltm->tm_min)
+				{
+					if (tSrS != 1)
+					{
+						tSrS = 1;
+						tOIcon = -1;
+					}
+					sprintf(tBuff, "/screen/textures/weather/day");
+				}
+				else
+				{
+					if (tSrS != 2)
+					{
+						tSrS = 2;
+						tOIcon = -1;
+					}
+					sprintf(tBuff, "/screen/textures/weather/night");
+				}
+			else
+			{
+				if (tSrS != 1)
+				{
+					tSrS = 1;
+					tOIcon = -1;
+				}
+				sprintf(tBuff, "/screen/textures/weather/day");
+			}
+		}
 		else
+		{
+			if (tSrS != 2)
+			{
+				tSrS = 2;
+				tOIcon = -1;
+			}
+
 			sprintf(tBuff, "/screen/textures/weather/night");
+		}
 
 		/* Weather Icon Fading Transition */
 		if ((tIcon != tOIcon) && (wFadeA[1] == 0))

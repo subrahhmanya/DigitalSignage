@@ -54,7 +54,7 @@ private:
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[10];
 	int pTWidth, pTHeight, tC1, tFarenheight, tCondition, tHumidity, tIcon,
-			tOIcon, tWind, wFarenheight, wIWind, wFadeTI;
+			tOIcon, tWind, tSrS, wFarenheight, wIWind, wFadeTI;
 	int sWidth, sHeight;
 	bool bV1, wOK;
 	char nthsInWord[8], dateString[32];
