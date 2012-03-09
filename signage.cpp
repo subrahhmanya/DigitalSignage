@@ -529,9 +529,9 @@ void Signage::Update()
 		char tBuff[64] = "";
 
 		if ((rhr >= ltm->tm_hour) && (rmn <= ltm->tm_min))
-			sprintf(tBuff, "/screen/textures/weather/night");
-		else
 			sprintf(tBuff, "/screen/textures/weather/day");
+		else
+			sprintf(tBuff, "/screen/textures/weather/night");
 
 		/* Weather Icon Fading Transition */
 		if ((tIcon != tOIcon) && (wFadeA[1] == 0))
