@@ -297,10 +297,10 @@ void Signage::Update()
 		iBoxes[0].doUpdate();
 
 	/* iPlayer Specific Box */
-	//	if (!iBoxes[10].isCreated())
-	//		iBoxes[10].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
-	//	else
-	//		iBoxes[10].doUpdate();
+		if (!iBoxes[10].isCreated())
+			iBoxes[10].Create(0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
+		else
+			iBoxes[10].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
@@ -390,7 +390,6 @@ void Signage::Update()
 				wOK = false;
 			}
 			/* Calculate Weather */
-			//wFarenheight = 0;
 			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5)
 					/ 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
@@ -529,49 +528,65 @@ void Signage::Update()
 		smn = (settm - (double) shr) * 60;
 
 		char tBuff[64] = "";
-		printf("%i:%i %i:%i %i:%i\n", rhr, rmn, shr, smn, ltm->tm_hour,
-				ltm->tm_min);
+
 		if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
 		{
-			if ((ltm->tm_hour - rhr) == 0)
-				if (rmn <= ltm->tm_min)
+			/* We are in Day */
+			if (ltm->tm_hour == rhr)
+			{
+				/* We are at first hour */
+				if (ltm->tm_min >= rmn)
 				{
 					if (tSrS != 1)
 					{
+						/* Set Day */
 						tSrS = 1;
 						tOIcon = -1;
 					}
-					sprintf(tBuff, "/screen/textures/weather/day");
-				}
-				else
-				{
+				} else {
 					if (tSrS != 2)
 					{
+						/* Set Night */
 						tSrS = 2;
 						tOIcon = -1;
 					}
-					sprintf(tBuff, "/screen/textures/weather/night");
 				}
-			else
+			} else if (ltm->tm_hour == shr)
 			{
-				if (tSrS != 1)
+				/* We are at last hour */
+				if (ltm->tm_min < smn)
 				{
-					tSrS = 1;
-					tOIcon = -1;
+					if (tSrS != 1)
+					{
+						/* Set Day */
+						tSrS = 1;
+						tOIcon = -1;
+					}
+				} else {
+					if (tSrS != 2)
+					{
+						/* Set Night */
+						tSrS = 2;
+						tOIcon = -1;
+					}
 				}
-				sprintf(tBuff, "/screen/textures/weather/day");
 			}
 		}
 		else
 		{
+			/* Obvious Night */
 			if (tSrS != 2)
 			{
+				/* Set Night */
 				tSrS = 2;
 				tOIcon = -1;
 			}
-
-			sprintf(tBuff, "/screen/textures/weather/night");
 		}
+
+		if (tSrS == 2)
+			sprintf(tBuff, "/screen/textures/weather/night");
+		else
+			sprintf(tBuff, "/screen/textures/weather/day");
 
 		/* Weather Icon Fading Transition */
 		if ((tIcon != tOIcon) && (wFadeA[1] == 0))
@@ -656,7 +671,6 @@ void Signage::Update()
 				wFadeA[0] = 0;
 			}
 		}
-
 	}
 }
 
