@@ -430,7 +430,7 @@ bool drawText(const char* text,
 
 	/* Clean up */
 	SDL_FreeSurface(initial);
-	glDeleteTextures(2, &texture);
+	glDeleteTextures(1, &texture);
 	return true;
 }
 
