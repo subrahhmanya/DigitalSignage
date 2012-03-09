@@ -8,11 +8,97 @@
 #include "signage.h"
 #include "textures.h"
 
+/* Sunrise */
+double pi = 3.14;
+double tpi = 2 * pi;
+double degs = 180.0 / pi;
+double rads = pi / 180.0;
+
+double L, g, daylen;
+double SunDia = 0.53; // Sunradius degrees
+
+double AirRefr = 34.0 / 60.0; // athmospheric refraction degrees //
+
+double FNday(int y, int m, int d, float h)
+{
+	long int luku = -7 * (y + (m + 9) / 12) / 4 + 275 * m / 9 + d;
+
+	// Typecasting needed for TClite on PC DOS at least, to avoid product overflow
+	luku += (long int) y * 367;
+
+	return (double) luku - 730531.5 + h / 24.0;
+}
+;
+
+// the function below returns an angle in the range
+// 0 to 2*pi
+
+double FNrange(double x)
+{
+	double b = x / tpi;
+	double a = tpi * (b - (long) (b));
+	if (a < 0)
+		a = tpi + a;
+	return a;
+}
+;
+
+// Calculating the hourangle
+double f0(double lat, double declin)
+{
+
+	double fo, dfo;
+	// Correction: different sign at S HS
+	dfo = rads * (0.5 * SunDia + AirRefr);
+	if (lat < 0.0)
+		dfo = -dfo;
+	fo = tan(declin + dfo) * tan(lat * rads);
+
+	if (fo > 0.99999)
+		fo = 1.0; // to avoid overflow //
+	fo = asin(fo) + pi / 2.0;
+	return fo;
+}
+;
+
+// Calculating the hourangle for twilight times
+//
+double f1(double lat, double declin)
+{
+
+	double fi, df1;
+	// Correction: different sign at S HS
+	df1 = rads * 6.0;
+	if (lat < 0.0)
+		df1 = -df1;
+	fi = tan(declin + df1) * tan(lat * rads);
+
+	if (fi > 0.99999)
+		fi = 1.0; // to avoid overflow //
+	fi = asin(fi) + pi / 2.0;
+	return fi;
+}
+;
+
+// Find the ecliptic longitude of the Sun
+double FNsun(double d)
+{
+
+	// mean longitude of the Sun
+	L = FNrange(280.461 * rads + .9856474 * rads * d);
+
+	// mean anomaly of the Sun
+	g = FNrange(357.528 * rads + .9856003 * rads * d);
+
+	// Ecliptic longitude of the Sun
+	return FNrange(L + 1.915 * rads * sin(g) + .02 * rads * sin(2 * g));
+}
+;
+
 /* Signage constructor */
 Signage::Signage()
 {
 	/* Preset variables */
-	bool IS_RUNNING = true;
 	wLastCheckH = 99;
 	wLastCheckM = 99;
 	wUpdateTimer[0] = 0;
@@ -141,7 +227,7 @@ void Signage::Init(const char* title, int width, int height, int bpp,
 	/* Load Fonts */
 	int n;
 
-	for (n = 0; n < 11; n++)
+	for (n = 0; n < 10; n++)
 	{
 		printf(
 				"Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ",
@@ -198,6 +284,8 @@ void Signage::Update()
 	time_t now = time(0);
 	ltm = localtime(&now);
 
+	/* Calculate Sunrise/Sunset */
+
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
@@ -208,10 +296,10 @@ void Signage::Update()
 		iBoxes[0].doUpdate();
 
 	/* iPlayer Specific Box */
-	//if (!iBoxes[10].isCreated())
-	//	iBoxes[10].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
-	//else
-	//	iBoxes[10].doUpdate();
+	//	if (!iBoxes[10].isCreated())
+	//		iBoxes[10].Create(0, 2, 10, 295, 688, 384, sWidth, sHeight, 255, 5);
+	//	else
+	//		iBoxes[10].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
@@ -288,7 +376,6 @@ void Signage::Update()
 				xmlFreeDoc(doc); // free document
 				xmlCleanupParser(); // Free globals
 				/* Update last check interval */
-				wFarenheight = 100.0f;
 				if (wOK)
 					wLastCheckH = ltm->tm_hour;
 				else
@@ -302,7 +389,6 @@ void Signage::Update()
 				wOK = false;
 			}
 			/* Calculate Weather */
-			//wFarenheight=100;
 			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5)
 					/ 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
@@ -311,11 +397,6 @@ void Signage::Update()
 	if (wOK)
 	{
 		/* Set the Weather Icon */
-		/*		if (wCelcius <= 3.0)
-		 drawTexture(wTex_cold, pCIW+12, 5, (255-wFadeV[1]),1);
-		 else if (wCelcius >= 25.0)
-		 drawTexture(wTex_hot, pCIW+12, 5, (255-wFadeV[1]),1);
-		 */
 		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0)
 			tIcon = 0;
 		if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0)
@@ -391,6 +472,67 @@ void Signage::Update()
 			wFadeA[0] = 1;
 		}
 
+		/* Calculate Sunrise/Sunset */
+		double tzone = 0.0;
+		double d =
+				FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
+		double lambda = FNsun(d);
+		double obliq = 23.439 * rads - .0000004 * rads * d;
+		double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
+		double delta = asin(sin(obliq) * sin(lambda));
+
+		double LL = L - alpha;
+		if (L < pi)
+			LL += tpi;
+		double equation = 1440.0 * (1.0 - LL / tpi);
+		double latit = 52.8943;
+		double longit = -2.2158;
+		double ha = f0(latit, delta);
+
+		double hb = f1(latit, delta);
+		double twx = hb - ha; // length of twilight in radians
+		twx = 12.0 * twx / pi; // length of twilight in degrees
+
+		// Conversion of angle to hours and minutes //
+		daylen = degs * ha / 7.5;
+		if (daylen < 0.0001)
+		{
+			daylen = 0.0;
+		}
+		// arctic winter   //
+
+		double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation
+				/ 60.0;
+		double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation
+				/ 60.0;
+		double noont = riset + 12.0 * ha / pi;
+		double altmax = 90.0 + delta * degs - latit;
+		// Correction suggested by David Smith
+		// to express as degrees from the N horizon
+
+		if (delta * degs > latit)
+			altmax = 90.0 + latit - delta * degs;
+
+		double twam = riset - twx; // morning twilight begin
+		double twpm = settm + twx; // evening twilight end
+
+		if (riset > 24.0)
+			riset -= 24.0;
+		if (settm > 24.0)
+			settm -= 24.0;
+		int rhr, rmn, shr, smn;
+		rhr = (int) riset;
+		rmn = (riset - (double) rhr) * 60;
+		shr = (int) settm;
+		smn = (settm - (double) shr) * 60;
+
+		char tBuff[64] = "";
+
+		if ((rhr >= ltm->tm_hour) && (rmn <= ltm->tm_min))
+			sprintf(tBuff, "/screen/textures/weather/night");
+		else
+			sprintf(tBuff, "/screen/textures/weather/day");
+
 		/* Weather Icon Fading Transition */
 		if ((tIcon != tOIcon) && (wFadeA[1] == 0))
 		{
@@ -415,29 +557,28 @@ void Signage::Update()
 				wFadeA[1] = 2;
 				wFadeV[1] = 0;
 				iBoxes[1].Destroy();
-				char tBuff[1024] = "";
 				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
 				{
 					if (wFadeTI == 1)
 					{
 						if (wCelcius <= 3.0)
-							sprintf(tBuff, "/screen/textures/weather/9.png");
+							sprintf(tBuff, "%s/9.png", tBuff);
 						else
-							sprintf(tBuff, "/screen/textures/weather/22.png");
+							sprintf(tBuff, "%s/22.png", tBuff);
 					}
 					else
-						sprintf(tBuff, "/screen/textures/weather/%i.png", tIcon);
+						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 					if (wFadeTI == 1)
-							wFadeTI = 0;
+						wFadeTI = 0;
 					else
 						wFadeTI = 1;
 				}
 				else
-					sprintf(tBuff, "/screen/textures/weather/%i.png", tIcon);
+					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 				weather[0].Load(tBuff);
-				iBoxes[1].Create(weather[0].gltex(), 4, 16 + pTWidth + 4, 0,
-						weather[0].width(), weather[0].height(), sWidth, sHeight,
-						255, 1);
+				iBoxes[1].Create(weather[0].gltex(), 4, 0, 0,
+						weather[0].width(), weather[0].height(), sWidth,
+						sHeight, 255, 1);
 			}
 			if (wFadeV[1] > 255)
 			{
@@ -496,10 +637,10 @@ void Signage::Draw()
 	{
 		if (ltm->tm_hour > 9)
 			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth
-					+ 45, 11);
+					+ 44, 11);
 		else
 			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth
-					+ 27, 11);
+					+ 26, 11);
 	}
 
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1172, 32);
@@ -517,26 +658,26 @@ void Signage::Draw()
 			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
-		iBoxes[1].rePos(16 + pTWidth + 4, 0);
+		iBoxes[1].rePos(16 + pTWidth, 0);
 
 		switch (wCurDisp)
 		{
 		case 0:
 			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
 					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
-							+ 24, 8);
+							+ 16, 8);
 			;
 			break;
 		case 1:
 			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
 					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
-							+ 24, 8);
+							+ 16, 8);
 			;
 			break;
 		case 2:
 			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
 					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
-							+ 24, 8);
+							+ 16, 8);
 			;
 			break;
 		}

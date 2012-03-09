@@ -11,7 +11,6 @@
 /* Signage constructor */
 Box::Box()
 {
-	glGenTextures(1, &glTex);
 	m_bRunning = false;
 	bType = false;
 	bCol = 0;
@@ -169,6 +168,7 @@ void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h,
 	sHeight = ah;
 	bScale = scale;
 	m_bRunning = true;
+	glGenTextures(1, &glTex);
 	glTex = TextureID;
 }
 
@@ -322,8 +322,8 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx,
 
 		int hs = (absh / 255.0) * scale;
 
-		if (h > miny)
-			h = miny;
+		if (h > ((miny / 255.0) * scale))
+			h = (miny / 255.0) * scale;
 
 		glBegin(GL_QUADS);
 		/* Recall that the origin is in the lower-left corner
@@ -446,8 +446,7 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y,
 	int mplayer_pos_y = (y / 720.0) * sHeight;
 	int mplayer_pos_x = (x / 1280.0) * sWidth;
 	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
-	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0)
-			* scale;
+	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y,
 			mplayer_width, mplayer_height);
 	if (!play_win)
