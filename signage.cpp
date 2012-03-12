@@ -739,24 +739,12 @@ void Signage::Update()
 					}
 				}
 				if (validConfig == true)
-					printf(" [OK]\nBoard '%s' with %i boards configured.\n", dList[dS].c_str(), tBt);
+					printf("\n\tBoard '%s' with %i boards configured.\n", dList[dS].c_str(), tBt);
 				else
-					printf(" [OK]\nBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
+					printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 			}
 		}
 	}
-}
-
-bool Signage::FileExists(const char* FileName)
-{
-	FILE* fp = NULL;
-	fp = fopen(FileName, "rb");
-	if (fp != NULL)
-	{
-		fclose(fp);
-		return true;
-	}
-	return false;
 }
 
 void Signage::Draw()
@@ -869,7 +857,7 @@ void Signage::Clean()
 	int n;
 	for (n = 0; n < 10; n++)
 	{
-		printf("Destroying Font ftnCGothic[%i]... ", n);
+		printf("Destroying Font fntCGothic[%i]... ", n);
 		TTF_CloseFont(fntCGothic[n]);
 		printf("OK\n");
 	}
@@ -1240,4 +1228,16 @@ void Signage::parseWeather(xmlNode * a_node)
 		}
 		parseWeather(cur_node->children);
 	}
+}
+
+bool Signage::FileExists(const char* FileName)
+{
+	FILE* fp = NULL;
+	fp = fopen(FileName, "rb");
+	if (fp != NULL)
+	{
+		fclose(fp);
+		return true;
+	}
+	return false;
 }
