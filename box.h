@@ -22,8 +22,7 @@ class Box
 {
 public:
 	Box();
-	void Create(GLuint TextureID, int bcol, int px, int py, int w, int h,
-			int aw, int ah, int scale, int sourceType);
+	void Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType);
 	bool doDraw(int aOverride);
 	void doUpdate();
 	void rePos(int x, int y)
@@ -60,21 +59,17 @@ private:
 	bool m_bRunning, bType;
 	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight;
 
-	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx,
-			int miny, int scrollv, int absh, float br, float bg, float bb,
-			int scale, int balpha, int calpha);
+	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
+			int balpha, int calpha);
 
 	/* iPlayer Specific */
 	bool ipVis;
-	void createiPlayer(int maxqual, int width, int height, int x, int y,
-			int scale);
+	void createiPlayer(int maxqual, int width, int height, int x, int y, int scale);
 	void destroy_x11_subwindow(Display *dpy, Window parent);
-	Window create_x11_subwindow(Display *dpy, Window parent, int x, int y,
-			int width, int height);
+	Window create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height);
 	Window create_sdl_x11_subwindow(int x, int y, int width, int height);
 	SDL_SysWMinfo get_sdl_wm_info(void);
-	void create_iplayer(const char *streamid, const char *quality, int cache,
-			Window win, FILE **mplayer_fp);
+	void create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp);
 
 	/* MPlayer Integration */
 	Window play_win;

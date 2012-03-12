@@ -55,11 +55,9 @@ bool Box::doDraw(int aOverride)
 		pclose(fp);
 	}
 	if (aOverride != -1)
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f,
-				bScale, 255, aOverride);
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, aOverride);
 	else
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f,
-				bScale, 255, 255);
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, 255);
 	return true;
 }
 
@@ -131,8 +129,7 @@ void Box::Destroy()
 	}
 }
 
-void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h,
-		int aw, int ah, int scale, int sourceType)
+void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType)
 {
 	bType = false;
 	if (bcol == 1)
@@ -172,9 +169,8 @@ void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h,
 	glTex = TextureID;
 }
 
-void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx,
-		int miny, int scrollv, int absh, float br, float bg, float bb,
-		int scale, int balpha, int calpha)
+void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
+		int balpha, int calpha)
 {
 
 	/* Box Types (bcol)
@@ -346,8 +342,7 @@ void Box::destroy_x11_subwindow(Display *dpy, Window parent)
 	XDestroyWindow(dpy, parent);
 }
 
-Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y,
-		int width, int height)
+Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height)
 {
 	Window win;
 	int winbgcol;
@@ -357,8 +352,7 @@ Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y,
 
 	winbgcol = WhitePixel(dpy, DefaultScreen(dpy));
 
-	win = XCreateSimpleWindow(dpy, parent, x, y, width, height, 0, winbgcol,
-			winbgcol);
+	win = XCreateSimpleWindow(dpy, parent, x, y, width, height, 0, winbgcol, winbgcol);
 
 	if (!win)
 		return 0;
@@ -393,8 +387,7 @@ Window Box::create_sdl_x11_subwindow(int x, int y, int width, int height)
 
 	sdl_info.info.x11.lock_func();
 
-	play_win = create_x11_subwindow(sdl_info.info.x11.display,
-			sdl_info.info.x11.window, x, y, width, height);
+	play_win = create_x11_subwindow(sdl_info.info.x11.display, sdl_info.info.x11.window, x, y, width, height);
 
 	sdl_info.info.x11.unlock_func();
 
@@ -419,8 +412,7 @@ SDL_SysWMinfo Box::get_sdl_wm_info(void)
 	return sdl_info;
 }
 
-void Box::create_iplayer(const char *streamid, const char *quality, int cache,
-		Window win, FILE **mplayer_fp)
+void Box::create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp)
 {
 	char cmdline[1024];
 
@@ -433,8 +425,7 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache,
 	*mplayer_fp = popen(cmdline, "w");
 }
 
-void Box::createiPlayer(int maxqual, int width, int height, int x, int y,
-		int scale)
+void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int scale)
 {
 	/* MPLAYER Testing */
 	/* Default IPlayer Feed - 688x384 */
@@ -447,8 +438,7 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y,
 	int mplayer_pos_x = (x / 1280.0) * sWidth;
 	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
 	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
-	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y,
-			mplayer_width, mplayer_height);
+	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win)
 	{
 		fprintf(stderr, "Cannot create X11 window\n");
@@ -464,11 +454,9 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y,
 		// flashvhigh - 688x384 @ 1500kbps (1372v, 128a)
 		if ((mplayer_width <= 400) || (maxqual <= 1))
 			create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
-		else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual
-				== 2))
+		else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2))
 			create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
-		else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual
-				== 3))
+		else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3))
 			create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
 		else if ((mplayer_width > 800) || (maxqual >= 4))
 			create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);

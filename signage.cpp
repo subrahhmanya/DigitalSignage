@@ -132,8 +132,7 @@ Signage::Signage()
 	wCelcius = 0.0;
 }
 
-void Signage::Init(const char* title, int width, int height, int bpp,
-		bool fullscreen)
+void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen)
 {
 
 	/* Default to True, as we will falsify later if fail. */
@@ -161,15 +160,13 @@ void Signage::Init(const char* title, int width, int height, int bpp,
 	if (fullscreen)
 	{
 		/* We're running full screen on the target, so use full screen */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT
-				| SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
 		SDL_ShowCursor(SDL_DISABLE);
 	}
 	else
 	{
 		/* We're running in a window (no fullscreen flag set) so don't pass SDL_FULLSCREEN */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT
-				| SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_HWSURFACE | SDL_OPENGL);
 	}
 
 	sWidth = width;
@@ -182,9 +179,8 @@ void Signage::Init(const char* title, int width, int height, int bpp,
 	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blue);
 	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alpha);
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &doublebuf);
-	printf(
-			"Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n",
-			red, green, blue, alpha, (doublebuf == 1 ? "Yes" : "No"));
+	printf("Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", red, green, blue, alpha,
+			(doublebuf == 1 ? "Yes" : "No"));
 
 	//print video card memory
 	const SDL_VideoInfo* info = SDL_GetVideoInfo();
@@ -230,9 +226,7 @@ void Signage::Init(const char* title, int width, int height, int bpp,
 
 	for (n = 0; n < 10; n++)
 	{
-		printf(
-				"Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ",
-				n, 12 + (n * 4));
+		printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, 12 + (n * 4));
 		fntCGothic[n] = TTF_OpenFont("/screen/fonts/cgothic.ttf", 12 + (n * 4));
 		if (fntCGothic[n] == NULL)
 		{
@@ -290,9 +284,8 @@ void Signage::Update()
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width()
-				/ 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(),
-				sWidth, sHeight, 200, 1);
+		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth, sHeight, 200,
+				1);
 	else
 		iBoxes[0].doUpdate();
 
@@ -306,8 +299,7 @@ void Signage::Update()
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
 
 	/* Add one day if the year is leap year and desired date is after February */
-	if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0
-			|| (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
+	if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0 || (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
 		days++;
 	if (days == 7)
 		days = 0;
@@ -331,13 +323,11 @@ void Signage::Update()
 
 		tC1 = ltm->tm_sec;
 	}
-	sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins,
-			daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+	sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 	/* Process Weather Information */
 	/* Do Weather Check (update once every 15 minutes) */
-	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min
-			== 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
+	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
 	{
 		if (wLastCheckM != ltm->tm_min)
 		{
@@ -366,8 +356,7 @@ void Signage::Update()
 			LIBXML_TEST_VERSION // Macro to check API for match with
 			// the DLL we are using
 			/*parse the file and get the DOM */
-			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN",
-					NULL, 0);
+			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
 			if (doc)
 			{
 
@@ -390,8 +379,7 @@ void Signage::Update()
 				wOK = false;
 			}
 			/* Calculate Weather */
-			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5)
-					/ 10;
+			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
 			sprintf(wTemp, "%.1fºC", wCelcius);
 		}
 	}
@@ -475,8 +463,7 @@ void Signage::Update()
 
 		/* Calculate Sunrise/Sunset */
 		double tzone = 0.0;
-		double d =
-				FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
+		double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
 		double lambda = FNsun(d);
 		double obliq = 23.439 * rads - .0000004 * rads * d;
 		double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
@@ -502,10 +489,8 @@ void Signage::Update()
 		}
 		// arctic winter   //
 
-		double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation
-				/ 60.0;
-		double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation
-				/ 60.0;
+		double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+		double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
 		double noont = riset + 12.0 * ha / pi;
 		double altmax = 90.0 + delta * degs - latit;
 		// Correction suggested by David Smith
@@ -636,9 +621,7 @@ void Signage::Update()
 				else
 					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 				weather[0].Load(tBuff);
-				iBoxes[1].Create(weather[0].gltex(), 4, 0, 0,
-						weather[0].width(), weather[0].height(), sWidth,
-						sHeight, 255, 1);
+				iBoxes[1].Create(weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1);
 			}
 			if (wFadeV[1] > 255)
 			{
@@ -681,8 +664,7 @@ void Signage::Update()
 	if (now > (wUpdateTimer[2] + 10))
 	{
 		/* Check Board Information */
-		printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min,
-				ltm->tm_sec);
+		printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 		wUpdateTimer[2] = now;
 		DIR *d;
 		vector<string> dList;
@@ -692,8 +674,7 @@ void Signage::Update()
 		{
 			while ((dir = readdir(d)) != NULL)
 			{
-				if ((strcmp(".", dir->d_name) != 0) && (strcmp("..",
-						dir->d_name) != 0))
+				if ((strcmp(".", dir->d_name) != 0) && (strcmp("..", dir->d_name) != 0))
 				{
 					dList.push_back(dir->d_name);
 				}
@@ -703,12 +684,10 @@ void Signage::Update()
 			printf("Directories Found = %i\n", dList.size());
 			for (int dS = 0; dS < dList.size(); dS++)
 			{
-				printf("Parsing Board '%s'.",
-						dList[dS].c_str());
+				printf("Parsing Board '%s'.", dList[dS].c_str());
 				/* Check for valid Configuration Files and Contents */
 				char tFName[128];
-				sprintf(tFName, "/screen/boards/%s/config.ini",
-						dList[dS].c_str());
+				sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
 				bool validConfig = false;
 				int tEn, tPX, tPY, tSc, tBr, tW, tH, tBt, tA, tTs;
 				if (FileExists(tFName))
@@ -717,12 +696,14 @@ void Signage::Update()
 					CIniFile ini;
 					ini.Load(tFName);
 					CIniSection* pSection = ini.GetSection("BoardSettings");
-					if (pSection) {
+					if (pSection)
+					{
 						CIniKey* pKey;
 						if (pSection->GetKey("Enabled"))
 						{
 							tEn = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
-							if (tEn == 1) {
+							if (tEn == 1)
+							{
 								tPX = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
 								tPY = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
 								tSc = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
@@ -732,27 +713,32 @@ void Signage::Update()
 								tBt = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
 								tA = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
 								tTs = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-								validConfig=true;
+								validConfig = true;
 							}
 						}
 					}
-					if (validConfig==true) {
+					if (validConfig == true)
+					{
 						/* Check Each Board for this item */
-						for (int brdC = 0; brdC < tBt; brdC++)
+						int tBtC = tBt;
+						for (int brdC = 0; brdC < tBtC; brdC++)
 						{
 							char bSection[32];
-							sprintf(bSection, "Board-%i", brdC+1);
+							sprintf(bSection, "Board-%i", brdC + 1);
 							pSection = ini.GetSection(bSection);
-							if (pSection) {
+							if (pSection)
+							{
 								printf(".");
-							} else {
+							}
+							else
+							{
 								printf(".");
 								tBt--;
 							}
 						}
 					}
 				}
-				if (validConfig==true)
+				if (validConfig == true)
 					printf(" [OK]\nBoard '%s' with %i boards configured.\n", dList[dS].c_str(), tBt);
 				else
 					printf(" [OK]\nBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
@@ -780,8 +766,7 @@ void Signage::Draw()
 	glLoadIdentity();
 
 	/* Draw Title */
-	drawText("Notification Centre", fntCGothic[7], 3, 255, 255, 255, 255, 1280,
-			680);
+	drawText("Notification Centre", fntCGothic[7], 3, 255, 255, 255, 255, 1280, 680);
 
 	/* Draw Time */
 	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 1262, 8);
@@ -789,11 +774,9 @@ void Signage::Draw()
 	if (bV1)
 	{
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth
-					+ 44, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 44, 11);
 		else
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth
-					+ 26, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 26, 11);
 	}
 
 	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1172, 32);
@@ -816,21 +799,15 @@ void Signage::Draw()
 		switch (wCurDisp)
 		{
 		case 0:
-			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
-					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
-							+ 16, 8);
+			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
 			;
 			break;
 		case 1:
-			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
-					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
-							+ 16, 8);
+			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
 			;
 			break;
 		case 2:
-			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0],
-					((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth
-							+ 16, 8);
+			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
 			;
 			break;
 		}
@@ -838,8 +815,7 @@ void Signage::Draw()
 	}
 	else
 	{
-		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255,
-				16, 8);
+		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
 	}
 
 	// Draw Boxes
@@ -899,8 +875,7 @@ void Signage::Clean()
 	}
 }
 
-void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment,
-		int cr, int cg, int cb, int alpha, int px, int py)
+void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py)
 {
 	SDL_Surface* initial;
 	SDL_Color color;
@@ -943,8 +918,7 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment,
 	/* Tell GL about our new texture */
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-			initial->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, initial->pixels);
 
 	/* GL_NEAREST looks horrible, if scaled... */
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -987,8 +961,7 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment,
 int Signage::calcDay_Dec31(int yyyy)
 {
 	int dayCode = 0;
-	dayCode = ((yyyy - 1) * 365 + (yyyy - 1) / 4 - (yyyy - 1) / 100
-			+ (yyyy - 1) / 400) % 7;
+	dayCode = ((yyyy - 1) * 365 + (yyyy - 1) / 4 - (yyyy - 1) / 100 + (yyyy - 1) / 400) % 7;
 	return dayCode;
 }
 
@@ -1205,11 +1178,9 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				if (tCondition == 0)
 				{
-					sprintf(wCondition, "%s",
-							cur_node->properties->children->content);
+					sprintf(wCondition, "%s", cur_node->properties->children->content);
 					tCondition = 1;
-					printf("\tItem: %s \tData: %s\n", cur_node->name,
-							wCondition);
+					printf("\tItem: %s \tData: %s\n", cur_node->name, wCondition);
 				}
 			}
 
@@ -1220,8 +1191,7 @@ void Signage::parseWeather(xmlNode * a_node)
 				{
 					wFarenheight = strtol(tWord, NULL, 0);
 					tFarenheight = wFarenheight;
-					printf("\tItem: %s \t\tData: %i\n", cur_node->name,
-							wFarenheight);
+					printf("\tItem: %s \t\tData: %i\n", cur_node->name, wFarenheight);
 				}
 			}
 
@@ -1230,10 +1200,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				if (tHumidity == 0)
 				{
 					tHumidity = 1;
-					sprintf(wHumidity, "%s",
-							cur_node->properties->children->content);
-					printf("\tItem: %s \t\tData: %s\n", cur_node->name,
-							wHumidity);
+					sprintf(wHumidity, "%s", cur_node->properties->children->content);
+					printf("\tItem: %s \t\tData: %s\n", cur_node->name, wHumidity);
 				}
 			}
 
@@ -1242,8 +1210,7 @@ void Signage::parseWeather(xmlNode * a_node)
 				if (tIcon == 0)
 				{
 					tIcon = 1;
-					sprintf(wIcon, "%s",
-							cur_node->properties->children->content);
+					sprintf(wIcon, "%s", cur_node->properties->children->content);
 					printf("\tItem: %s \t\tData: %s\n", cur_node->name, wIcon);
 				}
 			}
@@ -1253,8 +1220,7 @@ void Signage::parseWeather(xmlNode * a_node)
 				if (tWind == 0)
 				{
 					tWind = 1;
-					sprintf(wWind, "%s",
-							cur_node->properties->children->content);
+					sprintf(wWind, "%s", cur_node->properties->children->content);
 					/* Get speed of wind and convert to int */
 					for (int i = 0; i < strlen(wWind); ++i)
 					{
@@ -1266,8 +1232,7 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence.
 				 This way, even if only part of the data was missed, we still declare as Dirty */
-				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0)
-						&& (tFarenheight != 0) && (tCondition != 0))
+				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0) && (tFarenheight != 0) && (tCondition != 0))
 					wOK = true;
 				else
 					wOK = false;
