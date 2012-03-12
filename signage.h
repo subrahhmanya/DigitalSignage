@@ -11,6 +11,7 @@
 #include "textures.h"
 #include "box.h"
 #include "fps_counter.h"
+#include "inifile.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -27,6 +28,11 @@
 #include <stdio.h>
 #include <string>
 #include <time.h>
+#include <dirent.h>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
 
 class Signage
 {
@@ -63,7 +69,7 @@ private:
 			wUpdateTimer[32];
 	float wCelcius;
 	char wTemp[32];
-	int iPlayerScale, iPlayerPosX, iPlayerPosY;
+
 	tm *ltm;
 
 	/* FPS */
@@ -71,7 +77,7 @@ private:
 
 	void drawText(const char* text, TTF_Font*& fntChosen, int alignment,
 			int cr, int cg, int cb, int alpha, int px, int py);
-
+	bool FileExists(const char* FileName);
 	int calcDay_Dec31(int yyyy);
 	int dayInYear(int dd, int mm);
 	void dayInStr(char daysInWord[], int days);

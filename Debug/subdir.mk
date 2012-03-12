@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../box.cpp \
 ../fps_counter.cpp \
+../inifile.cpp \
 ../main.cpp \
 ../signage.cpp \
 ../textures.cpp 
@@ -13,6 +14,7 @@ CPP_SRCS += \
 OBJS += \
 ./box.o \
 ./fps_counter.o \
+./inifile.o \
 ./main.o \
 ./signage.o \
 ./textures.o 
@@ -20,6 +22,7 @@ OBJS += \
 CPP_DEPS += \
 ./box.d \
 ./fps_counter.d \
+./inifile.d \
 ./main.d \
 ./signage.d \
 ./textures.d 

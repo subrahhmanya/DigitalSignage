@@ -297,10 +297,10 @@ void Signage::Update()
 		iBoxes[0].doUpdate();
 
 	/* iPlayer Specific Box */
-		if (!iBoxes[10].isCreated())
-			iBoxes[10].Create(0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
-		else
-			iBoxes[10].doUpdate();
+	//	if (!iBoxes[10].isCreated())
+	//		iBoxes[10].Create(0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
+	//	else
+	//		iBoxes[10].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
@@ -543,7 +543,9 @@ void Signage::Update()
 						tSrS = 1;
 						tOIcon = -1;
 					}
-				} else {
+				}
+				else
+				{
 					if (tSrS != 2)
 					{
 						/* Set Night */
@@ -551,7 +553,8 @@ void Signage::Update()
 						tOIcon = -1;
 					}
 				}
-			} else if (ltm->tm_hour == shr)
+			}
+			else if (ltm->tm_hour == shr)
 			{
 				/* We are at last hour */
 				if (ltm->tm_min < smn)
@@ -562,7 +565,9 @@ void Signage::Update()
 						tSrS = 1;
 						tOIcon = -1;
 					}
-				} else {
+				}
+				else
+				{
 					if (tSrS != 2)
 					{
 						/* Set Night */
@@ -672,6 +677,100 @@ void Signage::Update()
 			}
 		}
 	}
+
+	if (now > (wUpdateTimer[2] + 10))
+	{
+		/* Check Board Information */
+		printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min,
+				ltm->tm_sec);
+		wUpdateTimer[2] = now;
+		DIR *d;
+		vector<string> dList;
+		struct dirent *dir;
+		d = opendir("/screen/boards/");
+		if (d)
+		{
+			while ((dir = readdir(d)) != NULL)
+			{
+				if ((strcmp(".", dir->d_name) != 0) && (strcmp("..",
+						dir->d_name) != 0))
+				{
+					dList.push_back(dir->d_name);
+				}
+			}
+			closedir(d);
+			sort(dList.begin(), dList.end()); /* Sort Array */
+			printf("Directories Found = %i\n", dList.size());
+			for (int dS = 0; dS < dList.size(); dS++)
+			{
+				printf("Parsing Board '%s'.",
+						dList[dS].c_str());
+				/* Check for valid Configuration Files and Contents */
+				char tFName[128];
+				sprintf(tFName, "/screen/boards/%s/config.ini",
+						dList[dS].c_str());
+				bool validConfig = false;
+				int tEn, tPX, tPY, tSc, tBr, tW, tH, tBt, tA, tTs;
+				if (FileExists(tFName))
+				{
+					/* Found a config gile, parse it... */
+					CIniFile ini;
+					ini.Load(tFName);
+					CIniSection* pSection = ini.GetSection("BoardSettings");
+					if (pSection) {
+						CIniKey* pKey;
+						if (pSection->GetKey("Enabled"))
+						{
+							tEn = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
+							if (tEn == 1) {
+								tPX = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+								tPY = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+								tSc = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+								tBr = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+								tW = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+								tH = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+								tBt = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+								tA = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+								tTs = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+								validConfig=true;
+							}
+						}
+					}
+					if (validConfig==true) {
+						/* Check Each Board for this item */
+						for (int brdC = 0; brdC < tBt; brdC++)
+						{
+							char bSection[32];
+							sprintf(bSection, "Board-%i", brdC+1);
+							pSection = ini.GetSection(bSection);
+							if (pSection) {
+								printf(".");
+							} else {
+								printf(".");
+								tBt--;
+							}
+						}
+					}
+				}
+				if (validConfig==true)
+					printf(" [OK]\nBoard '%s' with %i boards configured.\n", dList[dS].c_str(), tBt);
+				else
+					printf(" [OK]\nBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
+			}
+		}
+	}
+}
+
+bool Signage::FileExists(const char* FileName)
+{
+	FILE* fp = NULL;
+	fp = fopen(FileName, "rb");
+	if (fp != NULL)
+	{
+		fclose(fp);
+		return true;
+	}
+	return false;
 }
 
 void Signage::Draw()
