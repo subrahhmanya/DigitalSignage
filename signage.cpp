@@ -138,6 +138,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
 	wCurDisp = 0;
+	fullscreen = true;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -356,7 +357,7 @@ void Signage::Update()
 			LIBXML_TEST_VERSION // Macro to check API for match with
 			// the DLL we are using
 			/*parse the file and get the DOM */
-			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
+			doc = xmlReadFile("http://www.google.com/ig/api?weather=Swynnerton", NULL, 0);
 			if (doc)
 			{
 
@@ -739,9 +740,13 @@ void Signage::Update()
 					}
 				}
 				if (validConfig == true)
+				{
 					printf("\n\tBoard '%s' with %i boards configured.\n", dList[dS].c_str(), tBt);
+				}
 				else
+				{
 					printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
+				}
 			}
 		}
 	}
@@ -988,25 +993,25 @@ void Signage::dayInStr(char daysInWord[], int days)
 	switch (days)
 	{
 	case 0:
-		strcpy(daysInWord, "Sun");
+		strcpy(daysInWord, "Sunday");
 		break;
 	case 1:
-		strcpy(daysInWord, "Mon");
+		strcpy(daysInWord, "Monday");
 		break;
 	case 2:
-		strcpy(daysInWord, "Tue");
+		strcpy(daysInWord, "Tuesday");
 		break;
 	case 3:
-		strcpy(daysInWord, "Wed");
+		strcpy(daysInWord, "Wednesday");
 		break;
 	case 4:
-		strcpy(daysInWord, "Thu");
+		strcpy(daysInWord, "Thursday");
 		break;
 	case 5:
-		strcpy(daysInWord, "Fri");
+		strcpy(daysInWord, "Friday");
 		break;
 	case 6:
-		strcpy(daysInWord, "Sat");
+		strcpy(daysInWord, "Saturday");
 		break;
 	}
 }

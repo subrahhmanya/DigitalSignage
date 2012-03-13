@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
 	srand(time(NULL)); /* Randomise Time Seed */
 	Signage signage;
-	signage.Init("Digital Signage", 1280, 720, 32, false);
+	signage.Init("Digital Signage", 1920, 1080, 32, false);
 
 	while (signage.Running())
 	{
