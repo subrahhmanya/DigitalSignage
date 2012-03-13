@@ -1331,7 +1331,7 @@ void doDisplay() {
 			                       // the DLL we are using
 
 			/*parse the file and get the DOM */
-			doc = xmlReadFile("http://www.google.com/ig/api?weather=ST150QN", NULL, 0);
+			doc = xmlReadFile("http://www.google.com/ig/api?weather=Swynnerton", NULL, 0);
 			if (doc)
 			{
 
