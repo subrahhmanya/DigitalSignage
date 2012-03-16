@@ -22,6 +22,8 @@ Box::Box()
 	sType = 0;
 	sWidth = 0;
 	sHeight = 0;
+	bTStamp = 0;
+	sprintf(bUID, "*");
 }
 
 bool Box::doDraw(int aOverride)
@@ -106,6 +108,8 @@ void Box::Destroy()
 		sType = 0;
 		sWidth = 0;
 		sHeight = 0;
+		bTStamp = 0;
+		sprintf(bUID, "*");
 		if (layout[0].width() != 0)
 		{
 			printf(" - BoxTex1 ");
@@ -129,7 +133,14 @@ void Box::Destroy()
 	}
 }
 
-void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType)
+void Box::SwapTex(GLuint TextureID)
+{
+	glTex = 0;
+	glGenTextures(1, &glTex);
+	glTex = TextureID;
+}
+
+void Box::Create(char btUID[128], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType)
 {
 	bType = false;
 	if (bcol == 1)
@@ -165,6 +176,8 @@ void Box::Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int a
 	sHeight = ah;
 	bScale = scale;
 	m_bRunning = true;
+	bTStamp = tStamp;
+	sprintf(bUID, "%s", btUID);
 	glGenTextures(1, &glTex);
 	glTex = TextureID;
 }

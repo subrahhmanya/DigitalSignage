@@ -22,8 +22,15 @@ class Box
 {
 public:
 	Box();
-	void Create(GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType);
+	void Create(char btUID[128], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType);
+	void SwapTex(GLuint TextureID);
 	bool doDraw(int aOverride);
+	char * GetUID() {
+		return bUID;
+	}
+	int GetTStamp() {
+		return bTStamp;
+	}
 	void doUpdate();
 	void rePos(int x, int y)
 	{
@@ -57,7 +64,8 @@ private:
 	Texture layout[4];
 	GLuint glTex;
 	bool m_bRunning, bType;
-	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight;
+	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp;
+	char bUID[128];
 
 	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
 			int balpha, int calpha);

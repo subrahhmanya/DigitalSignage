@@ -138,7 +138,6 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
 	wCurDisp = 0;
-	fullscreen = true;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -285,14 +284,14 @@ void Signage::Update()
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
 	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create(pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth, sHeight, 200,
+		iBoxes[0].Create("Orbital Logo", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth, sHeight, 200,
 				1);
 	else
 		iBoxes[0].doUpdate();
 
 	/* iPlayer Specific Box */
 	//	if (!iBoxes[10].isCreated())
-	//		iBoxes[10].Create(0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
+	//		iBoxes[10].Create("iPlayer", 0, 0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
 	//	else
 	//		iBoxes[10].doUpdate();
 
@@ -494,14 +493,10 @@ void Signage::Update()
 		double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
 		double noont = riset + 12.0 * ha / pi;
 		double altmax = 90.0 + delta * degs - latit;
-		// Correction suggested by David Smith
-		// to express as degrees from the N horizon
+		/* Express as degrees from the N horizon */
 
 		if (delta * degs > latit)
 			altmax = 90.0 + latit - delta * degs;
-
-		double twam = riset - twx; // morning twilight begin
-		double twpm = settm + twx; // evening twilight end
 
 		if (riset > 24.0)
 			riset -= 24.0;
@@ -622,7 +617,7 @@ void Signage::Update()
 				else
 					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 				weather[0].Load(tBuff);
-				iBoxes[1].Create(weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1);
+				iBoxes[1].Create("Weather Condition", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1);
 			}
 			if (wFadeV[1] > 255)
 			{
@@ -690,7 +685,8 @@ void Signage::Update()
 				char tFName[128];
 				sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
 				bool validConfig = false;
-				int tEn, tPX, tPY, tSc, tBr, tW, tH, tBt, tA, tTs;
+				int tEn, tPX, tPY, tSc, tBr, tW, tH, tBt, tA, tTs, tDuration[64];
+				char tUID[128], tType[64][128], tSrc[64][128];
 				if (FileExists(tFName))
 				{
 					/* Found a config gile, parse it... */
@@ -705,16 +701,22 @@ void Signage::Update()
 							tEn = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
 							if (tEn == 1)
 							{
-								tPX = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-								tPY = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-								tSc = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-								tBr = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-								tW = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-								tH = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-								tBt = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-								tA = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-								tTs = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-								validConfig = true;
+								if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale")) && (pSection->GetKey("Border"))
+										&& (pSection->GetKey("Width")) && (pSection->GetKey("Height")) && (pSection->GetKey("Boards")) && (pSection->GetKey(
+										"Alert")) && (pSection->GetKey("TimeStamp")))
+								{
+									sprintf(tUID, "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+									tPX = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+									tPY = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+									tSc = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+									tBr = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+									tW = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+									tH = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+									tBt = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+									tA = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+									tTs = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+									validConfig = true;
+								}
 							}
 						}
 					}
@@ -730,6 +732,14 @@ void Signage::Update()
 							if (pSection)
 							{
 								printf(".");
+								/* Now get the Data */
+								if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
+								{
+									sprintf(tType[brdC], "%s", ini.GetKeyValue(bSection, "Type").c_str());
+									sprintf(tSrc[brdC], "%s", ini.GetKeyValue(bSection, "Src").c_str());
+									tDuration[brdC] = atoi(ini.GetKeyValue(bSection, "Duration").c_str());
+								} else
+									validConfig = false;
 							}
 							else
 							{
@@ -741,7 +751,12 @@ void Signage::Update()
 				}
 				if (validConfig == true)
 				{
-					printf("\n\tBoard '%s' with %i boards configured.\n", dList[dS].c_str(), tBt);
+					/* We need to check to see if the board already exists, with the correct timestamp data. */
+					printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID, tBt);
+					for (int brdO = 0; brdO < tBt; brdO++)
+					{
+						printf("\t\tBoard %i\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO+1, tType[brdO], tSrc[brdO], tDuration[brdO]);
+					}
 				}
 				else
 				{
