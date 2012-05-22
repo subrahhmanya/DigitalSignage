@@ -290,10 +290,10 @@ void Signage::Update()
 		iBoxes[0].doUpdate();
 
 	/* iPlayer Specific Box */
-	//	if (!iBoxes[10].isCreated())
-	//		iBoxes[10].Create("iPlayer", 0, 0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
-	//	else
-	//		iBoxes[10].doUpdate();
+		if (!iBoxes[10].isCreated())
+			iBoxes[10].Create("iPlayer", 0, 0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
+		else
+			iBoxes[10].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;

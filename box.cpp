@@ -23,6 +23,7 @@ Box::Box()
 	sWidth = 0;
 	sHeight = 0;
 	bTStamp = 0;
+	ipLFail = 0;
 	sprintf(bUID, "*");
 }
 
@@ -43,7 +44,9 @@ bool Box::doDraw(int aOverride)
 		if (!fgets(buff, sizeof buff, fp) != NULL)
 		{
 			/* get_iplayer isn't running - Close current window and set ipVis to false
-			 * iPlayer Window will automatically re-launch when closed. */
+			 * iPlayer Window will automatically re-launch when closed.
+			 * Also, worth cycling through Quality settings, just in case it's an issue
+			 * with the stream, as experienced around May 20th 2012. */
 			SDL_SysWMinfo sdl_info;
 
 			sdl_info = get_sdl_wm_info();
@@ -51,6 +54,13 @@ bool Box::doDraw(int aOverride)
 
 			destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
 
+			/* Try '2' for Quality */
+			if (ipLFail == 0)
+				ipLFail = 1;
+			else
+				ipLFail = 0;
+
+			printf("Qual = %i\nipLFail = %i\n", sType, ipLFail);
 			sdl_info.info.x11.unlock_func();
 			ipVis = false;
 		}
@@ -465,13 +475,26 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 		// flashstd   - 640x360 @ 496kbps  (400v, 96a)
 		// flashhigh  - 640x360 @ 800kbps  (704v, 96a)
 		// flashvhigh - 688x384 @ 1500kbps (1372v, 128a)
-		if ((mplayer_width <= 400) || (maxqual <= 1))
-			create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
-		else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2))
-			create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
-		else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3))
-			create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
-		else if ((mplayer_width > 800) || (maxqual >= 4))
-			create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);
+		if ((mplayer_width <= 400) || (maxqual <= 1)) {
+			if (ipLFail == 1)
+				create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
+			else
+				create_iplayer("80002", "flashlow2", 1024, play_win, &mplayer_fp);
+		} else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2)) {
+			if (ipLFail == 1)
+				create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
+			else
+				create_iplayer("80002", "flashstd2", 2048, play_win, &mplayer_fp);
+		} else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3)) {
+			if (ipLFail == 1)
+				create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
+			else
+				create_iplayer("80002", "flashhigh2", 3072, play_win, &mplayer_fp);
+		} else if ((mplayer_width > 800) || (maxqual >= 4)) {
+			if (ipLFail == 1)
+				create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);
+			else
+				create_iplayer("80002", "flashvhigh2", 4096, play_win, &mplayer_fp);
+		}
 	}
 }

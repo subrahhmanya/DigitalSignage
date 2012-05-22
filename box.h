@@ -64,7 +64,7 @@ private:
 	Texture layout[4];
 	GLuint glTex;
 	bool m_bRunning, bType;
-	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp;
+	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail;
 	char bUID[128];
 
 	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,

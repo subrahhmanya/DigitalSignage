@@ -20,8 +20,8 @@
 #include <SDL/SDL_ttf.h>
 
 /* Include libxml */
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/tree.h>
 
 /* Include standard C libraries */
 #include <math.h>
