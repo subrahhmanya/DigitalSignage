@@ -13,12 +13,7 @@ int main(int argc, char* argv[])
 	srand(time(NULL)); /* Randomise Time Seed */
 	Signage signage;
 
-	bool isFullScreen = false;
-
-	if (FileExists("/screen/full"))
-		isFullScreen = true;
-
-	signage.Init("Digital Signage", 1280, 720, 32, isFullScreen);
+	signage.Init("Digital Signage", 1280, 720, 32, FileExists("/screen/full"));
 
 	while (signage.Running())
 	{
