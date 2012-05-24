@@ -24,52 +24,151 @@ Box::Box()
 	sHeight = 0;
 	bTStamp = 0;
 	ipLFail = 0;
+	ipLooper = 0;
+	tAlpha = 0;
+	tSTimer = 0;
+	tCScreen = -1;
 	sprintf(bUID, "*");
+	sprintf(bMSRC, "*");
 }
 
 bool Box::doDraw(int aOverride)
 {
 	/* mplayer/iPlayer check
-	 * mPlayer will have sType of 2
-	 * iPlayer will have sType of 3+ */
-	if (sType >= 3)
-		if (!ipVis)
-			createiPlayer(sType - 2, bW, bH, bX, bY, bScale);
+	 * Streaming Issue will have sType of 2
+	 * mPlayer will have sType of 3
+	 * iPlayer will have sType of 4+ */
 
-	if ((sType >= 3) && (ipVis))
-	{
-		/* Check for getiPlayer Instance, restart if required. */
-		FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
-		char buff[1024];
-		if (!fgets(buff, sizeof buff, fp) != NULL)
-		{
-			/* get_iplayer isn't running - Close current window and set ipVis to false
-			 * iPlayer Window will automatically re-launch when closed.
-			 * Also, worth cycling through Quality settings, just in case it's an issue
-			 * with the stream, as experienced around May 20th 2012. */
-			SDL_SysWMinfo sdl_info;
-
-			sdl_info = get_sdl_wm_info();
-			sdl_info.info.x11.lock_func();
-
-			destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
-
-			/* Try '2' for Quality */
-			if (ipLFail == 0)
-				ipLFail = 1;
-			else
-				ipLFail = 0;
-
-			printf("Qual = %i\nipLFail = %i\n", sType, ipLFail);
-			sdl_info.info.x11.unlock_func();
-			ipVis = false;
-		}
-		pclose(fp);
-	}
-	if (aOverride != -1)
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, aOverride);
+	/* tAlpha is the initial Alpha value when creating a new Box.
+	 * All boxes need to fade in, and fade out, thus being clean. */
+	if ((sType != 0) && (sType != -1))
+		tAlpha = tAlpha + 15;
 	else
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, 255, 255);
+		tAlpha = tAlpha - 15;
+	if ((tAlpha > 255) && (sType != 0))
+	{
+		tAlpha = 255;
+		if (tCScreen == -1)	/* Initial Creation */
+			tCScreen = 0;
+	}
+	if ((tAlpha < 0) && (sType == -1))
+		tAlpha = 0;
+
+	if ((tAlpha == 255) && (sType != 0) && (sType != -1))
+	{
+		if (sType >= 4)
+			if (!ipVis)
+				createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
+
+		if ((sType >= 4) && (ipVis))
+		{
+			/* Check for getiPlayer Instance, restart if required. */
+			FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
+			char buff[1024];
+			if (!fgets(buff, sizeof buff, fp) != NULL)
+			{
+				/* get_iplayer isn't running - Close current window and set ipVis to false
+				 * iPlayer Window will automatically re-launch when closed.
+				 * Also, worth cycling through Quality settings, just in case it's an issue
+				 * with the stream, as experienced around May 20th 2012. */
+				SDL_SysWMinfo sdl_info;
+
+				sdl_info = get_sdl_wm_info();
+				sdl_info.info.x11.lock_func();
+
+				destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
+
+				/* Try '2' for Quality */
+				if (ipLFail == 0)
+					ipLFail = 1;
+				else
+				{
+					ipLFail = 0;
+					ipLooper++;
+				}
+
+				if (ipLooper == 2)
+				{
+					sType = 4;
+				}
+				else if (ipLooper >= 3)
+				{
+					sType++;
+				}
+
+				if ((sType - 3) > 4)
+				{
+					/* Remove iPlayer feed, set as Static Image with "Unavailable" feed. */
+					sType = 2;
+					char bgID[128];
+					sprintf(bgID, "/screen/textures/iplayer/%s.png", bUID);
+					if (FileExists(bgID) == false)
+						sprintf(bgID, "/screen/textures/iplayer/generic_fail.png");
+					ipBG.Load(bgID);
+					glTex = ipBG.gltex();
+				}
+
+				sdl_info.info.x11.unlock_func();
+				ipVis = false;
+			}
+			pclose(fp);
+		}
+	}
+	else if ((tAlpha == 0) && (sType == -1))
+	{
+		/* Delete Board */
+		printf("    BOX \"%s\" Destroy Event Complete\n", bUID);
+		glTex = 0;
+		m_bRunning = false;
+		bType = false;
+		bCol = 0;
+		bX = 0;
+		bY = 0;
+		bW = 0;
+		bH = 0;
+		bScale = 0;
+		sWidth = 0;
+		sHeight = 0;
+		sType = 0;
+		bTStamp = 0;
+		ipLFail = 0;
+		ipLooper = 0;
+		tAlpha = 0;
+		tSTimer = 0;
+		tCScreen = -1;
+		sprintf(bUID, "*");
+		sprintf(bMSRC, "*");
+		if (ipBG.width() != 0)
+		{
+			printf(" - ipBG");
+			ipBG.Destroy();
+		}
+		if (layout[0].width() != 0)
+		{
+			printf(" - BoxTex1 ");
+			layout[0].Destroy();
+		}
+		if (layout[1].width() != 0)
+		{
+			printf(" - BoxTex2 ");
+			layout[1].Destroy();
+		}
+		if (layout[2].width() != 0)
+		{
+			printf(" - BoxTex3 ");
+			layout[2].Destroy();
+		}
+		if (layout[3].width() != 0)
+		{
+			printf(" - BoxTex4 ");
+			layout[3].Destroy();
+		}
+	}
+
+	if (aOverride != -1)
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, tAlpha, aOverride);
+	else
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, tAlpha, 255);
 	return true;
 }
 
@@ -80,9 +179,10 @@ void Box::doUpdate()
 
 void Box::Destroy()
 {
+	printf("    BOX \"%s\" Destroy Event Called\n", bUID);
 	if (m_bRunning)
 	{
-		if ((sType >= 3) && (ipVis))
+		if ((sType >= 4) && (ipVis))
 		{
 			printf(" - Destroying iplayer/mplayer reference...\n");
 			system("killall -9 mplayer");
@@ -106,39 +206,12 @@ void Box::Destroy()
 			}
 			pclose(fp);
 		}
-		glTex = 0;
-		m_bRunning = false;
-		bType = false;
-		bCol = 0;
-		bX = 0;
-		bY = 0;
-		bW = 0;
-		bH = 0;
-		bScale = 0;
-		sType = 0;
-		sWidth = 0;
-		sHeight = 0;
-		bTStamp = 0;
-		sprintf(bUID, "*");
-		if (layout[0].width() != 0)
+		if (ipVis == false)
 		{
-			printf(" - BoxTex1 ");
-			layout[0].Destroy();
-		}
-		if (layout[1].width() != 0)
-		{
-			printf(" - BoxTex2 ");
-			layout[1].Destroy();
-		}
-		if (layout[2].width() != 0)
-		{
-			printf(" - BoxTex3 ");
-			layout[2].Destroy();
-		}
-		if (layout[3].width() != 0)
-		{
-			printf(" - BoxTex4 ");
-			layout[3].Destroy();
+			if (sType != -1)
+			{
+				sType = -1;
+			}
 		}
 	}
 }
@@ -150,7 +223,8 @@ void Box::SwapTex(GLuint TextureID)
 	glTex = TextureID;
 }
 
-void Box::Create(char btUID[128], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType)
+void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
+		int sourceType, int dScreen)
 {
 	bType = false;
 	if (bcol == 1)
@@ -187,7 +261,9 @@ void Box::Create(char btUID[128], int tStamp, GLuint TextureID, int bcol, int px
 	bScale = scale;
 	m_bRunning = true;
 	bTStamp = tStamp;
+	tCScreen = dScreen;
 	sprintf(bUID, "%s", btUID);
+	sprintf(bMSRC, "%s", btMSRC);
 	glGenTextures(1, &glTex);
 	glTex = TextureID;
 }
@@ -423,7 +499,7 @@ SDL_SysWMinfo Box::get_sdl_wm_info(void)
 
 	memset(&sdl_info, 0, sizeof(sdl_info));
 
-	SDL_VERSION (&sdl_info.version);
+	SDL_VERSION(&sdl_info.version);
 	if (SDL_GetWMInfo(&sdl_info) <= 0 || sdl_info.subsystem != SDL_SYSWM_X11)
 	{
 		fprintf(stderr, "This is not X11\n");
@@ -439,9 +515,7 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 {
 	char cmdline[1024];
 
-	snprintf(
-			cmdline,
-			1024,
+	snprintf(cmdline, 1024,
 			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao pulse -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\"",
 			quality, streamid, cache, win);
 	printf("%s\n", cmdline);
@@ -475,26 +549,45 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 		// flashstd   - 640x360 @ 496kbps  (400v, 96a)
 		// flashhigh  - 640x360 @ 800kbps  (704v, 96a)
 		// flashvhigh - 688x384 @ 1500kbps (1372v, 128a)
-		if ((mplayer_width <= 400) || (maxqual <= 1)) {
+		if ((mplayer_width <= 400) || (maxqual <= 1))
+		{
 			if (ipLFail == 1)
-				create_iplayer("80002", "flashlow", 1024, play_win, &mplayer_fp);
+				create_iplayer(bMSRC, "flashlow", 1024, play_win, &mplayer_fp);
 			else
-				create_iplayer("80002", "flashlow2", 1024, play_win, &mplayer_fp);
-		} else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2)) {
+				create_iplayer(bMSRC, "flashlow2", 1024, play_win, &mplayer_fp);
+		}
+		else if (((mplayer_width > 400) && (mplayer_width <= 600)) || (maxqual == 2))
+		{
 			if (ipLFail == 1)
-				create_iplayer("80002", "flashstd", 2048, play_win, &mplayer_fp);
+				create_iplayer(bMSRC, "flashstd", 2048, play_win, &mplayer_fp);
 			else
-				create_iplayer("80002", "flashstd2", 2048, play_win, &mplayer_fp);
-		} else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3)) {
+				create_iplayer(bMSRC, "flashstd2", 2048, play_win, &mplayer_fp);
+		}
+		else if (((mplayer_width > 600) && (mplayer_width <= 800)) || (maxqual == 3))
+		{
 			if (ipLFail == 1)
-				create_iplayer("80002", "flashhigh", 3072, play_win, &mplayer_fp);
+				create_iplayer(bMSRC, "flashhigh", 3072, play_win, &mplayer_fp);
 			else
-				create_iplayer("80002", "flashhigh2", 3072, play_win, &mplayer_fp);
-		} else if ((mplayer_width > 800) || (maxqual >= 4)) {
+				create_iplayer(bMSRC, "flashhigh2", 3072, play_win, &mplayer_fp);
+		}
+		else if ((mplayer_width > 800) || (maxqual >= 4))
+		{
 			if (ipLFail == 1)
-				create_iplayer("80002", "flashvhigh", 4096, play_win, &mplayer_fp);
+				create_iplayer(bMSRC, "flashvhigh", 4096, play_win, &mplayer_fp);
 			else
-				create_iplayer("80002", "flashvhigh2", 4096, play_win, &mplayer_fp);
+				create_iplayer(bMSRC, "flashvhigh2", 4096, play_win, &mplayer_fp);
 		}
 	}
+}
+
+bool Box::FileExists(const char* FileName)
+{
+	FILE* fp = NULL;
+	fp = fopen(FileName, "rb");
+	if (fp != NULL)
+	{
+		fclose(fp);
+		return true;
+	}
+	return false;
 }

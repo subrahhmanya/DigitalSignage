@@ -56,6 +56,7 @@ private:
 	bool m_bFullscreen, m_bRunning;
 	Texture pLogo;
 	Texture weather[3];
+	Texture bTex[64];
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[10];
 	int pTWidth, pTHeight, tC1, tFarenheight, tCondition, tHumidity, tIcon, tOIcon, tWind, tSrS, wFarenheight, wIWind, wFadeTI;
@@ -80,6 +81,11 @@ private:
 	void monthInStr(char monthsInWord[], int month);
 	void nthInStr(char dowInWord[], int monthday);
 	void parseWeather(xmlNode * a_node);
+
+	/* Board Specific Vars */
+	bool validConfig[64];
+	int tEn[64], tPX[64], tPY[64], tSc[64], tBr[64], tW[64], tH[64], tBt[64], tA[64], tTs[64], tDuration[64][64], tSType[64][64], tBC[64], tBR[64], pFade[64];
+	char tFldr[64][1024], tUID[64][128], tType[64][64][128], tSrc[64][64][128], bSection[64][32];
 };
 
 #endif /* SIGNAGE_H_ */

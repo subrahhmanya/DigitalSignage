@@ -22,7 +22,7 @@ class Box
 {
 public:
 	Box();
-	void Create(char btUID[128], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType);
+	void Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType, int dScreen);
 	void SwapTex(GLuint TextureID);
 	bool doDraw(int aOverride);
 	char * GetUID() {
@@ -59,13 +59,39 @@ public:
 	{
 		return bScale;
 	}
+	int stype()
+	{
+		return sType;
+	}
+	int getClicks()
+	{
+		return tSTimer;
+	}
+	int getScreen()
+	{
+		return tCScreen;
+	}
+	void setClicks(int tClick)
+	{
+		tSTimer = tClick;
+	}
+	void setScreen(int tScreen)
+	{
+		tCScreen = tScreen;
+	}
+	char* buid()
+	{
+		return bUID;
+	}
 	void Destroy();
 private:
 	Texture layout[4];
+	Texture ipBG;
 	GLuint glTex;
 	bool m_bRunning, bType;
-	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail;
+	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail, ipLooper, tAlpha, tSTimer, tCScreen;
 	char bUID[128];
+	char bMSRC[1024];
 
 	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
 			int balpha, int calpha);
@@ -82,6 +108,9 @@ private:
 	/* MPlayer Integration */
 	Window play_win;
 	FILE *mplayer_fp;
+
+	/* Generic */
+	bool FileExists(const char* FileName);
 };
 
 #endif /* BOX_H_ */

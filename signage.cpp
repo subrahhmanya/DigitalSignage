@@ -106,16 +106,6 @@ Signage::Signage()
 	wUpdateTimer[2] = 0;
 	wUpdateTimer[3] = 0;
 	wUpdateTimer[4] = 0;
-	wFadeA[0] = 0;
-	wFadeV[0] = 0;
-	wFadeA[1] = 0;
-	wFadeV[1] = 0;
-	wFadeA[2] = 0;
-	wFadeV[2] = 0;
-	wFadeA[3] = 0;
-	wFadeV[3] = 0;
-	wFadeA[4] = 0;
-	wFadeV[4] = 0;
 	wCurDisp = 0;
 	wFarenheight = 0;
 	wIWind = 0;
@@ -283,17 +273,11 @@ void Signage::Update()
 
 	/* Calculate the day for Dec 31 of the previous year */
 	days = calcDay_Dec31(1900 + ltm->tm_year);
-	if (!iBoxes[0].isCreated())
-		iBoxes[0].Create("Orbital Logo", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(), sWidth, sHeight, 200,
-				1);
+	if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
+		iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(),
+				sWidth, sHeight, 200, 1, 1);
 	else
 		iBoxes[0].doUpdate();
-
-	/* iPlayer Specific Box */
-		if (!iBoxes[10].isCreated())
-			iBoxes[10].Create("iPlayer", 0, 0, 2, 10, 65, 688, 384, sWidth, sHeight, 255, 5);
-		else
-			iBoxes[10].doUpdate();
 
 	/* Calculate the day for the given date */
 	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
@@ -597,7 +581,6 @@ void Signage::Update()
 			{
 				wFadeA[1] = 2;
 				wFadeV[1] = 0;
-				iBoxes[1].Destroy();
 				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
 				{
 					if (wFadeTI == 1)
@@ -617,7 +600,7 @@ void Signage::Update()
 				else
 					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 				weather[0].Load(tBuff);
-				iBoxes[1].Create("Weather Condition", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1);
+				iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1, 1);
 			}
 			if (wFadeV[1] > 255)
 			{
@@ -662,6 +645,29 @@ void Signage::Update()
 		/* Check Board Information */
 		printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 		wUpdateTimer[2] = now;
+		/* Clear old Board Variables */
+		for (int wC = 0; wC < 64; wC++)
+		{
+			for (int vC = 0; vC < 64; vC++)
+			{
+				tDuration[wC][vC] = false;
+				sprintf(tType[wC][vC], "");
+				sprintf(tSrc[wC][vC], "");
+			}
+			validConfig[wC] = false;
+			tEn[wC] = false;
+			tPX[wC] = false;
+			tPY[wC] = false;
+			tSc[wC] = false;
+			tBr[wC] = false;
+			tW[wC] = false;
+			tH[wC] = false;
+			tBt[wC] = false;
+			tA[wC] = false;
+			// tTs[wC] = false;
+			// sprintf(tUID[wC], "");
+			sprintf(bSection[wC], "");
+		}
 		DIR *d;
 		vector<string> dList;
 		struct dirent *dir;
@@ -684,9 +690,6 @@ void Signage::Update()
 				/* Check for valid Configuration Files and Contents */
 				char tFName[128];
 				sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
-				bool validConfig = false;
-				int tEn, tPX, tPY, tSc, tBr, tW, tH, tBt, tA, tTs, tDuration[64];
-				char tUID[128], tType[64][128], tSrc[64][128];
 				if (FileExists(tFName))
 				{
 					/* Found a config gile, parse it... */
@@ -698,64 +701,74 @@ void Signage::Update()
 						CIniKey* pKey;
 						if (pSection->GetKey("Enabled"))
 						{
-							tEn = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
-							if (tEn == 1)
+							tEn[dS] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
+							if (tEn[dS] == 1)
 							{
-								if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale")) && (pSection->GetKey("Border"))
-										&& (pSection->GetKey("Width")) && (pSection->GetKey("Height")) && (pSection->GetKey("Boards")) && (pSection->GetKey(
-										"Alert")) && (pSection->GetKey("TimeStamp")))
+								if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
+										&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
+										&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp")))
 								{
-									sprintf(tUID, "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
-									tPX = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-									tPY = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-									tSc = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-									tBr = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-									tW = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-									tH = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-									tBt = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-									tA = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-									tTs = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-									validConfig = true;
+									/* Only alter these details if UID and TS differ */
+									if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[dS]) != 0)
+											&& (tTs[dS] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
+									{
+										tBC[dS] = -1;
+										tBR[dS] = 0;
+									}
+									sprintf(tFldr[dS], "%s", dList[dS].c_str());
+									sprintf(tUID[dS], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+									tPX[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+									tPY[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+									tSc[dS] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+									tBr[dS] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+									tW[dS] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+									tH[dS] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+									tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+									tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+									tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+									validConfig[dS] = true;
 								}
 							}
 						}
 					}
-					if (validConfig == true)
+					if (validConfig[dS] == true)
 					{
 						/* Check Each Board for this item */
-						int tBtC = tBt;
+						int tBtC = tBt[dS];
 						for (int brdC = 0; brdC < tBtC; brdC++)
 						{
-							char bSection[32];
-							sprintf(bSection, "Board-%i", brdC + 1);
-							pSection = ini.GetSection(bSection);
+							sprintf(bSection[dS], "Board-%i", brdC + 1);
+							pSection = ini.GetSection(bSection[dS]);
 							if (pSection)
 							{
 								printf(".");
 								/* Now get the Data */
 								if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
 								{
-									sprintf(tType[brdC], "%s", ini.GetKeyValue(bSection, "Type").c_str());
-									sprintf(tSrc[brdC], "%s", ini.GetKeyValue(bSection, "Src").c_str());
-									tDuration[brdC] = atoi(ini.GetKeyValue(bSection, "Duration").c_str());
-								} else
-									validConfig = false;
+									sprintf(tType[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
+									sprintf(tSrc[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
+									tDuration[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
+									tSType[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+								}
+								else
+									validConfig[dS] = false;
 							}
 							else
 							{
 								printf(".");
-								tBt--;
+								tBt[dS]--;
 							}
 						}
 					}
 				}
-				if (validConfig == true)
+				if (validConfig[dS] == true)
 				{
 					/* We need to check to see if the board already exists, with the correct timestamp data. */
-					printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID, tBt);
-					for (int brdO = 0; brdO < tBt; brdO++)
+					printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[dS], tBt[dS]);
+					for (int brdO = 0; brdO < tBt[dS]; brdO++)
 					{
-						printf("\t\tBoard %i\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO+1, tType[brdO], tSrc[brdO], tDuration[brdO]);
+						printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
+								tSrc[dS][brdO], tDuration[dS][brdO]);
 					}
 				}
 				else
@@ -765,11 +778,157 @@ void Signage::Update()
 			}
 		}
 	}
+
+	if (now > (wUpdateTimer[3] + 1))
+	{
+		/* Do Forward Board Sorting to add/update boards when configs change */
+		wUpdateTimer[3] = now;
+		for (int tB = 0; tB < 64; tB++)
+		{
+			bool bFound = false;
+			for (int pB = 10; pB < 74; pB++)
+			{
+				if (iBoxes[pB].isCreated())
+				{
+					for (int ttB = 0; ttB < 64; ttB++)
+					{
+						if (strlen(tSrc[tB][ttB]) > 0)
+						{
+							if (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0)
+							{
+								/* We Found a Board!  Check the TimeStamp */
+								if (tTs[tB] != iBoxes[pB].GetTStamp())
+									/* Time Stamp Not Match - Signal for Board Destroy */
+									if (iBoxes[pB].stype() != -1)
+										iBoxes[pB].Destroy();
+								bFound = true;
+								break;
+							}
+						}
+					}
+				}
+				else if (bFound == true)
+					break;
+			}
+			if (bFound == false)
+			{
+				/* Add Board Config */
+				for (int pB = 10; pB < 74; pB++)
+				{
+					if (strlen(tSrc[tB][0]) > 0)
+					{
+						if (iBoxes[pB].isCreated() == false)
+						{
+							/* Empty Board Location - Create */
+							if (strcmp(*tType[tB], "image") == 0)
+							{
+								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
+										tBC[tB]);
+								break;
+							}
+							if (strcmp(*tType[tB], "mplayer") == 0)
+							{
+								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
+										tBC[tB]);
+								break;
+							}
+							if (strcmp(*tType[tB], "iplayer") == 0)
+							{
+								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
+										tSType[tB][0], tBC[tB]);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		/* Do Reverse Sorting - Remove Boards which are no longer present/disabled */
+	}
+
+	/* Do Board Timer Events */
+	for (int tB = 0; tB < 64; tB++)
+	{
+		for (int pB = 10; pB < 74; pB++)
+		{
+			if (iBoxes[pB].isCreated())
+			{
+				for (int ttB = 0; ttB < 64; ttB++)
+				{
+					if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1))
+					{
+						/* Valid Board Found */
+						bool resetClicks = false;
+						if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
+						{
+							if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
+							{
+								printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%i\n", now, pB, iBoxes[pB].getScreen(), ttB + 1,
+										tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB]);
+
+								/* Destroy broken Streaming Events */
+								if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
+								{
+									/* Destroy iPlayer/Media Reference */
+									iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+								}
+
+								tBR[tB]++;
+								if (tBR[tB] > tBt[tB] - 1)
+									tBR[tB] = 0;
+							}
+
+							/* Process Fade Out Events */
+							if (tBR[tB] != tBC[tB])
+							{
+								pFade[tB] = pFade[tB] - 5;
+								if (pFade[tB] < 0)
+									pFade[tB] = 0;
+							}
+
+							/* Swap Textures (if applicable) */
+							if ((tBR[tB] != tBC[tB]) && (pFade[tB] == 0))
+							{
+								tBC[tB] = tBR[tB];
+								iBoxes[pB].setScreen(tBC[tB]);
+								char bdID[128];
+								sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+								if (FileExists(bdID) == false)
+									sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
+								bTex[tB].Destroy();
+								bTex[tB].Load(bdID);
+								iBoxes[pB].SwapTex(bTex[tB].gltex());
+								iBoxes[pB].setClicks(0); /* Set to 0 to take into account of different timings per page */
+							}
+
+							/* Process Fade In Events */
+							if (tBR[tB] == tBC[tB])
+							{
+								pFade[tB] = pFade[tB] + 5;
+								if (pFade[tB] > 255)
+								{
+									pFade[tB] = 255;
+								}
+								if (pFade[tB] == 255)
+									resetClicks = true;
+							}
+
+							/* Reset Clicks */
+							if (resetClicks)
+								iBoxes[pB].setClicks(now);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void Signage::Draw()
 {
-	// Draw something with Logotex
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
@@ -826,19 +985,28 @@ void Signage::Draw()
 		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
 	}
 
-	// Draw Boxes
+// Draw Boxes
 	for (int n = 0; n < 128; n++)
 	{
 		if (iBoxes[n].isCreated())
 		{
-			if ((n == 1))
+			if (n < 10)
 			{
-				if (!iBoxes[n].doDraw(wFadeV[1]))
-					m_bRunning = false;
+				if ((n == 1))
+				{
+					/* Weather Box */
+					if (!iBoxes[n].doDraw(wFadeV[1]))
+						m_bRunning = false;
+				}
+				else
+				{
+					if (!iBoxes[n].doDraw(-1))
+						m_bRunning = false;
+				}
 			}
 			else
 			{
-				if (!iBoxes[n].doDraw(-1))
+				if (!iBoxes[n].doDraw(pFade[n - 10]))
 					m_bRunning = false;
 			}
 		}
@@ -863,23 +1031,40 @@ void Signage::Clean()
 	{
 		if (iBoxes[n].isCreated())
 		{
-			printf("Destroying Box iBoxes[%i]...\n", n);
-			iBoxes[n].Destroy();
+			if (iBoxes[n].stype() != -1)
+			{
+				printf("Destroying Box iBoxes[%i]...\n", n);
+				iBoxes[n].Destroy();
+			}
 		}
 	}
 
-	/* Delete Any and All Testures */
-	printf("Destroying Texture pLogo... ");
-	pLogo.Destroy();
+	m_bRunning = false;
 
-	printf("Destroying Texture weather... ");
-	weather[0].Destroy();
-	int n;
-	for (n = 0; n < 10; n++)
+	/* Sanity Check */
+	for (int n = 0; n < 128; n++)
 	{
-		printf("Destroying Font fntCGothic[%i]... ", n);
-		TTF_CloseFont(fntCGothic[n]);
-		printf("OK\n");
+		if (iBoxes[n].isCreated())
+		{
+			m_bRunning = true;
+		}
+	}
+
+	if (m_bRunning == false)
+	{
+		/* Delete Any and All Testures */
+		printf("Destroying Texture pLogo... ");
+		pLogo.Destroy();
+
+		printf("Destroying Texture weather... ");
+		weather[0].Destroy();
+		int n;
+		for (n = 0; n < 10; n++)
+		{
+			printf("Destroying Font fntCGothic[%i]... ", n);
+			TTF_CloseFont(fntCGothic[n]);
+			printf("OK\n");
+		}
 	}
 }
 
@@ -979,26 +1164,37 @@ int Signage::dayInYear(int dd, int mm)
 	{
 	case 11:
 		dd += 30;
+		break;
 	case 10:
 		dd += 31;
+		break;
 	case 9:
 		dd += 30;
+		break;
 	case 8:
 		dd += 31;
+		break;
 	case 7:
 		dd += 31;
+		break;
 	case 6:
 		dd += 30;
+		break;
 	case 5:
 		dd += 31;
+		break;
 	case 4:
 		dd += 30;
+		break;
 	case 3:
 		dd += 31;
+		break;
 	case 2:
 		dd += 28;
+		break;
 	case 1:
 		dd += 31;
+		break;
 	}
 	return dd;
 }
