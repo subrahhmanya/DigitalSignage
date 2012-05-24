@@ -3,3 +3,17 @@
 infodisplay.cpp~
 Makefile~
 updater/puTasks.sh~
+Debug/OrbitalDigitalSignage
+Debug/box.d
+Debug/box.o
+Debug/fps_counter.d
+Debug/fps_counter.o
+Debug/inifile.d
+Debug/inifile.o
+Debug/main.d
+Debug/main.o
+Debug/signage.d
+Debug/signage.o
+Debug/textures.d
+Debug/textures.o
+

@@ -12,7 +12,8 @@ int main(int argc, char* argv[])
 {
 	srand(time(NULL)); /* Randomise Time Seed */
 	Signage signage;
-	signage.Init("Digital Signage", 1280, 720, 32, true);
+
+	signage.Init("Digital Signage", 1280, 720, 32, FileExists("/screen/full"));
 
 	while (signage.Running())
 	{
@@ -35,4 +36,16 @@ int main(int argc, char* argv[])
 	printf("OrbitalDigitalSignage has cleanly exited.\n");
 
 	return 0;
+}
+
+bool FileExists(const char* FileName)
+{
+	FILE* fp = NULL;
+	fp = fopen(FileName, "rb");
+	if (fp != NULL)
+	{
+		fclose(fp);
+		return true;
+	}
+	return false;
 }
