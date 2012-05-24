@@ -30,6 +30,7 @@ rm -rf ${scrroot}textures > /dev/null 2>&1
 #Compile infodisplay
 logOut "Compiling InfoDisplay..."
 cd ${srcroot}Debug/ > /dev/null 2>&1
+make clean > /dev/null 2>&1
 make > /dev/null 2>&1
 
 #Move new binary and associated files...
