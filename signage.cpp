@@ -773,6 +773,17 @@ void Signage::Update()
 				}
 				else
 				{
+					sprintf(tFldr[dS], "%s", "");
+					sprintf(tUID[dS], "%s", "");
+					tPX[dS] = 0;
+					tPY[dS] = 0;
+					tSc[dS] = 0;
+					tBr[dS] = 0;
+					tW[dS] = 0;
+					tH[dS] = 0;
+					tBt[dS] = 0;
+					tA[dS] = 0;
+					tTs[dS] = 0;
 					printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 				}
 			}
@@ -815,38 +826,52 @@ void Signage::Update()
 				/* Add Board Config */
 				for (int pB = 10; pB < 74; pB++)
 				{
-					if (strlen(tSrc[tB][0]) > 0)
+					if ((strlen(tSrc[tB][0]) > 0) && (iBoxes[pB].isCreated() == false))
 					{
-						if (iBoxes[pB].isCreated() == false)
+						/* Empty Board Location - Create */
+						if (strcmp(*tType[tB], "image") == 0)
 						{
-							/* Empty Board Location - Create */
-							if (strcmp(*tType[tB], "image") == 0)
-							{
-								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
-										tBC[tB]);
-								break;
-							}
-							if (strcmp(*tType[tB], "mplayer") == 0)
-							{
-								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
-										tBC[tB]);
-								break;
-							}
-							if (strcmp(*tType[tB], "iplayer") == 0)
-							{
-								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										tSType[tB][0], tBC[tB]);
-								break;
-							}
+							printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
+							iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
+									tBC[tB]);
+							break;
+						}
+						if (strcmp(*tType[tB], "mplayer") == 0)
+						{
+							printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
+							iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
+									tBC[tB]);
+							break;
+						}
+						if (strcmp(*tType[tB], "iplayer") == 0)
+						{
+							printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
+							iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
+									tSType[tB][0], tBC[tB]);
+							break;
 						}
 					}
 				}
 			}
 		}
 		/* Do Reverse Sorting - Remove Boards which are no longer present/disabled */
+		for (int pB = 10; pB < 74; pB++)
+		{
+			if (iBoxes[pB].isCreated())
+			{
+				bool bFound = false;
+				for (int tB = 0; tB < 64; tB++)
+				{
+					if ((strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (tTs[tB] == iBoxes[pB].GetTStamp()))
+					{
+						/* We Found a Board!  Check the TimeStamp */
+						bFound = true;
+					}
+				}
+				if (bFound == false)
+					iBoxes[pB].Destroy();
+			}
+		}
 	}
 
 	/* Do Board Timer Events */
@@ -866,8 +891,8 @@ void Signage::Update()
 						{
 							if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
 							{
-								printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%i\n", now, pB, iBoxes[pB].getScreen(), ttB + 1,
-										tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB]);
+								printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%i\n", now, pB, iBoxes[pB].getScreen(),
+										ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB]);
 
 								/* Destroy broken Streaming Events */
 								if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
