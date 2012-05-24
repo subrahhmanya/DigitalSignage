@@ -708,9 +708,9 @@ void Signage::Update()
 										&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
 										&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp")))
 								{
-									/* Only alter these details if UID and TS differ */
+									/* Only alter these details if UID or TS differ */
 									if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[dS]) != 0)
-											&& (tTs[dS] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
+											|| (tTs[dS] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
 									{
 										tBC[dS] = -1;
 										tBR[dS] = 0;
@@ -1010,7 +1010,7 @@ void Signage::Draw()
 		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
 	}
 
-// Draw Boxes
+	/* Draw Boxes */
 	for (int n = 0; n < 128; n++)
 	{
 		if (iBoxes[n].isCreated())
