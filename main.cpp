@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	bool isFullScreen = false;
 
 	if (FileExists("/screen/full"))
-		isFullScreen = true
+		isFullScreen = true;
 
 	signage.Init("Digital Signage", 1280, 720, 32, isFullScreen);
 
