@@ -759,6 +759,24 @@ void Signage::Update()
 								tBt[dS]--;
 							}
 						}
+
+						/* Get Alert Board Information */
+						sprintf(bSection[dS], "Alert");
+						pSection = ini.GetSection(bSection[dS]);
+						if (pSection)
+						{
+							printf(".");
+							/* Now get the Data */
+							if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
+							{
+								sprintf(aType[dS], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
+								sprintf(aSrc[dS], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
+								aDuration[dS] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
+								aSType[dS] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+							}
+							else
+								tA[dS] = 0;
+						}
 					}
 				}
 				if (validConfig[dS] == true)
@@ -769,6 +787,11 @@ void Signage::Update()
 					{
 						printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
 								tSrc[dS][brdO], tDuration[dS][brdO]);
+					}
+					if (tA[dS] == 1)
+					{
+						printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[dS], aType[dS], aSrc[dS],
+								aDuration[dS]);
 					}
 				}
 				else
@@ -1008,6 +1031,7 @@ void Signage::Draw()
 	else
 	{
 		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
+		iBoxes[1].Destroy();
 	}
 
 	/* Draw Boxes */
