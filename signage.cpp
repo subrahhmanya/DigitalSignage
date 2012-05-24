@@ -1043,7 +1043,7 @@ void Signage::Draw()
 	counter.tick();
 	currentFPS = counter.get_fps();
 	sprintf(FPSC, "FPS - %i", currentFPS);
-	drawText(FPSC, fntCGothic[0], 1, 255, 255, 255, 255, 2, 0);
+	// drawText(FPSC, fntCGothic[0], 1, 255, 255, 255, 255, 2, 0);
 
 	/* Swap Buffers */
 	SDL_GL_SwapBuffers();
