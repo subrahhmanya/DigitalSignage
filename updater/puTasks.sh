@@ -38,8 +38,8 @@ logOut "Copying new infodisplay files..."
 cp ${srcroot}Debug/OrbitalDigitalSignage ${scrroot}infodisplay > /dev/null 2>&1
 rm ${srcroot}Debug/OrbitalDigitalSignage > /dev/null 2>&1
 cp ${srcroot}updater/runcheck.sh ${scrroot} > /dev/null 2>&1
-cp -a fonts ${scrroot} > /dev/null 2>&1
-cp -a textures ${scrroot} > /dev/null 2>&1
+cp -a ${srcroot}fonts ${scrroot} > /dev/null 2>&1
+cp -a ${srcroot}textures ${scrroot} > /dev/null 2>&1
 
 # Load Application
 logOut "Launching InfoDisplay..."
