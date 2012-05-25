@@ -980,11 +980,37 @@ void Signage::Update()
 			}
 		}
 	}
-	/* Save Screenshot every 5 seconds */
-	if (now > wUpdateTimer[4] + 5)
-	{
+	/* Save Screenshot every 29 seconds */
+	if (wUpdateTimer[4] == 0)
 		wUpdateTimer[4] = now;
 
+	if (now >= wUpdateTimer[4] + 29)
+	{
+		printf("Generating Screendump...");
+		wUpdateTimer[4] = now;
+		SDL_Surface * scrimage = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
+
+		glReadBuffer(GL_FRONT);
+		//glReadPixels(0, 0, screen->w, screen->h, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+		void *pixels = malloc(screen->w * screen->h * 3);
+		if (pixels == NULL)
+		{
+			SDL_FreeSurface(scrimage);
+			return;
+		}
+
+		// Read OpenGL frame buffer
+		glReadPixels(0, 0, screen->w, screen->h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+		// Copy pixel buffer (which is upside-down) to surface
+		for (int y = 0; y < screen->h; y++)
+			memcpy(scrimage->pixels + scrimage->pitch * y, pixels + screen->w * 3 * (screen->h - y - 1), screen->w * 3);
+		free(pixels);
+
+		SDL_SaveBMP(scrimage, "/screen/SCRDUMP.bmp");
+		SDL_FreeSurface(scrimage);
+		printf("[OK] (%is)\n", now - wUpdateTimer[4]);
 	}
 }
 
@@ -1528,9 +1554,4 @@ bool Signage::FileExists(const char* FileName)
 		return true;
 	}
 	return false;
-}
-
-int Signage::Screenshot(char *filename)
-{
-	return 0;
 }

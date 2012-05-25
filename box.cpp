@@ -106,6 +106,8 @@ bool Box::doDraw(int aOverride)
 						sprintf(bgID, "/screen/textures/iplayer/generic_fail.png");
 					ipBG.Load(bgID);
 					glTex = ipBG.gltex();
+				} else {
+					glTex = 0;
 				}
 
 				sdl_info.info.x11.unlock_func();
