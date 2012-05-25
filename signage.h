@@ -53,7 +53,7 @@ public:
 	}
 private:
 	SDL_Surface* screen;
-	bool m_bFullscreen, m_bRunning;
+	bool m_bFullscreen, m_bRunning, m_bQuitting;
 	Texture pLogo;
 	Texture weather[3];
 	Texture bTex[64];

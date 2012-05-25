@@ -127,6 +127,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
+	m_bQuitting = false;
 	wCurDisp = 0;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -187,6 +188,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	{
 		fprintf(stderr, "Video mode set failed: %s\n", SDL_GetError());
 		m_bRunning = false;
+		m_bQuitting = true;
 	}
 
 	m_bFullscreen = fullscreen;
@@ -260,484 +262,513 @@ void Signage::HandleEvents(Signage* signage)
 
 void Signage::Update()
 {
-	/* Process and Time String */
-	int days;
-	char daysInWord[8];
-	char monthsInWord[8];
-	char mins[8];
+	/* Only perform Update if Running */
 
-	time_t now = time(0);
-	ltm = localtime(&now);
-
-	/* Calculate Sunrise/Sunset */
-
-	/* Calculate the day for Dec 31 of the previous year */
-	days = calcDay_Dec31(1900 + ltm->tm_year);
-	if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
-		iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(), pLogo.height(),
-				sWidth, sHeight, 200, 1, 1);
-	else
-		iBoxes[0].doUpdate();
-
-	/* Calculate the day for the given date */
-	days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
-
-	/* Add one day if the year is leap year and desired date is after February */
-	if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0 || (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
-		days++;
-	if (days == 7)
-		days = 0;
-	/* Get string values for Day and Year */
-	dayInStr(daysInWord, days);
-	monthInStr(monthsInWord, ltm->tm_mon);
-	nthInStr(nthsInWord, ltm->tm_mday);
-	/* Add a leading 0 to the date if we are less than the 10th into the month */
-	if (ltm->tm_min < 10)
-		sprintf(mins, "0%i", ltm->tm_min);
-	else
-		sprintf(mins, "%i", ltm->tm_min);
-
-	/* Create the Date/Time String - We want blinking : */
-	if (tC1 != ltm->tm_sec)
+	if (m_bQuitting == false)
 	{
-		if (bV1)
-			bV1 = false;
+		/* Process and Time String */
+		int days;
+		char daysInWord[8];
+		char monthsInWord[8];
+		char mins[8];
+
+		time_t now = time(0);
+		ltm = localtime(&now);
+
+		/* Calculate Sunrise/Sunset */
+
+		/* Calculate the day for Dec 31 of the previous year */
+		days = calcDay_Dec31(1900 + ltm->tm_year);
+		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
+			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
+					pLogo.height(), sWidth, sHeight, 200, 1, 1);
 		else
-			bV1 = true;
+			iBoxes[0].doUpdate();
 
-		tC1 = ltm->tm_sec;
-	}
-	sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+		/* Calculate the day for the given date */
+		days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
 
-	/* Process Weather Information */
-	/* Do Weather Check (update once every 15 minutes) */
-	if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
-	{
-		if (wLastCheckM != ltm->tm_min)
+		/* Add one day if the year is leap year and desired date is after February */
+		if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0 || (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
+			days++;
+		if (days == 7)
+			days = 0;
+		/* Get string values for Day and Year */
+		dayInStr(daysInWord, days);
+		monthInStr(monthsInWord, ltm->tm_mon);
+		nthInStr(nthsInWord, ltm->tm_mday);
+		/* Add a leading 0 to the date if we are less than the 10th into the month */
+		if (ltm->tm_min < 10)
+			sprintf(mins, "0%i", ltm->tm_min);
+		else
+			sprintf(mins, "%i", ltm->tm_min);
+
+		/* Create the Date/Time String - We want blinking : */
+		if (tC1 != ltm->tm_sec)
 		{
-			/* Update last check interval */
-			wLastCheckM = ltm->tm_min;
-
-			if (ltm->tm_min < 10)
-			{
-				printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
-			}
+			if (bV1)
+				bV1 = false;
 			else
-			{
-				printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
-			}
-			/* Hour is odd, we call check */
-			tFarenheight = 0;
-			tCondition = 0;
-			tHumidity = 0;
-			tIcon = 0;
-			tWind = 0;
-			wFadeTI = 0;
-			wOK = false; /* New Check - default wOK to false (so data regarded dirty first) */
-			xmlDoc *doc = NULL;
-			xmlNode *root_element = NULL;
+				bV1 = true;
 
-			LIBXML_TEST_VERSION // Macro to check API for match with
-			// the DLL we are using
-			/*parse the file and get the DOM */
-			doc = xmlReadFile("http://www.google.com/ig/api?weather=Swynnerton", NULL, 0);
-			if (doc)
-			{
-
-				/*Get the root element node */
-				root_element = xmlDocGetRootElement(doc);
-				parseWeather(root_element);
-				xmlFreeDoc(doc); // free document
-				xmlCleanupParser(); // Free globals
-				/* Update last check interval */
-				if (wOK)
-					wLastCheckH = ltm->tm_hour;
-				else
-					wLastCheckH = -5;
-			}
-			else
-			{
-				/* Update last check interval (we want to check in another minute) */
-				printf("NO DATA/NET CONNECTION\n");
-				wLastCheckH = -5;
-				wOK = false;
-			}
-			/* Calculate Weather */
-			wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
-			sprintf(wTemp, "%.1fºC", wCelcius);
+			tC1 = ltm->tm_sec;
 		}
-	}
-	if (wOK)
-	{
-		/* Set the Weather Icon */
-		if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0)
-			tIcon = 0;
-		if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0)
-			tIcon = 1;
-		if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0)
-			tIcon = 2;
-		if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0)
-			tIcon = 3;
-		if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0)
-			tIcon = 4;
-		if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0)
-			tIcon = 5;
-		if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) == 0)
-			tIcon = 6;
-		if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0)
-			tIcon = 7;
-		if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0)
-			tIcon = 8;
-		if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0)
-			tIcon = 11;
-		if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0)
-			tIcon = 12;
-		if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0)
-			tIcon = 13;
-		if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0)
-			tIcon = 14;
-		if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0)
-			tIcon = 15;
-		if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0)
-			tIcon = 16;
-		if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0)
-			tIcon = 17;
-		if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0)
-			tIcon = 18;
-		if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0)
-			tIcon = 19;
-		if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0)
-			tIcon = 20;
-		if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0)
-			tIcon = 21;
-		if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0)
-			tIcon = 23;
+		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
-		/* Do Looping Weather Animations */
-		if (now > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
+		/* Process Weather Information */
+		/* Do Weather Check (update once every 15 minutes) */
+		if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
 		{
-			if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
+			if (wLastCheckM != ltm->tm_min)
+			{
+				/* Update last check interval */
+				wLastCheckM = ltm->tm_min;
+
+				if (ltm->tm_min < 10)
+				{
+					printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+				}
+				else
+				{
+					printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+				}
+				/* Hour is odd, we call check */
+				tFarenheight = 0;
+				tCondition = 0;
+				tHumidity = 0;
+				tIcon = 0;
+				tWind = 0;
+				wFadeTI = 0;
+				wOK = false; /* New Check - default wOK to false (so data regarded dirty first) */
+				xmlDoc *doc = NULL;
+				xmlNode *root_element = NULL;
+
+				LIBXML_TEST_VERSION // Macro to check API for match with
+				// the DLL we are using
+				/*parse the file and get the DOM */
+				doc = xmlReadFile("http://www.google.com/ig/api?weather=Swynnerton", NULL, 0);
+				if (doc)
+				{
+
+					/*Get the root element node */
+					root_element = xmlDocGetRootElement(doc);
+					parseWeather(root_element);
+					xmlFreeDoc(doc); // free document
+					xmlCleanupParser(); // Free globals
+					/* Update last check interval */
+					if (wOK)
+						wLastCheckH = ltm->tm_hour;
+					else
+						wLastCheckH = -5;
+				}
+				else
+				{
+					/* Update last check interval (we want to check in another minute) */
+					printf("NO DATA/NET CONNECTION\n");
+					wLastCheckH = -5;
+					wOK = false;
+				}
+				/* Calculate Weather */
+				wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
+				sprintf(wTemp, "%.1fºC", wCelcius);
+			}
+		}
+		if (wOK)
+		{
+			/* Set the Weather Icon */
+			if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0)
+				tIcon = 0;
+			if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0)
+				tIcon = 1;
+			if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0)
+				tIcon = 2;
+			if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0)
+				tIcon = 3;
+			if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0)
+				tIcon = 4;
+			if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0)
+				tIcon = 5;
+			if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) == 0)
+				tIcon = 6;
+			if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0)
+				tIcon = 7;
+			if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0)
+				tIcon = 8;
+			if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0)
+				tIcon = 11;
+			if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0)
+				tIcon = 12;
+			if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0)
+				tIcon = 13;
+			if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0)
+				tIcon = 14;
+			if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0)
+				tIcon = 15;
+			if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0)
+				tIcon = 16;
+			if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0)
+				tIcon = 17;
+			if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0)
+				tIcon = 18;
+			if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0)
+				tIcon = 19;
+			if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0)
+				tIcon = 20;
+			if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0)
+				tIcon = 21;
+			if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0)
+				tIcon = 23;
+
+			/* Do Looping Weather Animations */
+			if (now > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
+			{
+				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
+				{
+					wUpdateTimer[1] = now;
+					switch (wFadeA[1])
+					{
+					case 0:
+						wFadeA[1] = 1;
+						;
+						break;
+					case 1:
+						wFadeA[1] = 2;
+						;
+						break;
+					case 2:
+						wFadeA[1] = 1;
+						;
+						break;
+					}
+				}
+				else
+					wFadeA[1] = 0;
+			}
+
+			if (now > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
+			{
+				wUpdateTimer[0] = now;
+				wFadeA[0] = 1;
+			}
+
+			/* Calculate Sunrise/Sunset */
+			double tzone = 0.0;
+			double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
+			double lambda = FNsun(d);
+			double obliq = 23.439 * rads - .0000004 * rads * d;
+			double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
+			double delta = asin(sin(obliq) * sin(lambda));
+
+			double LL = L - alpha;
+			if (L < pi)
+				LL += tpi;
+			double equation = 1440.0 * (1.0 - LL / tpi);
+			double latit = 52.8943;
+			double longit = -2.2158;
+			double ha = f0(latit, delta);
+
+			double hb = f1(latit, delta);
+			double twx = hb - ha; // length of twilight in radians
+			twx = 12.0 * twx / pi; // length of twilight in degrees
+
+			// Conversion of angle to hours and minutes //
+			daylen = degs * ha / 7.5;
+			if (daylen < 0.0001)
+			{
+				daylen = 0.0;
+			}
+			// arctic winter   //
+
+			double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+			double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+			double noont = riset + 12.0 * ha / pi;
+			double altmax = 90.0 + delta * degs - latit;
+			/* Express as degrees from the N horizon */
+
+			if (delta * degs > latit)
+				altmax = 90.0 + latit - delta * degs;
+
+			if (riset > 24.0)
+				riset -= 24.0;
+			if (settm > 24.0)
+				settm -= 24.0;
+			int rhr, rmn, shr, smn;
+			rhr = (int) riset;
+			rmn = (riset - (double) rhr) * 60;
+			shr = (int) settm;
+			smn = (settm - (double) shr) * 60;
+
+			char tBuff[64] = "";
+
+			if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
+			{
+				/* We are in Day */
+				if (ltm->tm_hour == rhr)
+				{
+					/* We are at first hour */
+					if (ltm->tm_min >= rmn)
+					{
+						if (tSrS != 1)
+						{
+							/* Set Day */
+							tSrS = 1;
+							tOIcon = -1;
+						}
+					}
+					else
+					{
+						if (tSrS != 2)
+						{
+							/* Set Night */
+							tSrS = 2;
+							tOIcon = -1;
+						}
+					}
+				}
+				else if (ltm->tm_hour == shr)
+				{
+					/* We are at last hour */
+					if (ltm->tm_min < smn)
+					{
+						if (tSrS != 1)
+						{
+							/* Set Day */
+							tSrS = 1;
+							tOIcon = -1;
+						}
+					}
+					else
+					{
+						if (tSrS != 2)
+						{
+							/* Set Night */
+							tSrS = 2;
+							tOIcon = -1;
+						}
+					}
+				}
+			}
+			else
+			{
+				/* Obvious Night */
+				if (tSrS != 2)
+				{
+					/* Set Night */
+					tSrS = 2;
+					tOIcon = -1;
+				}
+			}
+
+			if (tSrS == 2)
+				sprintf(tBuff, "/screen/textures/weather/night");
+			else
+				sprintf(tBuff, "/screen/textures/weather/day");
+
+			/* Weather Icon Fading Transition */
+			if ((tIcon != tOIcon) && (wFadeA[1] == 0))
 			{
 				wUpdateTimer[1] = now;
+				wFadeA[1] = 1;
+			}
+			if ((wFadeA[1] == 1) || (wFadeA[1] == 2))
+			{
 				switch (wFadeA[1])
 				{
-				case 0:
-					wFadeA[1] = 1;
-					;
-					break;
 				case 1:
-					wFadeA[1] = 2;
+					wFadeV[1] = wFadeV[1] - 15;
 					;
 					break;
 				case 2:
-					wFadeA[1] = 1;
+					wFadeV[1] = wFadeV[1] + 15;
 					;
 					break;
 				}
-			}
-			else
-				wFadeA[1] = 0;
-		}
-
-		if (now > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
-		{
-			wUpdateTimer[0] = now;
-			wFadeA[0] = 1;
-		}
-
-		/* Calculate Sunrise/Sunset */
-		double tzone = 0.0;
-		double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
-		double lambda = FNsun(d);
-		double obliq = 23.439 * rads - .0000004 * rads * d;
-		double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
-		double delta = asin(sin(obliq) * sin(lambda));
-
-		double LL = L - alpha;
-		if (L < pi)
-			LL += tpi;
-		double equation = 1440.0 * (1.0 - LL / tpi);
-		double latit = 52.8943;
-		double longit = -2.2158;
-		double ha = f0(latit, delta);
-
-		double hb = f1(latit, delta);
-		double twx = hb - ha; // length of twilight in radians
-		twx = 12.0 * twx / pi; // length of twilight in degrees
-
-		// Conversion of angle to hours and minutes //
-		daylen = degs * ha / 7.5;
-		if (daylen < 0.0001)
-		{
-			daylen = 0.0;
-		}
-		// arctic winter   //
-
-		double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-		double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-		double noont = riset + 12.0 * ha / pi;
-		double altmax = 90.0 + delta * degs - latit;
-		/* Express as degrees from the N horizon */
-
-		if (delta * degs > latit)
-			altmax = 90.0 + latit - delta * degs;
-
-		if (riset > 24.0)
-			riset -= 24.0;
-		if (settm > 24.0)
-			settm -= 24.0;
-		int rhr, rmn, shr, smn;
-		rhr = (int) riset;
-		rmn = (riset - (double) rhr) * 60;
-		shr = (int) settm;
-		smn = (settm - (double) shr) * 60;
-
-		char tBuff[64] = "";
-
-		if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
-		{
-			/* We are in Day */
-			if (ltm->tm_hour == rhr)
-			{
-				/* We are at first hour */
-				if (ltm->tm_min >= rmn)
+				if (wFadeV[1] < 0)
 				{
-					if (tSrS != 1)
+					wFadeA[1] = 2;
+					wFadeV[1] = 0;
+					if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
 					{
-						/* Set Day */
-						tSrS = 1;
-						tOIcon = -1;
-					}
-				}
-				else
-				{
-					if (tSrS != 2)
-					{
-						/* Set Night */
-						tSrS = 2;
-						tOIcon = -1;
-					}
-				}
-			}
-			else if (ltm->tm_hour == shr)
-			{
-				/* We are at last hour */
-				if (ltm->tm_min < smn)
-				{
-					if (tSrS != 1)
-					{
-						/* Set Day */
-						tSrS = 1;
-						tOIcon = -1;
-					}
-				}
-				else
-				{
-					if (tSrS != 2)
-					{
-						/* Set Night */
-						tSrS = 2;
-						tOIcon = -1;
-					}
-				}
-			}
-		}
-		else
-		{
-			/* Obvious Night */
-			if (tSrS != 2)
-			{
-				/* Set Night */
-				tSrS = 2;
-				tOIcon = -1;
-			}
-		}
-
-		if (tSrS == 2)
-			sprintf(tBuff, "/screen/textures/weather/night");
-		else
-			sprintf(tBuff, "/screen/textures/weather/day");
-
-		/* Weather Icon Fading Transition */
-		if ((tIcon != tOIcon) && (wFadeA[1] == 0))
-		{
-			wUpdateTimer[1] = now;
-			wFadeA[1] = 1;
-		}
-		if ((wFadeA[1] == 1) || (wFadeA[1] == 2))
-		{
-			switch (wFadeA[1])
-			{
-			case 1:
-				wFadeV[1] = wFadeV[1] - 15;
-				;
-				break;
-			case 2:
-				wFadeV[1] = wFadeV[1] + 15;
-				;
-				break;
-			}
-			if (wFadeV[1] < 0)
-			{
-				wFadeA[1] = 2;
-				wFadeV[1] = 0;
-				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
-				{
-					if (wFadeTI == 1)
-					{
-						if (wCelcius <= 3.0)
-							sprintf(tBuff, "%s/9.png", tBuff);
+						if (wFadeTI == 1)
+						{
+							if (wCelcius <= 3.0)
+								sprintf(tBuff, "%s/9.png", tBuff);
+							else
+								sprintf(tBuff, "%s/22.png", tBuff);
+						}
 						else
-							sprintf(tBuff, "%s/22.png", tBuff);
+							sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
+						if (wFadeTI == 1)
+							wFadeTI = 0;
+						else
+							wFadeTI = 1;
 					}
 					else
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
-					if (wFadeTI == 1)
-						wFadeTI = 0;
-					else
-						wFadeTI = 1;
+					weather[0].Load(tBuff);
+					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1,
+							1);
 				}
-				else
-					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
-				weather[0].Load(tBuff);
-				iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1, 1);
+				if (wFadeV[1] > 255)
+				{
+					wFadeV[1] = 255;
+					wFadeA[1] = 0;
+					tOIcon = tIcon;
+				}
 			}
-			if (wFadeV[1] > 255)
+
+			/* Process Fading Weather Info */
+			if ((wFadeA[0] == 1) || (wFadeA[0] == 2))
 			{
-				wFadeV[1] = 255;
-				wFadeA[1] = 0;
-				tOIcon = tIcon;
+				switch (wFadeA[0])
+				{
+				case 1:
+					wFadeV[0] = wFadeV[0] - 15;
+					;
+					break;
+				case 2:
+					wFadeV[0] = wFadeV[0] + 15;
+					;
+					break;
+				}
+				if (wFadeV[0] < 0)
+				{
+					wFadeA[0] = 2;
+					wFadeV[0] = 0;
+					wCurDisp++;
+					if (wCurDisp == 3)
+						wCurDisp = 0;
+				}
+				if (wFadeV[0] > 255)
+				{
+					wFadeV[0] = 255;
+					wFadeA[0] = 0;
+				}
 			}
 		}
 
-		/* Process Fading Weather Info */
-		if ((wFadeA[0] == 1) || (wFadeA[0] == 2))
+		if (now > (wUpdateTimer[2] + 10))
 		{
-			switch (wFadeA[0])
+			/* Check Board Information */
+			printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+			wUpdateTimer[2] = now;
+			/* Clear old Board Variables */
+			for (int wC = 0; wC < 64; wC++)
 			{
-			case 1:
-				wFadeV[0] = wFadeV[0] - 15;
-				;
-				break;
-			case 2:
-				wFadeV[0] = wFadeV[0] + 15;
-				;
-				break;
-			}
-			if (wFadeV[0] < 0)
-			{
-				wFadeA[0] = 2;
-				wFadeV[0] = 0;
-				wCurDisp++;
-				if (wCurDisp == 3)
-					wCurDisp = 0;
-			}
-			if (wFadeV[0] > 255)
-			{
-				wFadeV[0] = 255;
-				wFadeA[0] = 0;
-			}
-		}
-	}
-
-	if (now > (wUpdateTimer[2] + 10))
-	{
-		/* Check Board Information */
-		printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-		wUpdateTimer[2] = now;
-		/* Clear old Board Variables */
-		for (int wC = 0; wC < 64; wC++)
-		{
-			for (int vC = 0; vC < 64; vC++)
-			{
-				tDuration[wC][vC] = false;
-				sprintf(tType[wC][vC], "");
-				sprintf(tSrc[wC][vC], "");
-			}
-			validConfig[wC] = false;
-			tEn[wC] = false;
-			tPX[wC] = false;
-			tPY[wC] = false;
-			tSc[wC] = false;
-			tBr[wC] = false;
-			tW[wC] = false;
-			tH[wC] = false;
-			tBt[wC] = false;
-			tA[wC] = false;
-			// tTs[wC] = false;
-			// sprintf(tUID[wC], "");
-			sprintf(bSection[wC], "");
-		}
-		DIR *d;
-		vector<string> dList;
-		struct dirent *dir;
-		d = opendir("/screen/boards/");
-		if (d)
-		{
-			while ((dir = readdir(d)) != NULL)
-			{
-				if ((strcmp(".", dir->d_name) != 0) && (strcmp("..", dir->d_name) != 0))
+				for (int vC = 0; vC < 64; vC++)
 				{
-					dList.push_back(dir->d_name);
+					tDuration[wC][vC] = false;
+					sprintf(tType[wC][vC], "");
+					sprintf(tSrc[wC][vC], "");
 				}
+				validConfig[wC] = false;
+				tEn[wC] = false;
+				tPX[wC] = false;
+				tPY[wC] = false;
+				tSc[wC] = false;
+				tBr[wC] = false;
+				tW[wC] = false;
+				tH[wC] = false;
+				tBt[wC] = false;
+				tA[wC] = false;
+				// tTs[wC] = false;
+				// sprintf(tUID[wC], "");
+				sprintf(bSection[wC], "");
 			}
-			closedir(d);
-			sort(dList.begin(), dList.end()); /* Sort Array */
-			printf("Directories Found = %i\n", dList.size());
-			for (int dS = 0; dS < dList.size(); dS++)
+			DIR *d;
+			vector<string> dList;
+			struct dirent *dir;
+			d = opendir("/screen/boards/");
+			if (d)
 			{
-				printf("Parsing Board '%s'.", dList[dS].c_str());
-				/* Check for valid Configuration Files and Contents */
-				char tFName[128];
-				sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
-				if (FileExists(tFName))
+				while ((dir = readdir(d)) != NULL)
 				{
-					/* Found a config gile, parse it... */
-					CIniFile ini;
-					ini.Load(tFName);
-					CIniSection* pSection = ini.GetSection("BoardSettings");
-					if (pSection)
+					if ((strcmp(".", dir->d_name) != 0) && (strcmp("..", dir->d_name) != 0))
 					{
-						CIniKey* pKey;
-						if (pSection->GetKey("Enabled"))
+						dList.push_back(dir->d_name);
+					}
+				}
+				closedir(d);
+				sort(dList.begin(), dList.end()); /* Sort Array */
+				printf("Directories Found = %i\n", dList.size());
+				for (int dS = 0; dS < dList.size(); dS++)
+				{
+					printf("Parsing Board '%s'.", dList[dS].c_str());
+					/* Check for valid Configuration Files and Contents */
+					char tFName[128];
+					sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
+					if (FileExists(tFName))
+					{
+						/* Found a config gile, parse it... */
+						CIniFile ini;
+						ini.Load(tFName);
+						CIniSection* pSection = ini.GetSection("BoardSettings");
+						if (pSection)
 						{
-							tEn[dS] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
-							if (tEn[dS] == 1)
+							CIniKey* pKey;
+							if (pSection->GetKey("Enabled"))
 							{
-								if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
-										&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
-										&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp")))
+								tEn[dS] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
+								if (tEn[dS] == 1)
 								{
-									/* Only alter these details if UID or TS differ */
-									if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[dS]) != 0)
-											|| (tTs[dS] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
+									if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
+											&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
+											&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp")))
 									{
-										tBC[dS] = -1;
-										tBR[dS] = 0;
+										/* Only alter these details if UID or TS differ */
+										if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[dS]) != 0)
+												|| (tTs[dS] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
+										{
+											tBC[dS] = -1;
+											tBR[dS] = 0;
+										}
+										sprintf(tFldr[dS], "%s", dList[dS].c_str());
+										sprintf(tUID[dS], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+										tPX[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+										tPY[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+										tSc[dS] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+										tBr[dS] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+										tW[dS] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+										tH[dS] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+										tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+										tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+										tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+										validConfig[dS] = true;
 									}
-									sprintf(tFldr[dS], "%s", dList[dS].c_str());
-									sprintf(tUID[dS], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
-									tPX[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-									tPY[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-									tSc[dS] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-									tBr[dS] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-									tW[dS] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-									tH[dS] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-									tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-									tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-									tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-									validConfig[dS] = true;
 								}
 							}
 						}
-					}
-					if (validConfig[dS] == true)
-					{
-						/* Check Each Board for this item */
-						int tBtC = tBt[dS];
-						for (int brdC = 0; brdC < tBtC; brdC++)
+						if (validConfig[dS] == true)
 						{
-							sprintf(bSection[dS], "Board-%i", brdC + 1);
+							/* Check Each Board for this item */
+							int tBtC = tBt[dS];
+							for (int brdC = 0; brdC < tBtC; brdC++)
+							{
+								sprintf(bSection[dS], "Board-%i", brdC + 1);
+								pSection = ini.GetSection(bSection[dS]);
+								if (pSection)
+								{
+									printf(".");
+									/* Now get the Data */
+									if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
+									{
+										sprintf(tType[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
+										sprintf(tSrc[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
+										tDuration[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
+										tSType[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+									}
+									else
+										validConfig[dS] = false;
+								}
+								else
+								{
+									printf(".");
+									tBt[dS]--;
+								}
+							}
+
+							/* Get Alert Board Information */
+							sprintf(bSection[dS], "Alert");
 							pSection = ini.GetSection(bSection[dS]);
 							if (pSection)
 							{
@@ -745,228 +776,205 @@ void Signage::Update()
 								/* Now get the Data */
 								if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
 								{
-									sprintf(tType[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
-									sprintf(tSrc[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
-									tDuration[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
-									tSType[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+									sprintf(aType[dS], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
+									sprintf(aSrc[dS], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
+									aDuration[dS] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
+									aSType[dS] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
 								}
 								else
-									validConfig[dS] = false;
-							}
-							else
-							{
-								printf(".");
-								tBt[dS]--;
+									tA[dS] = 0;
 							}
 						}
-
-						/* Get Alert Board Information */
-						sprintf(bSection[dS], "Alert");
-						pSection = ini.GetSection(bSection[dS]);
-						if (pSection)
+					}
+					if (validConfig[dS] == true)
+					{
+						/* We need to check to see if the board already exists, with the correct timestamp data. */
+						printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[dS], tBt[dS]);
+						for (int brdO = 0; brdO < tBt[dS]; brdO++)
 						{
-							printf(".");
-							/* Now get the Data */
-							if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
-							{
-								sprintf(aType[dS], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
-								sprintf(aSrc[dS], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
-								aDuration[dS] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
-								aSType[dS] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
-							}
-							else
-								tA[dS] = 0;
+							printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
+									tSrc[dS][brdO], tDuration[dS][brdO]);
+						}
+						if (tA[dS] == 1)
+						{
+							printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[dS], aType[dS],
+									aSrc[dS], aDuration[dS]);
 						}
 					}
-				}
-				if (validConfig[dS] == true)
-				{
-					/* We need to check to see if the board already exists, with the correct timestamp data. */
-					printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[dS], tBt[dS]);
-					for (int brdO = 0; brdO < tBt[dS]; brdO++)
+					else
 					{
-						printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
-								tSrc[dS][brdO], tDuration[dS][brdO]);
+						sprintf(tFldr[dS], "%s", "");
+						sprintf(tUID[dS], "%s", "");
+						tPX[dS] = 0;
+						tPY[dS] = 0;
+						tSc[dS] = 0;
+						tBr[dS] = 0;
+						tW[dS] = 0;
+						tH[dS] = 0;
+						tBt[dS] = 0;
+						tA[dS] = 0;
+						tTs[dS] = 0;
+						printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 					}
-					if (tA[dS] == 1)
-					{
-						printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[dS], aType[dS], aSrc[dS],
-								aDuration[dS]);
-					}
-				}
-				else
-				{
-					sprintf(tFldr[dS], "%s", "");
-					sprintf(tUID[dS], "%s", "");
-					tPX[dS] = 0;
-					tPY[dS] = 0;
-					tSc[dS] = 0;
-					tBr[dS] = 0;
-					tW[dS] = 0;
-					tH[dS] = 0;
-					tBt[dS] = 0;
-					tA[dS] = 0;
-					tTs[dS] = 0;
-					printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 				}
 			}
 		}
-	}
 
-	if (now > (wUpdateTimer[3] + 1))
-	{
-		/* Do Forward Board Sorting to add/update boards when configs change */
-		wUpdateTimer[3] = now;
+		if (now > (wUpdateTimer[3] + 1))
+		{
+			/* Do Forward Board Sorting to add/update boards when configs change */
+			wUpdateTimer[3] = now;
+			for (int tB = 0; tB < 64; tB++)
+			{
+				bool bFound = false;
+				for (int pB = 10; pB < 74; pB++)
+				{
+					if (iBoxes[pB].isCreated())
+					{
+						for (int ttB = 0; ttB < 64; ttB++)
+						{
+							if (strlen(tSrc[tB][ttB]) > 0)
+							{
+								if (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0)
+								{
+									/* We Found a Board!  Check the TimeStamp */
+									if (tTs[tB] != iBoxes[pB].GetTStamp())
+										/* Time Stamp Not Match - Signal for Board Destroy */
+										if (iBoxes[pB].stype() != -1)
+											iBoxes[pB].Destroy();
+									bFound = true;
+									break;
+								}
+							}
+						}
+					}
+					else if (bFound == true)
+						break;
+				}
+				if (bFound == false)
+				{
+					/* Add Board Config */
+					for (int pB = 10; pB < 74; pB++)
+					{
+						if ((strlen(tSrc[tB][0]) > 0) && (iBoxes[pB].isCreated() == false))
+						{
+							/* Empty Board Location - Create */
+							if (strcmp(*tType[tB], "image") == 0)
+							{
+								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
+										tBC[tB]);
+								break;
+							}
+							if (strcmp(*tType[tB], "mplayer") == 0)
+							{
+								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
+										tBC[tB]);
+								break;
+							}
+							if (strcmp(*tType[tB], "iplayer") == 0)
+							{
+								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
+										tSType[tB][0], tBC[tB]);
+								break;
+							}
+						}
+					}
+				}
+			}
+			/* Do Reverse Sorting - Remove Boards which are no longer present/disabled */
+			for (int pB = 10; pB < 74; pB++)
+			{
+				if (iBoxes[pB].isCreated())
+				{
+					bool bFound = false;
+					for (int tB = 0; tB < 64; tB++)
+					{
+						if ((strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (tTs[tB] == iBoxes[pB].GetTStamp()))
+						{
+							/* We Found a Board!  Check the TimeStamp */
+							bFound = true;
+						}
+					}
+					if (bFound == false)
+						iBoxes[pB].Destroy();
+				}
+			}
+		}
+
+		/* Do Board Timer Events */
 		for (int tB = 0; tB < 64; tB++)
 		{
-			bool bFound = false;
 			for (int pB = 10; pB < 74; pB++)
 			{
 				if (iBoxes[pB].isCreated())
 				{
 					for (int ttB = 0; ttB < 64; ttB++)
 					{
-						if (strlen(tSrc[tB][ttB]) > 0)
+						if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1))
 						{
-							if (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0)
+							/* Valid Board Found */
+							bool resetClicks = false;
+							if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
 							{
-								/* We Found a Board!  Check the TimeStamp */
-								if (tTs[tB] != iBoxes[pB].GetTStamp())
-									/* Time Stamp Not Match - Signal for Board Destroy */
-									if (iBoxes[pB].stype() != -1)
-										iBoxes[pB].Destroy();
-								bFound = true;
-								break;
-							}
-						}
-					}
-				}
-				else if (bFound == true)
-					break;
-			}
-			if (bFound == false)
-			{
-				/* Add Board Config */
-				for (int pB = 10; pB < 74; pB++)
-				{
-					if ((strlen(tSrc[tB][0]) > 0) && (iBoxes[pB].isCreated() == false))
-					{
-						/* Empty Board Location - Create */
-						if (strcmp(*tType[tB], "image") == 0)
-						{
-							printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
-							iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
-									tBC[tB]);
-							break;
-						}
-						if (strcmp(*tType[tB], "mplayer") == 0)
-						{
-							printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
-							iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
-									tBC[tB]);
-							break;
-						}
-						if (strcmp(*tType[tB], "iplayer") == 0)
-						{
-							printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
-							iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-									tSType[tB][0], tBC[tB]);
-							break;
-						}
-					}
-				}
-			}
-		}
-		/* Do Reverse Sorting - Remove Boards which are no longer present/disabled */
-		for (int pB = 10; pB < 74; pB++)
-		{
-			if (iBoxes[pB].isCreated())
-			{
-				bool bFound = false;
-				for (int tB = 0; tB < 64; tB++)
-				{
-					if ((strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (tTs[tB] == iBoxes[pB].GetTStamp()))
-					{
-						/* We Found a Board!  Check the TimeStamp */
-						bFound = true;
-					}
-				}
-				if (bFound == false)
-					iBoxes[pB].Destroy();
-			}
-		}
-	}
-
-	/* Do Board Timer Events */
-	for (int tB = 0; tB < 64; tB++)
-	{
-		for (int pB = 10; pB < 74; pB++)
-		{
-			if (iBoxes[pB].isCreated())
-			{
-				for (int ttB = 0; ttB < 64; ttB++)
-				{
-					if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1))
-					{
-						/* Valid Board Found */
-						bool resetClicks = false;
-						if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
-						{
-							if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
-							{
-								printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%i\n", now, pB, iBoxes[pB].getScreen(),
-										ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB]);
-
-								/* Destroy broken Streaming Events */
-								if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
+								if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
 								{
-									/* Destroy iPlayer/Media Reference */
-									iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+									printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%i\n", now, pB, iBoxes[pB].getScreen(),
+											ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB]);
+
+									/* Destroy broken Streaming Events */
+									if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
+									{
+										/* Destroy iPlayer/Media Reference */
+										iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+									}
+
+									tBR[tB]++;
+									if (tBR[tB] > tBt[tB] - 1)
+										tBR[tB] = 0;
 								}
 
-								tBR[tB]++;
-								if (tBR[tB] > tBt[tB] - 1)
-									tBR[tB] = 0;
-							}
-
-							/* Process Fade Out Events */
-							if (tBR[tB] != tBC[tB])
-							{
-								pFade[tB] = pFade[tB] - 5;
-								if (pFade[tB] < 0)
-									pFade[tB] = 0;
-							}
-
-							/* Swap Textures (if applicable) */
-							if ((tBR[tB] != tBC[tB]) && (pFade[tB] == 0))
-							{
-								tBC[tB] = tBR[tB];
-								iBoxes[pB].setScreen(tBC[tB]);
-								char bdID[128];
-								sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
-								if (FileExists(bdID) == false)
-									sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
-								bTex[tB].Destroy();
-								bTex[tB].Load(bdID);
-								iBoxes[pB].SwapTex(bTex[tB].gltex());
-								iBoxes[pB].setClicks(0); /* Set to 0 to take into account of different timings per page */
-							}
-
-							/* Process Fade In Events */
-							if (tBR[tB] == tBC[tB])
-							{
-								pFade[tB] = pFade[tB] + 5;
-								if (pFade[tB] > 255)
+								/* Process Fade Out Events */
+								if (tBR[tB] != tBC[tB])
 								{
-									pFade[tB] = 255;
+									pFade[tB] = pFade[tB] - 5;
+									if (pFade[tB] < 0)
+										pFade[tB] = 0;
 								}
-								if (pFade[tB] == 255)
-									resetClicks = true;
-							}
 
-							/* Reset Clicks */
-							if (resetClicks)
-								iBoxes[pB].setClicks(now);
+								/* Swap Textures (if applicable) */
+								if ((tBR[tB] != tBC[tB]) && (pFade[tB] == 0))
+								{
+									tBC[tB] = tBR[tB];
+									iBoxes[pB].setScreen(tBC[tB]);
+									char bdID[128];
+									sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+									if (FileExists(bdID) == false)
+										sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
+									bTex[tB].Destroy();
+									bTex[tB].Load(bdID);
+									iBoxes[pB].SwapTex(bTex[tB].gltex());
+									iBoxes[pB].setClicks(0); /* Set to 0 to take into account of different timings per page */
+								}
+
+								/* Process Fade In Events */
+								if (tBR[tB] == tBC[tB])
+								{
+									pFade[tB] = pFade[tB] + 5;
+									if (pFade[tB] > 255)
+									{
+										pFade[tB] = 255;
+									}
+									if (pFade[tB] == 255)
+										resetClicks = true;
+								}
+
+								/* Reset Clicks */
+								if (resetClicks)
+									iBoxes[pB].setClicks(now);
+							}
 						}
 					}
 				}
@@ -1045,18 +1053,27 @@ void Signage::Draw()
 				{
 					/* Weather Box */
 					if (!iBoxes[n].doDraw(wFadeV[1]))
+					{
+						m_bQuitting = true;
 						m_bRunning = false;
+					}
 				}
 				else
 				{
 					if (!iBoxes[n].doDraw(-1))
+					{
+						m_bQuitting = true;
 						m_bRunning = false;
+					}
 				}
 			}
 			else
 			{
 				if (!iBoxes[n].doDraw(pFade[n - 10]))
+				{
 					m_bRunning = false;
+					m_bQuitting = true;
+				}
 			}
 		}
 	}
@@ -1089,6 +1106,7 @@ void Signage::Clean()
 	}
 
 	m_bRunning = false;
+	m_bQuitting = true;
 
 	/* Sanity Check */
 	for (int n = 0; n < 128; n++)
