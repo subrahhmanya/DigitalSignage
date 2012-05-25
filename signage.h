@@ -81,6 +81,7 @@ private:
 	void monthInStr(char monthsInWord[], int month);
 	void nthInStr(char dowInWord[], int monthday);
 	void parseWeather(xmlNode * a_node);
+	int Screenshot(char *filename);
 
 	/* Board Specific Vars */
 	bool validConfig[64];

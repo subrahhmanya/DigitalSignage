@@ -262,19 +262,18 @@ void Signage::HandleEvents(Signage* signage)
 
 void Signage::Update()
 {
-	/* Only perform Update if Running */
+	/* Process and Time String */
+	int days;
+	char daysInWord[8];
+	char monthsInWord[8];
+	char mins[8];
 
+	time_t now = time(0);
+	ltm = localtime(&now);
+
+	/* Only perform Update if Running */
 	if (m_bQuitting == false)
 	{
-		/* Process and Time String */
-		int days;
-		char daysInWord[8];
-		char monthsInWord[8];
-		char mins[8];
-
-		time_t now = time(0);
-		ltm = localtime(&now);
-
 		/* Calculate Sunrise/Sunset */
 
 		/* Calculate the day for Dec 31 of the previous year */
@@ -981,6 +980,11 @@ void Signage::Update()
 			}
 		}
 	}
+	/* Save Screenshot every 5 seconds */
+	if (now > wUpdateTimer[4] + 5)
+	{
+
+	}
 }
 
 void Signage::Draw()
@@ -1523,4 +1527,45 @@ bool Signage::FileExists(const char* FileName)
 		return true;
 	}
 	return false;
+}
+
+int Screenshot(char *filename)
+{
+	SDL_Surface *screen;
+	SDL_Surface *temp;
+	unsigned char *pixels;
+	int i;
+
+	if (!(screen->flags & SDL_OPENGL))
+	{
+		SDL_SaveBMP(temp, filename);
+		return 0;
+	}
+
+	temp = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, 24,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+			0x000000FF, 0x0000FF00, 0x00FF0000, 0
+#else
+			0x00FF0000, 0x0000FF00, 0x000000FF, 0
+#endif
+			);
+	if (temp == NULL)
+		return -1;
+
+	pixels = malloc(3 * w * h);
+	if (pixels == NULL)
+	{
+		SDL_FreeSurface(temp);
+		return -1;
+	}
+
+	glReadPixels(0, 0, screen->w, screen->h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	for (i = 0; i < h; i++)
+		memcpy(((char *) temp->pixels) + temp->pitch * i, pixels + 3 * w * (h - i - 1), w * 3);
+	free(pixels);
+
+	SDL_SaveBMP(temp, filename);
+	SDL_FreeSurface(temp);
+	return 0;
 }
