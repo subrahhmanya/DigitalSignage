@@ -779,6 +779,8 @@ void Signage::Update()
 									sprintf(aSrc[dS], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
 									aDuration[dS] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
 									aSType[dS] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+									/* Set Mirror Config */
+									tDuration[dS][tBt[dS]] = aDuration[dS];
 								}
 								else
 									tA[dS] = 0;
@@ -930,9 +932,31 @@ void Signage::Update()
 										iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
 									}
 
-									tBR[tB]++;
-									if (tBR[tB] > tBt[tB] - 1)
-										tBR[tB] = 0;
+									if (tA[tB] == 1)
+									{
+										/* Alert Board Configured */
+										if (aActive[tB] == 1)
+										{
+											/* Alert Board currently showing - Turn Off and resume as normal */
+											aActive[tB] = 0;
+											tBR[tB] = tOR[tB] + 1;
+											if (tBR[tB] > tBt[tB] - 1)
+												tBR[tB] = 0;
+										}
+										else
+										{
+											tOR[tB] = tBR[tB];
+											tBR[tB] = tBt[tB];
+											aActive[tB] = 1;
+										}
+									}
+									else
+									{
+										/* No Alerts Showing - Run as Normal */
+										tBR[tB]++;
+										if (tBR[tB] > tBt[tB] - 1)
+											tBR[tB] = 0;
+									}
 								}
 
 								/* Process Fade Out Events */
@@ -947,9 +971,16 @@ void Signage::Update()
 								if ((tBR[tB] != tBC[tB]) && (pFade[tB] == 0))
 								{
 									tBC[tB] = tBR[tB];
-									iBoxes[pB].setScreen(tBC[tB]);
 									char bdID[128];
-									sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+									if ((aActive[tB] == 1) && (tA[tB] == 1))
+									{
+										sprintf(bdID, "/screen/boards/%s/alert/%s", tFldr[tB], aSrc[tB]);
+									}
+									else
+									{
+										sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+									}
+									iBoxes[pB].setScreen(tBC[tB]);
 									if (FileExists(bdID) == false)
 										sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
 									bTex[tB].Destroy();
