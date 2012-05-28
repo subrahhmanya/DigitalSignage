@@ -20,6 +20,7 @@ Box::Box()
 	bH = 0;
 	bScale = 0;
 	sType = 0;
+	scrollv = 0;
 	sWidth = 0;
 	sHeight = 0;
 	bTStamp = 0;
@@ -45,7 +46,8 @@ bool Box::doDraw(int aOverride)
 		tAlpha = tAlpha + 15;
 	else
 		tAlpha = tAlpha - 15;
-	if ((tAlpha > 255) && (sType != 0))
+
+	if ((tAlpha > 255) && (sType != 0) && (sType != -1))
 	{
 		tAlpha = 255;
 		if (tCScreen == -1)	/* Initial Creation */
@@ -129,6 +131,7 @@ bool Box::doDraw(int aOverride)
 		bW = 0;
 		bH = 0;
 		bScale = 0;
+		scrollv = 0;
 		sWidth = 0;
 		sHeight = 0;
 		sType = 0;
@@ -168,9 +171,9 @@ bool Box::doDraw(int aOverride)
 	}
 
 	if (aOverride != -1)
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, tAlpha, aOverride);
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, sHeight, 1.0f, 1.0f, 1.0f, bScale, tAlpha, aOverride);
 	else
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, 0, bH, 1.0f, 1.0f, 1.0f, bScale, tAlpha, 255);
+		drawInfoBox(glTex, bType, bX, bY, bW, bH, sHeight, 1.0f, 1.0f, 1.0f, bScale, tAlpha, 255);
 	return true;
 }
 
@@ -218,11 +221,14 @@ void Box::Destroy()
 	}
 }
 
-void Box::SwapTex(GLuint TextureID)
+void Box::SwapTex(GLuint TextureID, int w, int h)
 {
 	glTex = 0;
 	glGenTextures(1, &glTex);
 	glTex = TextureID;
+	printf("NEW WxH - %ix%i\n", w, h);
+	sWidth = w;
+	sHeight = h;
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
@@ -258,6 +264,7 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	bY = py;
 	bW = w;
 	bH = h;
+	scrollv = 0;
 	sWidth = aw;
 	sHeight = ah;
 	bScale = scale;
@@ -270,7 +277,7 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	glTex = TextureID;
 }
 
-void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
+void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int absh, float br, float bg, float bb, int scale,
 		int balpha, int calpha)
 {
 

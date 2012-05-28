@@ -280,7 +280,7 @@ void Signage::Update()
 		days = calcDay_Dec31(1900 + ltm->tm_year);
 		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
 			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), sWidth, sHeight, 200, 1, 1);
+					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1);
 		else
 			iBoxes[0].doUpdate();
 
@@ -605,8 +605,8 @@ void Signage::Update()
 					else
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 					weather[0].Load(tBuff);
-					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), sWidth, sHeight, 255, 1,
-							1);
+					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), weather[0].width(),
+							weather[0].height(), 255, 1, 1);
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -651,29 +651,30 @@ void Signage::Update()
 			/* Check Board Information */
 			printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			wUpdateTimer[2] = now;
-			/* Clear old Board Variables */
-			for (int wC = 0; wC < 64; wC++)
-			{
-				for (int vC = 0; vC < 64; vC++)
-				{
-					tDuration[wC][vC] = false;
-					sprintf(tType[wC][vC], "");
-					sprintf(tSrc[wC][vC], "");
-				}
-				validConfig[wC] = false;
-				tEn[wC] = false;
-				tPX[wC] = false;
-				tPY[wC] = false;
-				tSc[wC] = false;
-				tBr[wC] = false;
-				tW[wC] = false;
-				tH[wC] = false;
-				tBt[wC] = false;
-				tA[wC] = false;
-				// tTs[wC] = false;
-				// sprintf(tUID[wC], "");
-				sprintf(bSection[wC], "");
-			}
+			/* Clear old Board Variables
+			 for (int wC = 0; wC < 64; wC++)
+			 {
+			 for (int vC = 0; vC < 64; vC++)
+			 {
+			 tDuration[wC][vC] = false;
+			 sprintf(tType[wC][vC], "");
+			 sprintf(tSrc[wC][vC], "");
+			 }
+			 validConfig[wC] = false;
+			 tEn[wC] = false;
+			 tPX[wC] = false;
+			 tPY[wC] = false;
+			 tSc[wC] = false;
+			 tBr[wC] = false;
+			 tW[wC] = false;
+			 tH[wC] = false;
+			 tBt[wC] = false;
+			 tA[wC] = false;
+			 // tTs[wC] = false;
+			 // sprintf(tUID[wC], "");
+			 sprintf(bSection[wC], "");
+			 }
+			 */
 			DIR *d;
 			vector<string> dList;
 			struct dirent *dir;
@@ -720,18 +721,18 @@ void Signage::Update()
 										{
 											tBC[dS] = -1;
 											tBR[dS] = 0;
+											sprintf(tFldr[dS], "%s", dList[dS].c_str());
+											sprintf(tUID[dS], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+											tPX[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+											tPY[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+											tSc[dS] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+											tBr[dS] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+											tW[dS] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+											tH[dS] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+											tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+											tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+											tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
 										}
-										sprintf(tFldr[dS], "%s", dList[dS].c_str());
-										sprintf(tUID[dS], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
-										tPX[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-										tPY[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-										tSc[dS] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-										tBr[dS] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-										tW[dS] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-										tH[dS] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-										tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-										tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-										tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
 										validConfig[dS] = true;
 									}
 								}
@@ -755,6 +756,7 @@ void Signage::Update()
 										sprintf(tSrc[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
 										tDuration[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
 										tSType[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+										tSSpeed[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "ScrollSpeed").c_str());
 									}
 									else
 										validConfig[dS] = false;
@@ -779,8 +781,10 @@ void Signage::Update()
 									sprintf(aSrc[dS], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
 									aDuration[dS] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
 									aSType[dS] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
+									aSSpeed[dS] = atoi(ini.GetKeyValue(bSection[dS], "ScrollSpeed").c_str());
 									/* Set Mirror Config */
 									tDuration[dS][tBt[dS]] = aDuration[dS];
+									tSSpeed[dS][tBt[dS]] = aSSpeed[dS];
 								}
 								else
 									tA[dS] = 0;
@@ -865,6 +869,7 @@ void Signage::Update()
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
 										tBC[tB]);
+								tScrollV[tB] = 0;
 								break;
 							}
 							if (strcmp(*tType[tB], "mplayer") == 0)
@@ -914,48 +919,81 @@ void Signage::Update()
 				{
 					for (int ttB = 0; ttB < 64; ttB++)
 					{
-						if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1))
+						if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1) && (iBoxes[pB].stype() != -1))
 						{
 							/* Valid Board Found */
 							bool resetClicks = false;
+							bool scrUpdate = false;
 							if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
 							{
 								if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
 								{
-									printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%i\n", now, pB, iBoxes[pB].getScreen(),
-											ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB]);
+									if ((tScrollV[tB] == 0)
+											|| ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
+													== (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255))))
+										printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+												iBoxes[pB].getScreen(), ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
+												tScrollV[tB]);
 
-									/* Destroy broken Streaming Events */
-									if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
+									/* Check and Scroll if it's a big image */
+									if ((bTex[tB].height() > tH[tB]) && (pFade[tB] == 255))
 									{
-										/* Destroy iPlayer/Media Reference */
-										iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+										/* We need to scroll! */
+										if (((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
+												< (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255))))
+										{
+											tScrollV[tB]++;
+											scrUpdate = true;
+										}
+										if ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
+												>= (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255)))
+										{
+											/* Instead of eventually hitting an upper limit on the scroll
+											 we loop the scroll value to keep things clean */
+											if (tSComp[tB] == 0)
+											{
+												iBoxes[pB].setClicks(now);
+												scrUpdate = true;
+												tSComp[tB] = 1;
+											}
+										}
+										iBoxes[pB].setScrollV(tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()]);
 									}
 
-									if (tA[tB] == 1)
+									if ((scrUpdate == false) && (iBoxes[pB].stype() != -1))
 									{
-										/* Alert Board Configured */
-										if (aActive[tB] == 1)
+										/* Destroy broken Streaming Events */
+										if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
 										{
-											/* Alert Board currently showing - Turn Off and resume as normal */
-											aActive[tB] = 0;
-											tBR[tB] = tOR[tB] + 1;
-											if (tBR[tB] > tBt[tB] - 1)
-												tBR[tB] = 0;
+											/* Destroy iPlayer/Media Reference */
+											iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+										}
+
+										if (tA[tB] == 1)
+										{
+											/* Alert Board Configured */
+											if (aActive[tB] == 1)
+											{
+												/* Alert Board currently showing - Turn Off and resume as normal */
+												aActive[tB] = 0;
+												tBR[tB] = tOR[tB] + 1;
+												if (tBR[tB] > tBt[tB] - 1)
+													tBR[tB] = 0;
+											}
+											else
+											{
+												tOR[tB] = tBR[tB];
+												tBR[tB] = tBt[tB];
+												aActive[tB] = 1;
+											}
 										}
 										else
 										{
-											tOR[tB] = tBR[tB];
-											tBR[tB] = tBt[tB];
-											aActive[tB] = 1;
+											/* No Alerts Showing - Run as Normal */
+											tBR[tB]++;
+											if (tBR[tB] > tBt[tB] - 1)
+												tBR[tB] = 0;
 										}
-									}
-									else
-									{
-										/* No Alerts Showing - Run as Normal */
-										tBR[tB]++;
-										if (tBR[tB] > tBt[tB] - 1)
-											tBR[tB] = 0;
 									}
 								}
 
@@ -968,7 +1006,7 @@ void Signage::Update()
 								}
 
 								/* Swap Textures (if applicable) */
-								if ((tBR[tB] != tBC[tB]) && (pFade[tB] == 0))
+								if (((tBR[tB] != tBC[tB]) && (pFade[tB] == 0)) && (iBoxes[pB].stype() != -1))
 								{
 									tBC[tB] = tBR[tB];
 									char bdID[128];
@@ -985,7 +1023,17 @@ void Signage::Update()
 										sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
 									bTex[tB].Destroy();
 									bTex[tB].Load(bdID);
-									iBoxes[pB].SwapTex(bTex[tB].gltex());
+									/* Scale Texture to Box unless we scroll */
+									int texW = 0;
+									int texH = 0;
+									if (bTex[tB].height() < sHeight)
+										texH = tH[tB];
+									else
+										texH = bTex[tB].height();
+									iBoxes[pB].SwapTex(bTex[tB].gltex(), bTex[tB].width(), texH);
+									tScrollV[tB] = 0;
+									tSComp[tB] = 0;
+									iBoxes[pB].setScrollV(tScrollV[tB]);
 									iBoxes[pB].setClicks(0); /* Set to 0 to take into account of different timings per page */
 								}
 
@@ -1002,7 +1050,7 @@ void Signage::Update()
 								}
 
 								/* Reset Clicks */
-								if (resetClicks)
+								if ((resetClicks) && (scrUpdate == false))
 									iBoxes[pB].setClicks(now);
 							}
 						}

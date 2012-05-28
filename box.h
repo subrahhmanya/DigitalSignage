@@ -23,7 +23,7 @@ class Box
 public:
 	Box();
 	void Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType, int dScreen);
-	void SwapTex(GLuint TextureID);
+	void SwapTex(GLuint TextureID, int w, int h);
 	bool doDraw(int aOverride);
 	char * GetUID() {
 		return bUID;
@@ -63,6 +63,14 @@ public:
 	{
 		return sType;
 	}
+	int getScrollV()
+	{
+		return scrollv;
+	}
+	void setScrollV(int sv)
+	{
+		scrollv = sv;
+	}
 	int getClicks()
 	{
 		return tSTimer;
@@ -89,11 +97,11 @@ private:
 	Texture ipBG;
 	GLuint glTex;
 	bool m_bRunning, bType;
-	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail, ipLooper, tAlpha, tSTimer, tCScreen;
+	int bCol, bX, bY, bW, bH, tH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail, ipLooper, tAlpha, tSTimer, tCScreen, scrollv;
 	char bUID[128];
 	char bMSRC[1024];
 
-	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int scrollv, int absh, float br, float bg, float bb, int scale,
+	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int absh, float br, float bg, float bb, int scale,
 			int balpha, int calpha);
 
 	/* iPlayer Specific */
