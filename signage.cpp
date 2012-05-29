@@ -651,30 +651,6 @@ void Signage::Update()
 			/* Check Board Information */
 			printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			wUpdateTimer[2] = now;
-			/* Clear old Board Variables
-			 for (int wC = 0; wC < 64; wC++)
-			 {
-			 for (int vC = 0; vC < 64; vC++)
-			 {
-			 tDuration[wC][vC] = false;
-			 sprintf(tType[wC][vC], "");
-			 sprintf(tSrc[wC][vC], "");
-			 }
-			 validConfig[wC] = false;
-			 tEn[wC] = false;
-			 tPX[wC] = false;
-			 tPY[wC] = false;
-			 tSc[wC] = false;
-			 tBr[wC] = false;
-			 tW[wC] = false;
-			 tH[wC] = false;
-			 tBt[wC] = false;
-			 tA[wC] = false;
-			 // tTs[wC] = false;
-			 // sprintf(tUID[wC], "");
-			 sprintf(bSection[wC], "");
-			 }
-			 */
 			DIR *d;
 			vector<string> dList;
 			struct dirent *dir;
@@ -693,6 +669,8 @@ void Signage::Update()
 				printf("Directories Found = %i\n", dList.size());
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
+					validConfig[dS] = false;
+					bChanger[dS] = false;
 					printf("Parsing Board '%s'.", dList[dS].c_str());
 					/* Check for valid Configuration Files and Contents */
 					char tFName[128];
@@ -732,13 +710,14 @@ void Signage::Update()
 											tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
 											tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
 											tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+											bChanger[dS] = true;
 										}
 										validConfig[dS] = true;
 									}
 								}
 							}
 						}
-						if (validConfig[dS] == true)
+						if ((validConfig[dS] == true) && (bChanger[dS] == true))
 						{
 							/* Check Each Board for this item */
 							int tBtC = tBt[dS];
@@ -794,22 +773,35 @@ void Signage::Update()
 					if (validConfig[dS] == true)
 					{
 						/* We need to check to see if the board already exists, with the correct timestamp data. */
-						printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[dS], tBt[dS]);
-						for (int brdO = 0; brdO < tBt[dS]; brdO++)
+						if (bChanger[dS] == false)
 						{
-							printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
-									tSrc[dS][brdO], tDuration[dS][brdO]);
+							printf("\n\tBoard '%s' ('%s') configuration is unchanged.\n", dList[dS].c_str(), tUID[dS]);
 						}
-						if (tA[dS] == 1)
+						else
 						{
-							printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[dS], aType[dS],
-									aSrc[dS], aDuration[dS]);
+							printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[dS], tBt[dS]);
+							for (int brdO = 0; brdO < tBt[dS]; brdO++)
+							{
+								printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
+										tSrc[dS][brdO], tDuration[dS][brdO]);
+							}
+							if (tA[dS] == 1)
+							{
+								printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[dS],
+										aType[dS], aSrc[dS], aDuration[dS]);
+							}
 						}
 					}
 					else
 					{
-						sprintf(tFldr[dS], "%s", "");
-						sprintf(tUID[dS], "%s", "");
+						/* Clear old Board Variables */
+						for (int vC = 0; vC < 64; vC++)
+						{
+							tDuration[dS][vC] = 0;
+							sprintf(tType[dS][vC], "");
+							sprintf(tSrc[dS][vC], "");
+						}
+						tEn[dS] = 0;
 						tPX[dS] = 0;
 						tPY[dS] = 0;
 						tSc[dS] = 0;
@@ -819,6 +811,9 @@ void Signage::Update()
 						tBt[dS] = 0;
 						tA[dS] = 0;
 						tTs[dS] = 0;
+						sprintf(bSection[dS], "%s", "");
+						sprintf(tFldr[dS], "%s", "");
+						sprintf(tUID[dS], "%s", "");
 						printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 					}
 				}
@@ -846,7 +841,10 @@ void Signage::Update()
 									if (tTs[tB] != iBoxes[pB].GetTStamp())
 										/* Time Stamp Not Match - Signal for Board Destroy */
 										if (iBoxes[pB].stype() != -1)
+										{
 											iBoxes[pB].Destroy();
+											tBC[tB] = -1;
+										}
 									bFound = true;
 									break;
 								}
@@ -919,7 +917,8 @@ void Signage::Update()
 				{
 					for (int ttB = 0; ttB < 64; ttB++)
 					{
-						if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1) && (iBoxes[pB].stype() != -1))
+						if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1)
+								&& (iBoxes[pB].stype() != -1))
 						{
 							/* Valid Board Found */
 							bool resetClicks = false;
@@ -952,7 +951,7 @@ void Signage::Update()
 											 we loop the scroll value to keep things clean */
 											if (tSComp[tB] == 0)
 											{
-												iBoxes[pB].setClicks(now);
+												//iBoxes[pB].setClicks(now);
 												scrUpdate = true;
 												tSComp[tB] = 1;
 											}
@@ -963,36 +962,39 @@ void Signage::Update()
 									if ((scrUpdate == false) && (iBoxes[pB].stype() != -1))
 									{
 										/* Destroy broken Streaming Events */
-										if ((iBoxes[pB].stype() != 1) && (tBt[tB] > 1))
+										if ((iBoxes[pB].stype() != 1) && (iBoxes[pB].stype() == 2))
 										{
 											/* Destroy iPlayer/Media Reference */
+											printf("Destroying ID %i\n", iBoxes[pB].stype());
 											iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
-										}
-
-										if (tA[tB] == 1)
-										{
-											/* Alert Board Configured */
-											if (aActive[tB] == 1)
-											{
-												/* Alert Board currently showing - Turn Off and resume as normal */
-												aActive[tB] = 0;
-												tBR[tB] = tOR[tB] + 1;
-												if (tBR[tB] > tBt[tB] - 1)
-													tBR[tB] = 0;
-											}
-											else
-											{
-												tOR[tB] = tBR[tB];
-												tBR[tB] = tBt[tB];
-												aActive[tB] = 1;
-											}
 										}
 										else
 										{
-											/* No Alerts Showing - Run as Normal */
-											tBR[tB]++;
-											if (tBR[tB] > tBt[tB] - 1)
-												tBR[tB] = 0;
+											if (tA[tB] == 1)
+											{
+												/* Alert Board Configured */
+												if (aActive[tB] == 1)
+												{
+													/* Alert Board currently showing - Turn Off and resume as normal */
+													aActive[tB] = 0;
+													tBR[tB] = tOR[tB] + 1;
+													if (tBR[tB] > tBt[tB] - 1)
+														tBR[tB] = 0;
+												}
+												else
+												{
+													tOR[tB] = tBR[tB];
+													tBR[tB] = tBt[tB];
+													aActive[tB] = 1;
+												}
+											}
+											else
+											{
+												/* No Alerts Showing - Run as Normal */
+												tBR[tB]++;
+												if (tBR[tB] > tBt[tB] - 1)
+													tBR[tB] = 0;
+											}
 										}
 									}
 								}
@@ -1024,7 +1026,6 @@ void Signage::Update()
 									bTex[tB].Destroy();
 									bTex[tB].Load(bdID);
 									/* Scale Texture to Box unless we scroll */
-									int texW = 0;
 									int texH = 0;
 									if (bTex[tB].height() < sHeight)
 										texH = tH[tB];
@@ -1038,8 +1039,9 @@ void Signage::Update()
 								}
 
 								/* Process Fade In Events */
-								if (tBR[tB] == tBC[tB])
+								if ((tBR[tB] == tBC[tB]) && (iBoxes[pB].stype() != -1) && (iBoxes[pB].stype() < 3))
 								{
+									printf("%i INCREASE\n", tB);
 									pFade[tB] = pFade[tB] + 5;
 									if (pFade[tB] > 255)
 									{
@@ -1050,7 +1052,7 @@ void Signage::Update()
 								}
 
 								/* Reset Clicks */
-								if ((resetClicks) && (scrUpdate == false))
+								if ((resetClicks == true) && (scrUpdate == false))
 									iBoxes[pB].setClicks(now);
 							}
 						}

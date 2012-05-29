@@ -50,7 +50,7 @@ bool Box::doDraw(int aOverride)
 	if ((tAlpha > 255) && (sType != 0) && (sType != -1))
 	{
 		tAlpha = 255;
-		if (tCScreen == -1)	/* Initial Creation */
+		if (tCScreen == -1) /* Initial Creation */
 			tCScreen = 0;
 	}
 	if ((tAlpha < 0) && (sType == -1))
@@ -108,7 +108,9 @@ bool Box::doDraw(int aOverride)
 						sprintf(bgID, "/screen/textures/iplayer/generic_fail.png");
 					ipBG.Load(bgID);
 					glTex = ipBG.gltex();
-				} else {
+				}
+				else
+				{
 					glTex = 0;
 				}
 
@@ -226,9 +228,11 @@ void Box::SwapTex(GLuint TextureID, int w, int h)
 	glTex = 0;
 	glGenTextures(1, &glTex);
 	glTex = TextureID;
-	printf("NEW WxH - %ix%i\n", w, h);
-	sWidth = w;
-	sHeight = h;
+	if (sType == 1)
+	{
+		sWidth = w;
+		sHeight = h;
+	}
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
@@ -277,8 +281,8 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	glTex = TextureID;
 }
 
-void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int absh, float br, float bg, float bb, int scale,
-		int balpha, int calpha)
+void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int absh, float br, float bg, float bb, int scale, int balpha,
+		int calpha)
 {
 
 	/* Box Types (bcol)
@@ -544,6 +548,7 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	int mplayer_pos_x = (x / 1280.0) * sWidth;
 	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
 	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
+	printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_y, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win)
 	{
