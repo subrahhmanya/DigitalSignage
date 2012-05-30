@@ -29,6 +29,7 @@ Box::Box()
 	tAlpha = 0;
 	tSTimer = 0;
 	tCScreen = -1;
+	sprintf(audEnable, "*");
 	sprintf(bUID, "*");
 	sprintf(bMSRC, "*");
 }
@@ -146,6 +147,7 @@ bool Box::doDraw(int aOverride)
 		tAlpha = 0;
 		tSTimer = 0;
 		tCScreen = -1;
+		sprintf(audEnable, "*");;
 		sprintf(bUID, "*");
 		sprintf(bMSRC, "*");
 		if (ipBG.width() != 0)
@@ -241,7 +243,7 @@ void Box::SwapTex(GLuint TextureID, int w, int h)
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
-		int sourceType, int dScreen)
+		int sourceType, int dScreen, char dAudio[16])
 {
 	bType = false;
 	if (bcol == 1)
@@ -280,6 +282,7 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	m_bRunning = true;
 	bTStamp = tStamp;
 	tCScreen = dScreen;
+	sprintf(audEnable, "%s", dAudio);
 	sprintf(bUID, "%s", btUID);
 	sprintf(bMSRC, "%s", btMSRC);
 	glGenTextures(1, &glTex);
@@ -532,10 +535,9 @@ SDL_SysWMinfo Box::get_sdl_wm_info(void)
 void Box::create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp)
 {
 	char cmdline[1024];
-
-	snprintf(cmdline, 1024,
-			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao pulse -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\"",
-			quality, streamid, cache, win);
+	sprintf(cmdline,
+			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo gl2 -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\"",
+			quality, streamid, audEnable, cache, win);
 	printf("%s\n", cmdline);
 	*mplayer_fp = popen(cmdline, "w");
 }

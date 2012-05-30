@@ -280,7 +280,7 @@ void Signage::Update()
 		days = calcDay_Dec31(1900 + ltm->tm_year);
 		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
 			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1);
+					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1, "null");
 		else
 			iBoxes[0].doUpdate();
 
@@ -606,7 +606,7 @@ void Signage::Update()
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 					weather[0].Load(tBuff);
 					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), weather[0].width(),
-							weather[0].height(), 255, 1, 1);
+							weather[0].height(), 255, 1, 1, "null");
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -737,6 +737,7 @@ void Signage::Update()
 										tDuration[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Duration").c_str());
 										tSType[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
 										tSSpeed[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
+										sprintf(tAudEnable[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "EnableAudio").c_str());
 									}
 									else
 										validConfig[curD] = false;
@@ -765,6 +766,7 @@ void Signage::Update()
 									/* Set Mirror Config */
 									tDuration[curD][tBt[curD]] = aDuration[curD];
 									tSSpeed[curD][tBt[curD]] = aSSpeed[curD];
+									sprintf(tAudEnable[curD][tBt[curD]], "%s", ini.GetKeyValue(bSection[curD], "EnableAudio").c_str());
 								}
 								else
 									tA[curD] = 0;
@@ -773,7 +775,6 @@ void Signage::Update()
 					}
 					if (validConfig[curD] == true)
 					{
-						curD++;
 						/* We need to check to see if the board already exists, with the correct timestamp data. */
 						if (bChanger[curD] == false)
 						{
@@ -793,6 +794,8 @@ void Signage::Update()
 										aType[curD], aSrc[curD], aDuration[curD]);
 							}
 						}
+						/* Increase curD */
+						curD++;
 					}
 					else
 					{
@@ -866,29 +869,43 @@ void Signage::Update()
 							/* Empty Board Location - Create */
 							/* Reset Variables which rely first */
 							pFade[tB] = 0;
-							tBC[tB] = -1;
 							tScrollV[tB] = 0;
+							bool tBCMod = false;
+							if (tBC[tB] == -1)
+							{
+								tBC[tB] = 0;
+								tBCMod = true;
+							}
 
 							/* Create Board Objects */
 							if (strcmp(*tType[tB], "image") == 0)
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
-										tBC[tB]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
+										tBC[tB], tAudEnable[tB][tBC[tB]]);
+								printf("TAUD FLAG %i\n", tBC[tB]);
+								if (tBCMod == true)
+									tBC[tB] = -1;
 								break;
 							}
 							if (strcmp(*tType[tB], "mplayer") == 0)
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
-										tBC[tB]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
+										tBC[tB], tAudEnable[tB][tBC[tB]]);
+								printf("TAUD FLAG %i\n", tBC[tB]);
+								if (tBCMod == true)
+									tBC[tB] = -1;
 								break;
 							}
 							if (strcmp(*tType[tB], "iplayer") == 0)
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										tSType[tB][0], tBC[tB]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
+										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]]);
+								printf("TAUD FLAG %i\n", tBC[tB]);
+								if (tBCMod == true)
+									tBC[tB] = -1;
 								break;
 							}
 						}

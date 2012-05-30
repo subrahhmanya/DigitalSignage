@@ -22,7 +22,7 @@ class Box
 {
 public:
 	Box();
-	void Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType, int dScreen);
+	void Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale, int sourceType, int dScreen, char dAudio[16]);
 	void SwapTex(GLuint TextureID, int w, int h);
 	bool doDraw(int aOverride);
 	char * GetUID() {
@@ -100,6 +100,7 @@ private:
 	int bCol, bX, bY, bW, bH, tH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail, ipLooper, tAlpha, tSTimer, tCScreen, scrollv;
 	char bUID[128];
 	char bMSRC[1024];
+	char audEnable[16];
 
 	void drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int miny, int absh, float br, float bg, float bb, int scale,
 			int balpha, int calpha);
