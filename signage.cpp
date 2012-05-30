@@ -667,6 +667,7 @@ void Signage::Update()
 				closedir(d);
 				sort(dList.begin(), dList.end()); /* Sort Array */
 				printf("Directories Found = %i\n", dList.size());
+				int curD = 0;
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
 					validConfig[dS] = false;
@@ -686,109 +687,110 @@ void Signage::Update()
 							CIniKey* pKey;
 							if (pSection->GetKey("Enabled"))
 							{
-								tEn[dS] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
-								if (tEn[dS] == 1)
+								tEn[curD] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
+								if (tEn[curD] == 1)
 								{
 									if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
 											&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
 											&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp")))
 									{
 										/* Only alter these details if UID or TS differ */
-										if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[dS]) != 0)
-												|| (tTs[dS] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
+										if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[curD]) != 0)
+												|| (tTs[curD] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
 										{
-											tBC[dS] = -1;
-											tBR[dS] = 0;
-											sprintf(tFldr[dS], "%s", dList[dS].c_str());
-											sprintf(tUID[dS], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
-											tPX[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-											tPY[dS] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-											tSc[dS] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-											tBr[dS] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-											tW[dS] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-											tH[dS] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-											tBt[dS] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-											tA[dS] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-											tTs[dS] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-											bChanger[dS] = true;
+											tBC[curD] = -1;
+											tBR[curD] = 0;
+											sprintf(tFldr[curD], "%s", dList[curD].c_str());
+											sprintf(tUID[curD], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+											tPX[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+											tPY[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+											tSc[curD] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+											tBr[curD] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+											tW[curD] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+											tH[curD] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+											tBt[curD] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+											tA[curD] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+											tTs[curD] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+											bChanger[curD] = true;
 										}
-										validConfig[dS] = true;
+										validConfig[curD] = true;
 									}
 								}
 							}
 						}
-						if ((validConfig[dS] == true) && (bChanger[dS] == true))
+						if ((validConfig[curD] == true) && (bChanger[curD] == true))
 						{
 							/* Check Each Board for this item */
-							int tBtC = tBt[dS];
+							int tBtC = tBt[curD];
 							for (int brdC = 0; brdC < tBtC; brdC++)
 							{
-								sprintf(bSection[dS], "Board-%i", brdC + 1);
-								pSection = ini.GetSection(bSection[dS]);
+								sprintf(bSection[curD], "Board-%i", brdC + 1);
+								pSection = ini.GetSection(bSection[curD]);
 								if (pSection)
 								{
 									printf(".");
 									/* Now get the Data */
 									if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
 									{
-										sprintf(tType[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
-										sprintf(tSrc[dS][brdC], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
-										tDuration[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
-										tSType[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
-										tSSpeed[dS][brdC] = atoi(ini.GetKeyValue(bSection[dS], "ScrollSpeed").c_str());
+										sprintf(tType[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Type").c_str());
+										sprintf(tSrc[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Src").c_str());
+										tDuration[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Duration").c_str());
+										tSType[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
+										tSSpeed[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
 									}
 									else
-										validConfig[dS] = false;
+										validConfig[curD] = false;
 								}
 								else
 								{
 									printf(".");
-									tBt[dS]--;
+									tBt[curD]--;
 								}
 							}
 
 							/* Get Alert Board Information */
-							sprintf(bSection[dS], "Alert");
-							pSection = ini.GetSection(bSection[dS]);
+							sprintf(bSection[curD], "Alert");
+							pSection = ini.GetSection(bSection[curD]);
 							if (pSection)
 							{
 								printf(".");
 								/* Now get the Data */
 								if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
 								{
-									sprintf(aType[dS], "%s", ini.GetKeyValue(bSection[dS], "Type").c_str());
-									sprintf(aSrc[dS], "%s", ini.GetKeyValue(bSection[dS], "Src").c_str());
-									aDuration[dS] = atoi(ini.GetKeyValue(bSection[dS], "Duration").c_str());
-									aSType[dS] = atoi(ini.GetKeyValue(bSection[dS], "Quality").c_str());
-									aSSpeed[dS] = atoi(ini.GetKeyValue(bSection[dS], "ScrollSpeed").c_str());
+									sprintf(aType[curD], "%s", ini.GetKeyValue(bSection[curD], "Type").c_str());
+									sprintf(aSrc[curD], "%s", ini.GetKeyValue(bSection[curD], "Src").c_str());
+									aDuration[curD] = atoi(ini.GetKeyValue(bSection[curD], "Duration").c_str());
+									aSType[curD] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
+									aSSpeed[curD] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
 									/* Set Mirror Config */
-									tDuration[dS][tBt[dS]] = aDuration[dS];
-									tSSpeed[dS][tBt[dS]] = aSSpeed[dS];
+									tDuration[curD][tBt[curD]] = aDuration[curD];
+									tSSpeed[curD][tBt[curD]] = aSSpeed[curD];
 								}
 								else
-									tA[dS] = 0;
+									tA[curD] = 0;
 							}
 						}
 					}
-					if (validConfig[dS] == true)
+					if (validConfig[curD] == true)
 					{
+						curD++;
 						/* We need to check to see if the board already exists, with the correct timestamp data. */
-						if (bChanger[dS] == false)
+						if (bChanger[curD] == false)
 						{
-							printf("\n\tBoard '%s' ('%s') configuration is unchanged.\n", dList[dS].c_str(), tUID[dS]);
+							printf("\n\tBoard '%s' ('%s') configuration is unchanged.\n", dList[dS].c_str(), tUID[curD]);
 						}
 						else
 						{
-							printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[dS], tBt[dS]);
-							for (int brdO = 0; brdO < tBt[dS]; brdO++)
+							printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[curD], tBt[curD]);
+							for (int brdO = 0; brdO < tBt[curD]; brdO++)
 							{
-								printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[dS][brdO],
-										tSrc[dS][brdO], tDuration[dS][brdO]);
+								printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[curD][brdO],
+										tSrc[curD][brdO], tDuration[curD][brdO]);
 							}
 							if (tA[dS] == 1)
 							{
-								printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[dS],
-										aType[dS], aSrc[dS], aDuration[dS]);
+								printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[curD],
+										aType[curD], aSrc[curD], aDuration[curD]);
 							}
 						}
 					}
@@ -797,23 +799,23 @@ void Signage::Update()
 						/* Clear old Board Variables */
 						for (int vC = 0; vC < 64; vC++)
 						{
-							tDuration[dS][vC] = 0;
-							sprintf(tType[dS][vC], "");
-							sprintf(tSrc[dS][vC], "");
+							tDuration[curD][vC] = 0;
+							sprintf(tType[curD][vC], "");
+							sprintf(tSrc[curD][vC], "");
 						}
-						tEn[dS] = 0;
-						tPX[dS] = 0;
-						tPY[dS] = 0;
-						tSc[dS] = 0;
-						tBr[dS] = 0;
-						tW[dS] = 0;
-						tH[dS] = 0;
-						tBt[dS] = 0;
-						tA[dS] = 0;
-						tTs[dS] = 0;
-						sprintf(bSection[dS], "%s", "");
-						sprintf(tFldr[dS], "%s", "");
-						sprintf(tUID[dS], "%s", "");
+						tEn[curD] = 0;
+						tPX[curD] = 0;
+						tPY[curD] = 0;
+						tSc[curD] = 0;
+						tBr[curD] = 0;
+						tW[curD] = 0;
+						tH[curD] = 0;
+						tBt[curD] = 0;
+						tA[curD] = 0;
+						tTs[curD] = 0;
+						sprintf(bSection[curD], "%s", "");
+						sprintf(tFldr[curD], "%s", "");
+						sprintf(tUID[curD], "%s", "");
 						printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 					}
 				}
@@ -862,12 +864,17 @@ void Signage::Update()
 						if ((strlen(tSrc[tB][0]) > 0) && (iBoxes[pB].isCreated() == false))
 						{
 							/* Empty Board Location - Create */
+							/* Reset Variables which rely first */
+							pFade[tB] = 0;
+							tBC[tB] = -1;
+							tScrollV[tB] = 0;
+
+							/* Create Board Objects */
 							if (strcmp(*tType[tB], "image") == 0)
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][0], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
 										tBC[tB]);
-								tScrollV[tB] = 0;
 								break;
 							}
 							if (strcmp(*tType[tB], "mplayer") == 0)
@@ -951,7 +958,7 @@ void Signage::Update()
 											 we loop the scroll value to keep things clean */
 											if (tSComp[tB] == 0)
 											{
-												//iBoxes[pB].setClicks(now);
+												iBoxes[pB].setClicks(now);
 												scrUpdate = true;
 												tSComp[tB] = 1;
 											}
@@ -1041,7 +1048,6 @@ void Signage::Update()
 								/* Process Fade In Events */
 								if ((tBR[tB] == tBC[tB]) && (iBoxes[pB].stype() != -1) && (iBoxes[pB].stype() < 3))
 								{
-									printf("%i INCREASE\n", tB);
 									pFade[tB] = pFade[tB] + 5;
 									if (pFade[tB] > 255)
 									{

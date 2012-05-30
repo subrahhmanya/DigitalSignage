@@ -42,12 +42,12 @@ bool Box::doDraw(int aOverride)
 
 	/* tAlpha is the initial Alpha value when creating a new Box.
 	 * All boxes need to fade in, and fade out, thus being clean. */
-	if ((sType != 0) && (sType != -1))
+	if (sType > 0)
 		tAlpha = tAlpha + 15;
 	else
 		tAlpha = tAlpha - 15;
 
-	if ((tAlpha > 255) && (sType != 0) && (sType != -1))
+	if ((tAlpha > 255) && (sType > 0))
 	{
 		tAlpha = 255;
 		if (tCScreen == -1) /* Initial Creation */
@@ -56,16 +56,17 @@ bool Box::doDraw(int aOverride)
 	if ((tAlpha < 0) && (sType == -1))
 		tAlpha = 0;
 
-	if ((tAlpha == 255) && (sType != 0) && (sType != -1))
+	if ((tAlpha == 255) && (sType > 0))
 	{
-		if (sType >= 4)
-			if (!ipVis)
+		if ((sType >= 4) &&  (!ipVis))
 				createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
 
 		if ((sType >= 4) && (ipVis))
 		{
 			/* Check for getiPlayer Instance, restart if required. */
-			FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
+			char pgc[1024];
+			sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
+			FILE *fp = popen(pgc, "r");
 			char buff[1024];
 			if (!fgets(buff, sizeof buff, fp) != NULL)
 			{
@@ -107,6 +108,8 @@ bool Box::doDraw(int aOverride)
 					if (FileExists(bgID) == false)
 						sprintf(bgID, "/screen/textures/iplayer/generic_fail.png");
 					ipBG.Load(bgID);
+					sWidth = ipBG.width();
+					sHeight = ipBG.height();
 					glTex = ipBG.gltex();
 				}
 				else
@@ -195,7 +198,9 @@ void Box::Destroy()
 			system("killall -9 mplayer");
 			system("killall -9 rtmpdump");
 			system("killall -9 get_iplayer");
-			FILE *fp = popen("ps aux | grep get_iplayer | grep -vn grep", "r");
+			char pgc[1024];
+			sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
+			FILE *fp = popen(pgc, "r");
 			char buff[1024];
 			if (!fgets(buff, sizeof buff, fp) != NULL)
 			{
