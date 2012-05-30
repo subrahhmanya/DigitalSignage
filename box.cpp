@@ -147,7 +147,7 @@ bool Box::doDraw(int aOverride)
 		tAlpha = 0;
 		tSTimer = 0;
 		tCScreen = -1;
-		sprintf(audEnable, "*");;
+		sprintf(audEnable, "*");
 		sprintf(bUID, "*");
 		sprintf(bMSRC, "*");
 		if (ipBG.width() != 0)
