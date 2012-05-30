@@ -34,14 +34,18 @@ int main(int argc, char* argv[])
 					bool tFS = false;
 					int tWX, tWH, tBPP;
 					char tMID[256];
+					char tHeader[256];
+					char tWLoc[64];
 					if (atoi(ini.GetKeyValue("GeneralSettings", "FullScreen").c_str()) == 1)
 						tFS = true;
 					tWX = atoi(ini.GetKeyValue("GeneralSettings", "SWidth").c_str());
 					tWH = atoi(ini.GetKeyValue("GeneralSettings", "SHeight").c_str());
 					tBPP = atoi(ini.GetKeyValue("GeneralSettings", "BPP").c_str());
 					sprintf(tMID, "%s", ini.GetKeyValue("GeneralSettings", "MID").c_str());
+					sprintf(tHeader, "%s", ini.GetKeyValue("GeneralSettings", "Header").c_str());
+					sprintf(tWLoc, "%s", ini.GetKeyValue("GeneralSettings", "WeatherLoc").c_str());
 
-					signage.Init(tMID, tWX, tWH, tBPP, tFS);
+					signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc);
 
 					while (signage.Running())
 					{

@@ -536,7 +536,7 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 {
 	char cmdline[1024];
 	sprintf(cmdline,
-			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo gl2 -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\"",
+			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\"",
 			quality, streamid, audEnable, cache, win);
 	printf("%s\n", cmdline);
 	*mplayer_fp = popen(cmdline, "w");

@@ -122,9 +122,8 @@ Signage::Signage()
 	wCelcius = 0.0;
 }
 
-void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen)
+void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc)
 {
-
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
 	m_bQuitting = false;
@@ -229,6 +228,9 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 			printf("OK\n");
 		}
 	}
+
+	sprintf(sHeader, "%s", header);
+	sprintf(sWLoc, "%s", weatherloc);
 
 	/* FPS Timer */
 	counter = fps_counter();
@@ -345,7 +347,9 @@ void Signage::Update()
 				LIBXML_TEST_VERSION // Macro to check API for match with
 				// the DLL we are using
 				/*parse the file and get the DOM */
-				doc = xmlReadFile("http://www.google.com/ig/api?weather=Swynnerton", NULL, 0);
+				char tWString[512];
+				sprintf(tWString, "http://www.google.com/ig/api?weather=%s", sWLoc);
+				doc = xmlReadFile(tWString, NULL, 0);
 				if (doc)
 				{
 
@@ -1121,7 +1125,7 @@ void Signage::Draw()
 	glLoadIdentity();
 
 	/* Draw Title */
-	drawText("Notification Centre", fntCGothic[7], 3, 255, 255, 255, 255, 1280, 680);
+	drawText(sHeader, fntCGothic[7], 3, 255, 255, 255, 255, 1280, 680);
 
 	/* Draw Time */
 	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 1262, 8);
