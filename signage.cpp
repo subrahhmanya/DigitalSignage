@@ -883,7 +883,6 @@ void Signage::Update()
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
 										tBC[tB], tAudEnable[tB][tBC[tB]]);
-								printf("TAUD FLAG %i\n", tBC[tB]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -893,7 +892,6 @@ void Signage::Update()
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
 										tBC[tB], tAudEnable[tB][tBC[tB]]);
-								printf("TAUD FLAG %i\n", tBC[tB]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -903,7 +901,6 @@ void Signage::Update()
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
 										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]]);
-								printf("TAUD FLAG %i\n", tBC[tB]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
