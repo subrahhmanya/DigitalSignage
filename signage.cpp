@@ -882,22 +882,10 @@ void Signage::Update()
 								tBCMod = true;
 							}
 
-							/* Run Plugin before launch */
+							/* Run Plugin 5 seconds before transition.*/
 							if (strlen(bPluginCmd[tB]) != 0)
 							{
 								/* Plugin exists - Run Command! */
-								char cmdline[1024];
-								char bdID[128];
-								if ((aActive[tB] == 1) && (tA[tB] == 1))
-								{
-									sprintf(bdID, "/screen/boards/%s/alert/%s", tFldr[tB], aSrc[tB]);
-								}
-								else
-								{
-									sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
-								}
-								//sprintf(cmdline, "%s%s", bPluginCmd[tB], bdID);
-								printf("%s\n", cmdline);
 								pPluginCMD[tB] = NULL;
 								pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
 							}
@@ -969,6 +957,25 @@ void Signage::Update()
 							/* Valid Board Found */
 							bool resetClicks = false;
 							bool scrUpdate = false;
+
+							if ((now > (iBoxes[pB].getClicks() + (tDuration[tB][iBoxes[pB].getScreen()] - 6))))
+							{
+								/* Run Plugin 5 seconds before transition.*/
+								if (strlen(bPluginCmd[tB]) != 0)
+								{
+									if (tPRunning[tB] == false)
+									{
+										/* Plugin exists - Run Command! */
+										printf("Plugin Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+												iBoxes[pB].getScreen(), ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
+												tScrollV[tB]);
+										tPRunning[tB] = true;
+										pPluginCMD[tB] = NULL;
+										pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
+									}
+								}
+							}
+
 							if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
 							{
 								if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
@@ -998,6 +1005,7 @@ void Signage::Update()
 											if (tSComp[tB] == 0)
 											{
 												iBoxes[pB].setClicks(now);
+												tPRunning[tB] = false;
 												scrUpdate = true;
 												tSComp[tB] = 1;
 											}
@@ -1041,25 +1049,6 @@ void Signage::Update()
 												if (tBR[tB] > tBt[tB] - 1)
 													tBR[tB] = 0;
 											}
-										}
-										/* Run Plugin */
-										if (strlen(bPluginCmd[tB]) != 0)
-										{
-											/* Plugin exists - Run Command! */
-											char cmdline[1024];
-											char bdID[128];
-											if ((aActive[tB] == 1) && (tA[tB] == 1))
-											{
-												sprintf(bdID, "/screen/boards/%s/alert/%s", tFldr[tB], aSrc[tB]);
-											}
-											else
-											{
-												sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
-											}
-											sprintf(cmdline, "%s%s", bPluginCmd[tB], bdID);
-											printf("%s\n", cmdline);
-											pPluginCMD[tB] = NULL;
-											pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
 										}
 									}
 								}
@@ -1118,7 +1107,10 @@ void Signage::Update()
 
 								/* Reset Clicks */
 								if ((resetClicks == true) && (scrUpdate == false))
+								{
 									iBoxes[pB].setClicks(now);
+									tPRunning[tB] = false;
+								}
 							}
 						}
 					}
