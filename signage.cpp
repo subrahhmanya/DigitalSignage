@@ -703,7 +703,9 @@ void Signage::Update()
 											tBt[curD] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
 											tA[curD] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
 											tTs[curD] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+											sprintf(bPluginCmd[curD], "%s", ini.GetKeyValue("BoardSettings", "Plugin").c_str());
 											bChanger[curD] = true;
+											//char str[] = bPluginCmd[curD].c_str;
 										}
 										validConfig[curD] = true;
 									}
@@ -818,6 +820,7 @@ void Signage::Update()
 						tBt[curD] = 0;
 						tA[curD] = 0;
 						tTs[curD] = 0;
+						sprintf(bPluginCmd[curD], "%s", "");
 						sprintf(bSection[curD], "%s", "");
 						sprintf(tFldr[curD], "%s", "");
 						sprintf(tUID[curD], "%s", "");
@@ -877,6 +880,26 @@ void Signage::Update()
 							{
 								tBC[tB] = 0;
 								tBCMod = true;
+							}
+
+							/* Run Plugin before launch */
+							if (strlen(bPluginCmd[tB]) != 0)
+							{
+								/* Plugin exists - Run Command! */
+								char cmdline[1024];
+								char bdID[128];
+								if ((aActive[tB] == 1) && (tA[tB] == 1))
+								{
+									sprintf(bdID, "/screen/boards/%s/alert/%s", tFldr[tB], aSrc[tB]);
+								}
+								else
+								{
+									sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+								}
+								//sprintf(cmdline, "%s%s", bPluginCmd[tB], bdID);
+								printf("%s\n", cmdline);
+								pPluginCMD[tB] = NULL;
+								pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
 							}
 
 							/* Create Board Objects */
@@ -1018,6 +1041,25 @@ void Signage::Update()
 												if (tBR[tB] > tBt[tB] - 1)
 													tBR[tB] = 0;
 											}
+										}
+										/* Run Plugin */
+										if (strlen(bPluginCmd[tB]) != 0)
+										{
+											/* Plugin exists - Run Command! */
+											char cmdline[1024];
+											char bdID[128];
+											if ((aActive[tB] == 1) && (tA[tB] == 1))
+											{
+												sprintf(bdID, "/screen/boards/%s/alert/%s", tFldr[tB], aSrc[tB]);
+											}
+											else
+											{
+												sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+											}
+											sprintf(cmdline, "%s%s", bPluginCmd[tB], bdID);
+											printf("%s\n", cmdline);
+											pPluginCMD[tB] = NULL;
+											pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
 										}
 									}
 								}
