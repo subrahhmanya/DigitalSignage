@@ -73,20 +73,18 @@ private:
 	/* FPS */
 	fps_counter counter;
 
-	void drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py);
+	void drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int offset, int px, int py);
 	bool FileExists(const char* FileName);
-	int calcDay_Dec31(int yyyy);
-	int dayInYear(int dd, int mm);
 	void dayInStr(char daysInWord[], int days);
 	void monthInStr(char monthsInWord[], int month);
 	void nthInStr(char dowInWord[], int monthday);
 	void parseWeather(xmlNode * a_node);
 
 	/* Board Specific Vars */
-	bool validConfig[64], bChanger[64];
+	bool validConfig[64], bChanger[64], bHeaderVis[64][64];
 	int tEn[64], tPX[64], tPY[64], tSc[64], tBr[64], tW[64], tH[64], tBt[64], tA[64], tTs[64], tDuration[64][64], tSType[64][64], tSSpeed[64][64], tBC[64],
 			tBR[64], tOR[64], pFade[64], aDuration[64], aSType[64], aSSpeed[64], aActive[64], tScrollV[64], tSComp[64];
-	char tFldr[64][1024], tUID[64][128], tType[64][64][128], tSrc[64][64][128], aType[64][128], aSrc[64][128], bSection[64][32], tAudEnable[64][64][16], sHeader[256], sWLoc[64];
+	char tFldr[64][1024], tUID[64][128], tType[64][64][128], tSrc[64][64][128], aType[64][128], aSrc[64][128], bSection[64][32], tAudEnable[64][64][16], sHeader[256], sWLoc[64], tHeaderTxt[64][64][256];
 };
 
 #endif /* SIGNAGE_H_ */

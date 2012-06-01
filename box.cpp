@@ -29,6 +29,8 @@ Box::Box()
 	tAlpha = 0;
 	tSTimer = 0;
 	tCScreen = -1;
+	bHeaderEnab = false;
+	sprintf(bHeaderTxt, "*");
 	sprintf(audEnable, "*");
 	sprintf(bUID, "*");
 	sprintf(bMSRC, "*");
@@ -59,8 +61,8 @@ bool Box::doDraw(int aOverride)
 
 	if ((tAlpha == 255) && (sType > 0))
 	{
-		if ((sType >= 4) &&  (!ipVis))
-				createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
+		if ((sType >= 4) && (!ipVis))
+			createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
 
 		if ((sType >= 4) && (ipVis))
 		{
@@ -105,7 +107,7 @@ bool Box::doDraw(int aOverride)
 					/* Remove iPlayer feed, set as Static Image with "Unavailable" feed. */
 					sType = 2;
 					char bgID[128];
-					sprintf(bgID, "/screen/textures/iplayer/%s.png", bUID);
+					sprintf(bgID, "/screen/textures/iplayer/%s.png", bMSRC);
 					if (FileExists(bgID) == false)
 						sprintf(bgID, "/screen/textures/iplayer/generic_fail.png");
 					ipBG.Load(bgID);
@@ -147,6 +149,8 @@ bool Box::doDraw(int aOverride)
 		tAlpha = 0;
 		tSTimer = 0;
 		tCScreen = -1;
+		bHeaderEnab = false;
+		sprintf(bHeaderTxt, "*");
 		sprintf(audEnable, "*");
 		sprintf(bUID, "*");
 		sprintf(bMSRC, "*");
@@ -174,6 +178,11 @@ bool Box::doDraw(int aOverride)
 		{
 			printf(" - BoxTex4 ");
 			layout[3].Destroy();
+		}
+		if (layout[4].width() != 0)
+		{
+			printf(" - BoxTex5 ");
+			layout[4].Destroy();
 		}
 	}
 
@@ -243,7 +252,7 @@ void Box::SwapTex(GLuint TextureID, int w, int h)
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
-		int sourceType, int dScreen, char dAudio[16])
+		int sourceType, int dScreen, char dAudio[16], bool hasHeader, char txtHeader[256])
 {
 	bType = false;
 	if (bcol == 1)
@@ -253,6 +262,7 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 		layout[1].Load("/screen/textures/orb_bt.png");
 		layout[2].Load("/screen/textures/orb_bcrnr.png");
 		layout[3].Load("/screen/textures/orb_boxb.png");
+		layout[4].Load("/screen/textures/orb_bh.png");
 	}
 	else if (bcol == 2)
 	{
@@ -261,6 +271,7 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 		layout[1].Load("/screen/textures/orb_wt.png");
 		layout[2].Load("/screen/textures/orb_wcrnr.png");
 		layout[3].Load("/screen/textures/orb_boxw.png");
+		layout[4].Load("/screen/textures/orb_wh.png");
 	}
 	else if (bcol == 3)
 	{
@@ -282,6 +293,8 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	m_bRunning = true;
 	bTStamp = tStamp;
 	tCScreen = dScreen;
+	bHeaderEnab = hasHeader;
+	sprintf(bHeaderTxt, "%s", txtHeader);
 	sprintf(audEnable, "%s", dAudio);
 	sprintf(bUID, "%s", btUID);
 	sprintf(bMSRC, "%s", btMSRC);
@@ -454,6 +467,71 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 		glTexCoord2f(0.0f, (float) ((float) scrollv / hs));
 		glVertex2f(px, py + h);
 		glEnd();
+		/* Are we Scrolling? */
+		if (hs > h)
+		{
+			if (layout[4].width() != 0)
+			{
+				if (bHeaderEnab == false)
+				{
+					/* Draw Top Fade Line */
+					glBindTexture(GL_TEXTURE_2D, layout[4].gltex());
+					glBegin(GL_QUADS);
+					glTexCoord2f(0.0f, 1.0f);
+					glVertex2f(px, py + h - 20);
+					glTexCoord2f(1.0f, 1.0f);
+					glVertex2f(px + w, py + h - 20);
+					glTexCoord2f(1.0f, 0.0f);
+					glVertex2f(px + w, py + h);
+					glTexCoord2f(0.0f, 0.0f);
+					glVertex2f(px, py + h);
+					glEnd();
+					glFinish();
+				}
+				/* Draw Lower Fade Line */
+				glBindTexture(GL_TEXTURE_2D, layout[4].gltex());
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 1.0f);
+				glVertex2f(px, py + 20);
+				glTexCoord2f(1.0f, 1.0f);
+				glVertex2f(px + w, py + 20);
+				glTexCoord2f(1.0f, 0.0f);
+				glVertex2f(px + w, py);
+				glTexCoord2f(0.0f, 0.0f);
+				glVertex2f(px, py);
+				glEnd();
+				glFinish();
+			}
+		}
+	}
+	if (bHeaderEnab == true)
+	{
+		if (layout[4].width() != 0)
+		{
+			/* Draw a Header Image */
+			//sprintf(bHeaderTxt, "*");
+			glBindTexture(GL_TEXTURE_2D, layout[4].gltex());
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(px, py + h - 45);
+			glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(px + w, py + h - 45);
+			glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(px + w, py + h - 25);
+			glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(px, py + h - 25);
+			glEnd();
+			glFinish();
+
+			/* White Box */
+			glBegin(GL_QUADS);
+			glVertex2f(px, py + h - 25);
+			glVertex2f(px + w, py + h - 25);
+			glVertex2f(px + w, py + h);
+			glVertex2f(px, py + h);
+			glEnd();
+			glFinish();
+		}
 	}
 }
 

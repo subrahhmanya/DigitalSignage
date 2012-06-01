@@ -265,7 +265,6 @@ void Signage::HandleEvents(Signage* signage)
 void Signage::Update()
 {
 	/* Process and Time String */
-	int days;
 	char daysInWord[8];
 	char monthsInWord[8];
 	char mins[8];
@@ -276,26 +275,8 @@ void Signage::Update()
 	/* Only perform Update if Running */
 	if (m_bQuitting == false)
 	{
-		/* Calculate Sunrise/Sunset */
-
-		/* Calculate the day for Dec 31 of the previous year */
-		days = calcDay_Dec31(1900 + ltm->tm_year);
-		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
-			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1, "null");
-		else
-			iBoxes[0].doUpdate();
-
-		/* Calculate the day for the given date */
-		days = (dayInYear(ltm->tm_mday, ltm->tm_mon) + days) % 7;
-
-		/* Add one day if the year is leap year and desired date is after February */
-		if ((1900 + ltm->tm_year) % 4 == 0 && ((1900 + ltm->tm_year) % 100 != 0 || (1900 + ltm->tm_year) % 400 == 0) && ltm->tm_mon > 1)
-			days++;
-		if (days == 7)
-			days = 0;
 		/* Get string values for Day and Year */
-		dayInStr(daysInWord, days);
+		dayInStr(daysInWord, ltm->tm_wday);
 		monthInStr(monthsInWord, ltm->tm_mon);
 		nthInStr(nthsInWord, ltm->tm_mday);
 		/* Add a leading 0 to the date if we are less than the 10th into the month */
@@ -315,6 +296,12 @@ void Signage::Update()
 			tC1 = ltm->tm_sec;
 		}
 		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+
+		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
+			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
+					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1, "null", false, "");
+		else
+			iBoxes[0].doUpdate();
 
 		/* Process Weather Information */
 		/* Do Weather Check (update once every 15 minutes) */
@@ -344,7 +331,8 @@ void Signage::Update()
 				xmlDoc *doc = NULL;
 				xmlNode *root_element = NULL;
 
-				LIBXML_TEST_VERSION // Macro to check API for match with
+				LIBXML_TEST_VERSION
+				// Macro to check API for match with
 				// the DLL we are using
 				/*parse the file and get the DOM */
 				char tWString[512];
@@ -610,7 +598,7 @@ void Signage::Update()
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 					weather[0].Load(tBuff);
 					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), weather[0].width(),
-							weather[0].height(), 255, 1, 1, "null");
+							weather[0].height(), 255, 1, 1, "null", false, "");
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -704,7 +692,7 @@ void Signage::Update()
 										{
 											tBC[curD] = -1;
 											tBR[curD] = 0;
-											sprintf(tFldr[curD], "%s", dList[curD].c_str());
+											sprintf(tFldr[curD], "%s", dList[dS].c_str());
 											sprintf(tUID[curD], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
 											tPX[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
 											tPY[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
@@ -741,6 +729,11 @@ void Signage::Update()
 										tDuration[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Duration").c_str());
 										tSType[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
 										tSSpeed[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
+										sprintf(tHeaderTxt[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Header").c_str());
+										if (atoi(ini.GetKeyValue(bSection[curD], "HeaderEn").c_str()) == 1)
+											bHeaderVis[curD][brdC] = true;
+										else
+											bHeaderVis[curD][brdC] = false;
 										sprintf(tAudEnable[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "EnableAudio").c_str());
 									}
 									else
@@ -768,6 +761,11 @@ void Signage::Update()
 									aSType[curD] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
 									aSSpeed[curD] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
 									/* Set Mirror Config */
+									sprintf(tHeaderTxt[curD][tBt[curD]], "%s", ini.GetKeyValue(bSection[curD], "Header").c_str());
+									if (atoi(ini.GetKeyValue(bSection[curD], "HeaderEn").c_str()) == 1)
+										bHeaderVis[curD][tBt[curD]] = true;
+									else
+										bHeaderVis[curD][tBt[curD]] = false;
 									tDuration[curD][tBt[curD]] = aDuration[curD];
 									tSSpeed[curD][tBt[curD]] = aSSpeed[curD];
 									sprintf(tAudEnable[curD][tBt[curD]], "%s", ini.GetKeyValue(bSection[curD], "EnableAudio").c_str());
@@ -885,8 +883,8 @@ void Signage::Update()
 							if (strcmp(*tType[tB], "image") == 0)
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 1,
-										tBC[tB], tAudEnable[tB][tBC[tB]]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
+										1, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderTxt[tB][tBC[tB]]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -894,8 +892,8 @@ void Signage::Update()
 							if (strcmp(*tType[tB], "mplayer") == 0)
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB], 3,
-										tBC[tB], tAudEnable[tB][tBC[tB]]);
+								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
+										3, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderTxt[tB][tBC[tB]]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -904,7 +902,7 @@ void Signage::Update()
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]]);
+										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderTxt[tB][tBC[tB]]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -1046,6 +1044,7 @@ void Signage::Update()
 										sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
 									}
 									iBoxes[pB].setScreen(tBC[tB]);
+									printf("Attempting to load Texture '%s'...", bdID);
 									if (FileExists(bdID) == false)
 										sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
 									bTex[tB].Destroy();
@@ -1125,20 +1124,20 @@ void Signage::Draw()
 	glLoadIdentity();
 
 	/* Draw Title */
-	drawText(sHeader, fntCGothic[7], 3, 255, 255, 255, 255, 1280, 680);
+	drawText(sHeader, fntCGothic[7], 3, 255, 255, 255, 255, 0, 1280, 680);
 
 	/* Draw Time */
-	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 1262, 8);
+	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262, 8);
 
 	if (bV1)
 	{
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 44, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 44, 11);
 		else
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 1262 - pTWidth + 26, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 26, 11);
 	}
 
-	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 1172, 32);
+	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 0, 1172, 32);
 
 	/* Draw Weather */
 	if (wOK)
@@ -1146,11 +1145,11 @@ void Signage::Draw()
 		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 16, 8);
+			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 0, 16, 8);
 		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic[5], 1, 255, 0, 0, 255, 16, 8);
+			drawText(wTemp, fntCGothic[5], 1, 255, 0, 0, 255, 0, 16, 8);
 		else
-			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
+			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
 		iBoxes[1].rePos(16 + pTWidth, 0);
@@ -1158,15 +1157,15 @@ void Signage::Draw()
 		switch (wCurDisp)
 		{
 		case 0:
-			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
+			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
 			;
 			break;
 		case 1:
-			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
+			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
 			;
 			break;
 		case 2:
-			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
+			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
 			;
 			break;
 		}
@@ -1174,7 +1173,7 @@ void Signage::Draw()
 	}
 	else
 	{
-		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 16, 8);
+		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8);
 		iBoxes[1].Destroy();
 	}
 
@@ -1209,6 +1208,15 @@ void Signage::Draw()
 				{
 					m_bRunning = false;
 					m_bQuitting = true;
+				}
+				else
+				{
+					if (iBoxes[n].hasHeader() == true)
+					{
+						// drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py)
+						drawText(iBoxes[n].txtHeader(), fntCGothic[3], 3, 0, 0, 0, pFade[n - 10], tPX[n - 10] + tW[n - 10], tPX[n - 10],
+								tH[n - 10] + tPY[n - 10] - 25);
+					}
 				}
 			}
 		}
@@ -1271,7 +1279,7 @@ void Signage::Clean()
 	}
 }
 
-void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py)
+void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int offset, int px, int py)
 {
 	SDL_Surface* initial;
 	SDL_Color color;
@@ -1282,7 +1290,7 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	color.b = cr;
 	color.g = cg;
 	color.r = cb;
-	location.x = px;
+	location.x = px + offset;
 	location.y = py;
 
 	/* Use SDL_TTF to render our text */
@@ -1352,54 +1360,6 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	/* Clean up */
 	SDL_FreeSurface(initial);
 	glDeleteTextures(1, &texture);
-}
-
-int Signage::calcDay_Dec31(int yyyy)
-{
-	int dayCode = 0;
-	dayCode = ((yyyy - 1) * 365 + (yyyy - 1) / 4 - (yyyy - 1) / 100 + (yyyy - 1) / 400) % 7;
-	return dayCode;
-}
-
-int Signage::dayInYear(int dd, int mm)
-{
-	switch (mm)
-	{
-	case 11:
-		dd += 30;
-		break;
-	case 10:
-		dd += 31;
-		break;
-	case 9:
-		dd += 30;
-		break;
-	case 8:
-		dd += 31;
-		break;
-	case 7:
-		dd += 31;
-		break;
-	case 6:
-		dd += 30;
-		break;
-	case 5:
-		dd += 31;
-		break;
-	case 4:
-		dd += 30;
-		break;
-	case 3:
-		dd += 31;
-		break;
-	case 2:
-		dd += 28;
-		break;
-	case 1:
-		dd += 31;
-		break;
-	}
-	return dd;
 }
 
 void Signage::dayInStr(char daysInWord[], int days)
