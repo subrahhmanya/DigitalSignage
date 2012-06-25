@@ -15,9 +15,7 @@ killall -9 infodisplay > /dev/null 2>&1
 
 #Create Directory Structure (if not already done)
 logOut "Creating structure for Boards..."
-mkdir -p ${scrroot}boards/1 > /dev/null 2>&1
-mkdir -p ${scrroot}boards/2 > /dev/null 2>&1
-mkdir -p ${scrroot}boards/3 > /dev/null 2>&1
+mkdir -p ${scrroot}boards > /dev/null 2>&1
 
 #Delete old binary and associated files...
 logOut "Removing old infodisplay files..."
