@@ -966,8 +966,8 @@ void Signage::Update()
 									if (tPRunning[tB] == false)
 									{
 										/* Plugin exists - Run Command! */
-										printf("Plugin Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
-												iBoxes[pB].getScreen(), ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
+										printf("Plugin Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+												iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
 												tScrollV[tB]);
 										tPRunning[tB] = true;
 										pPluginCMD[tB] = NULL;
@@ -983,8 +983,8 @@ void Signage::Update()
 									if ((tScrollV[tB] == 0)
 											|| ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
 													== (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255))))
-										printf("Timer Event Check (%i) (%i,%i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
-												iBoxes[pB].getScreen(), ttB + 1, tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
+										printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+												iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
 												tScrollV[tB]);
 
 									/* Check and Scroll if it's a big image */
