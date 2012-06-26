@@ -988,17 +988,17 @@ void Signage::Update()
 												tScrollV[tB]);
 
 									/* Check and Scroll if it's a big image */
-									if ((bTex[tB].height() > tH[tB]) && (pFade[tB] == 255))
+									if ((bTex[tB].height() > tH[tB]) && (pFade[tB] == 255.0))
 									{
 										/* We need to scroll! */
 										if (((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
-												< (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255))))
+												< (tSc[tB] * (bTex[tB].height() / 255.0)) - (tSc[tB] * (tH[tB] / 255.0))))
 										{
 											tScrollV[tB]++;
 											scrUpdate = true;
 										}
 										if ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
-												>= (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255)))
+												>= (tSc[tB] * (bTex[tB].height() / 255.0)) - (tSc[tB] * (tH[tB] / 255.0)))
 										{
 											/* Instead of eventually hitting an upper limit on the scroll
 											 we loop the scroll value to keep things clean */
@@ -1082,7 +1082,7 @@ void Signage::Update()
 									bTex[tB].Load(bdID);
 									/* Scale Texture to Box unless we scroll */
 									int texH = 0;
-									if (bTex[tB].height() < sHeight)
+									if (bTex[tB].height() < tH[tB])
 										texH = tH[tB];
 									else
 										texH = bTex[tB].height();
