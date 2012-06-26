@@ -12,6 +12,11 @@ function logOut {
 #We're updating - kill previous infodisplay
 logOut "Killing existing infodisplay process..."
 killall -9 infodisplay > /dev/null 2>&1
+# Kill any other instance of mplayer/rtmpdump/get_iplayer just incase already running.
+killall -9 mplayer > /dev/null 2>&1
+killall -9 rtmpdump > /dev/null 2>&1
+killall -9 get_iplayer > /dev/null 2>&1
+
 
 #Create Directory Structure (if not already done)
 logOut "Creating structure for Boards..."
