@@ -299,7 +299,7 @@ void Signage::Update()
 
 		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
 			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1, "null", false, "");
+					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1, "null", false, false, "", "");
 		else
 			iBoxes[0].doUpdate();
 
@@ -598,7 +598,7 @@ void Signage::Update()
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 					weather[0].Load(tBuff);
 					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), weather[0].width(),
-							weather[0].height(), 255, 1, 1, "null", false, "");
+							weather[0].height(), 255, 1, 1, "null", false, false, "", "");
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -680,35 +680,39 @@ void Signage::Update()
 							if (pSection->GetKey("Enabled"))
 							{
 								tEn[curD] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
-								if (tEn[curD] == 1)
+								if ((tEn[curD] == 1)
+										&& ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
+												&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
+												&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp"))))
 								{
-									if ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
-											&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
-											&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp")))
+									/* Only alter these details if UID or TS differ */
+									if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[curD]) != 0)
+											|| (tTs[curD] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
 									{
-										/* Only alter these details if UID or TS differ */
-										if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[curD]) != 0)
-												|| (tTs[curD] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
-										{
-											tBC[curD] = -1;
-											tBR[curD] = 0;
-											sprintf(tFldr[curD], "%s", dList[dS].c_str());
-											sprintf(tUID[curD], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
-											tPX[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-											tPY[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-											tSc[curD] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-											tBr[curD] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-											tW[curD] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-											tH[curD] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-											tBt[curD] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-											tA[curD] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-											tTs[curD] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-											sprintf(bPluginCmd[curD], "%s", ini.GetKeyValue("BoardSettings", "Plugin").c_str());
-											bChanger[curD] = true;
-											//char str[] = bPluginCmd[curD].c_str;
-										}
-										validConfig[curD] = true;
+										tBC[curD] = -1;
+										tBR[curD] = 0;
+										sprintf(tFldr[curD], "%s", dList[dS].c_str());
+										sprintf(tUID[curD], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+										tPX[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+										tPY[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+										tSc[curD] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+										tBr[curD] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+										tW[curD] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+										tH[curD] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+										tBt[curD] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+										tA[curD] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+										sprintf(tSHeaderTxt[curD], "%s", ini.GetKeyValue("BoardSettings", "Header").c_str());
+										tSHeaderSize[curD] = atoi(ini.GetKeyValue("BoardSettings", "HeaderSize").c_str());
+										if (atoi(ini.GetKeyValue("BoardSettings", "HeaderEn").c_str()) == 1)
+											tHeaderVis[curD] = true;
+										else
+											tHeaderVis[curD] = false;
+										tTs[curD] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+										sprintf(bPluginCmd[curD], "%s", ini.GetKeyValue("BoardSettings", "Plugin").c_str());
+										bChanger[curD] = true;
+										//char str[] = bPluginCmd[curD].c_str;
 									}
+									validConfig[curD] = true;
 								}
 							}
 						}
@@ -732,6 +736,7 @@ void Signage::Update()
 										tSType[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
 										tSSpeed[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
 										sprintf(tHeaderTxt[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Header").c_str());
+										tBHeaderSize[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "HeaderSize").c_str());
 										if (atoi(ini.GetKeyValue(bSection[curD], "HeaderEn").c_str()) == 1)
 											bHeaderVis[curD][brdC] = true;
 										else
@@ -819,6 +824,8 @@ void Signage::Update()
 						tH[curD] = 0;
 						tBt[curD] = 0;
 						tA[curD] = 0;
+						tHeaderVis[curD] = false;
+						sprintf(tSHeaderTxt[curD], "%s", "");
 						tTs[curD] = 0;
 						sprintf(bPluginCmd[curD], "%s", "");
 						sprintf(bSection[curD], "%s", "");
@@ -843,21 +850,17 @@ void Signage::Update()
 					{
 						for (int ttB = 0; ttB < 64; ttB++)
 						{
-							if (strlen(tSrc[tB][ttB]) > 0)
+							if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0))
 							{
-								if (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0)
+								/* We Found a Board!  Check the TimeStamp */
+								if ((tTs[tB] != iBoxes[pB].GetTStamp()) && (iBoxes[pB].stype() != -1))
 								{
-									/* We Found a Board!  Check the TimeStamp */
-									if (tTs[tB] != iBoxes[pB].GetTStamp())
-										/* Time Stamp Not Match - Signal for Board Destroy */
-										if (iBoxes[pB].stype() != -1)
-										{
-											iBoxes[pB].Destroy();
-											tBC[tB] = -1;
-										}
-									bFound = true;
-									break;
+									/* Time Stamp Not Match - Signal for Board Destroy */
+									iBoxes[pB].Destroy();
+									tBC[tB] = -1;
 								}
+								bFound = true;
+								break;
 							}
 						}
 					}
@@ -895,7 +898,7 @@ void Signage::Update()
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										1, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderTxt[tB][tBC[tB]]);
+										1, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderVis[tB], tHeaderTxt[tB][tBC[tB]], tSHeaderTxt[tB]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -904,7 +907,7 @@ void Signage::Update()
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										3, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderTxt[tB][tBC[tB]]);
+										3, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderVis[tB], tHeaderTxt[tB][tBC[tB]], tSHeaderTxt[tB]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -913,7 +916,8 @@ void Signage::Update()
 							{
 								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
 								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderTxt[tB][tBC[tB]]);
+										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderVis[tB], tHeaderTxt[tB][tBC[tB]],
+										tSHeaderTxt[tB]);
 								if (tBCMod == true)
 									tBC[tB] = -1;
 								break;
@@ -958,22 +962,16 @@ void Signage::Update()
 							bool resetClicks = false;
 							bool scrUpdate = false;
 
-							if ((now > (iBoxes[pB].getClicks() + (tDuration[tB][iBoxes[pB].getScreen()] - 6))))
+							if (((now > (iBoxes[pB].getClicks() + (tDuration[tB][iBoxes[pB].getScreen()] - 6))))
+									&& ((strlen(bPluginCmd[tB]) != 0) && (tPRunning[tB] == false)))
 							{
 								/* Run Plugin 5 seconds before transition.*/
-								if (strlen(bPluginCmd[tB]) != 0)
-								{
-									if (tPRunning[tB] == false)
-									{
-										/* Plugin exists - Run Command! */
-										printf("Plugin Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
-												iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
-												tScrollV[tB]);
-										tPRunning[tB] = true;
-										pPluginCMD[tB] = NULL;
-										pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
-									}
-								}
+								/* Plugin exists - Run Command! */
+								printf("Plugin Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+										iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB], tScrollV[tB]);
+								tPRunning[tB] = true;
+								pPluginCMD[tB] = NULL;
+								pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
 							}
 
 							if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
@@ -997,18 +995,15 @@ void Signage::Update()
 											tScrollV[tB]++;
 											scrUpdate = true;
 										}
-										if ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
-												>= (tSc[tB] * (bTex[tB].height() / 255.0)) - (tSc[tB] * (tH[tB] / 255.0)))
+										if (((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
+												>= (tSc[tB] * (bTex[tB].height() / 255.0)) - (tSc[tB] * (tH[tB] / 255.0))) && (tSComp[tB] == 0))
 										{
 											/* Instead of eventually hitting an upper limit on the scroll
 											 we loop the scroll value to keep things clean */
-											if (tSComp[tB] == 0)
-											{
-												iBoxes[pB].setClicks(now);
-												tPRunning[tB] = false;
-												scrUpdate = true;
-												tSComp[tB] = 1;
-											}
+											iBoxes[pB].setClicks(now);
+											tPRunning[tB] = false;
+											scrUpdate = true;
+											tSComp[tB] = 1;
 										}
 										iBoxes[pB].setScrollV(tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()]);
 									}
@@ -1245,11 +1240,22 @@ void Signage::Draw()
 				}
 				else
 				{
-					if (iBoxes[n].hasHeader() == true)
+					//void drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int offset, int px, int py);
+					if (iBoxes[n].hasSHeader() == true)
 					{
-						// drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py)
-						drawText(iBoxes[n].txtHeader(), fntCGothic[3], 3, 0, 0, 0, pFade[n - 10], tPX[n - 10] + tW[n - 10], tPX[n - 10],
-								tH[n - 10] + tPY[n - 10] - 25);
+						drawText(iBoxes[n].txtSHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, 255,
+								tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
+								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (18 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5));
+					}
+					else
+					{
+						if (iBoxes[n].hasHeader() == true)
+						{
+							// drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py)
+							drawText(iBoxes[n].txtHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, pFade[n - 10],
+									tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
+									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (20 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5));
+						}
 					}
 				}
 			}

@@ -150,7 +150,9 @@ bool Box::doDraw(int aOverride)
 		tSTimer = 0;
 		tCScreen = -1;
 		bHeaderEnab = false;
+		sHeaderEnab = false;
 		sprintf(bHeaderTxt, "*");
+		sprintf(sHeaderTxt, "*");
 		sprintf(audEnable, "*");
 		sprintf(bUID, "*");
 		sprintf(bMSRC, "*");
@@ -252,7 +254,7 @@ void Box::SwapTex(GLuint TextureID, int w, int h)
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
-		int sourceType, int dScreen, char dAudio[16], bool hasHeader, char txtHeader[256])
+		int sourceType, int dScreen, char dAudio[16], bool hasHeader, bool hasSHeader, char txtHeader[256], char txtSHeader[256])
 {
 	bType = false;
 	if (bcol == 1)
@@ -294,6 +296,8 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	bTStamp = tStamp;
 	tCScreen = dScreen;
 	bHeaderEnab = hasHeader;
+	sHeaderEnab = hasSHeader;
+	sprintf(sHeaderTxt, "%s", txtSHeader);
 	sprintf(bHeaderTxt, "%s", txtHeader);
 	sprintf(audEnable, "%s", dAudio);
 	sprintf(bUID, "%s", btUID);
@@ -504,11 +508,13 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 			}
 		}
 	}
-	if (bHeaderEnab == true)
+	if ((bHeaderEnab == true) || (sHeaderEnab == true))
 	{
 		if (layout[4].width() != 0)
 		{
 			/* Draw a Header Image */
+			if (sHeaderEnab == true)
+				glColor4f(br, bg, bb, (float) balpha / 255.0);
 			//sprintf(bHeaderTxt, "*");
 			glBindTexture(GL_TEXTURE_2D, layout[4].gltex());
 			glBegin(GL_QUADS);
