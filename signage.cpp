@@ -1240,7 +1240,6 @@ void Signage::Draw()
 				}
 				else
 				{
-					//void drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int offset, int px, int py);
 					if (iBoxes[n].hasSHeader() == true)
 					{
 						drawText(iBoxes[n].txtSHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, 255,
@@ -1251,7 +1250,6 @@ void Signage::Draw()
 					{
 						if (iBoxes[n].hasHeader() == true)
 						{
-							// drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int px, int py)
 							drawText(iBoxes[n].txtHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, pFade[n - 10],
 									tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
 									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (20 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5));
@@ -1263,12 +1261,12 @@ void Signage::Draw()
 	}
 
 	/* Draw FPS */
-	int currentFPS = 0;
-	char FPSC[32] = "";
-	counter.tick();
-	currentFPS = counter.get_fps();
-	sprintf(FPSC, "FPS - %i", currentFPS);
-	// drawText(FPSC, fntCGothic[0], 1, 255, 255, 255, 255, 2, 0);
+	// int currentFPS = 0;
+	// char FPSC[32] = "";
+	// counter.tick();
+	// currentFPS = counter.get_fps();
+	// sprintf(FPSC, "FPS - %i", currentFPS);
+	// drawText(FPSC, fntCGothic[0], 0, 255, 255, 255, 255, 0, 2, 0);
 
 	/* Swap Buffers */
 	SDL_GL_SwapBuffers();
