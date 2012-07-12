@@ -36,6 +36,8 @@ int main(int argc, char* argv[])
 					char tMID[256];
 					char tHeader[256];
 					char tWLoc[64];
+					char tWCountry[64];
+					char tWAPI[64];
 					if (atoi(ini.GetKeyValue("GeneralSettings", "FullScreen").c_str()) == 1)
 						tFS = true;
 					tWX = atoi(ini.GetKeyValue("GeneralSettings", "SWidth").c_str());
@@ -44,8 +46,10 @@ int main(int argc, char* argv[])
 					sprintf(tMID, "%s", ini.GetKeyValue("GeneralSettings", "MID").c_str());
 					sprintf(tHeader, "%s", ini.GetKeyValue("GeneralSettings", "Header").c_str());
 					sprintf(tWLoc, "%s", ini.GetKeyValue("GeneralSettings", "WeatherLoc").c_str());
+					sprintf(tWCountry, "%s", ini.GetKeyValue("GeneralSettings", "WeatherCountry").c_str());
+					sprintf(tWAPI, "%s", ini.GetKeyValue("GeneralSettings", "WeatherAPI").c_str());
 
-					signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc);
+					signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc, tWCountry, tWAPI);
 
 					while (signage.Running())
 					{

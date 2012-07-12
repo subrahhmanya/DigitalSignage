@@ -106,15 +106,18 @@ Signage::Signage()
 	wUpdateTimer[2] = 0;
 	wUpdateTimer[3] = 0;
 	wUpdateTimer[4] = 0;
-	wCurDisp = 0;
-	wFarenheight = 0;
-	wIWind = 0;
-	tFarenheight = 0;
-	tCondition = 0;
-	tHumidity = 0;
-	tIcon = -1;
-	tOIcon = -2;
-	tWind = 0;
+	wCurDisp = 99;
+
+	tIcon = 0;
+	tOIcon = 0;
+	trObservationTime = 0;
+	trTemp = 0;
+	trWeatherCode = 0;
+	trWindSpeedMPH = 0;
+	trWindDir = 0;
+	trHumidity = 0;
+	trPressure = 0;
+
 	tSrS = 0;
 	bV1 = false;
 	wOK = false;
@@ -122,12 +125,13 @@ Signage::Signage()
 	wCelcius = 0.0;
 }
 
-void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc)
+void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc, const char* weathercountry,
+		const char* weatherapi)
 {
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
 	m_bQuitting = false;
-	wCurDisp = 0;
+	wCurDisp = 99;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -211,6 +215,8 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	/* Load Default Texture Items */
 	pLogo.Load("/screen/textures/orblogo.png");
+	tScrollTex[0].Load("/screen/textures/fader_blft.png");
+	tScrollTex[1].Load("/screen/textures/fader_brght.png");
 
 	/* Load Fonts */
 	int n;
@@ -231,6 +237,8 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	sprintf(sHeader, "%s", header);
 	sprintf(sWLoc, "%s", weatherloc);
+	sprintf(sWCountry, "%s", weathercountry);
+	sprintf(sWAPI, "%s", weatherapi);
 
 	/* FPS Timer */
 	counter = fps_counter();
@@ -321,11 +329,16 @@ void Signage::Update()
 					printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 				}
 				/* Hour is odd, we call check */
-				tFarenheight = 0;
-				tCondition = 0;
-				tHumidity = 0;
 				tIcon = 0;
-				tWind = 0;
+				tOIcon = 0;
+				trObservationTime = 0;
+				trTemp = 0;
+				trWeatherCode = 0;
+				trWindSpeedMPH = 0;
+				trWindDir = 0;
+				trHumidity = 0;
+				trPressure = 0;
+
 				wFadeTI = 0;
 				wOK = false; /* New Check - default wOK to false (so data regarded dirty first) */
 				xmlDoc *doc = NULL;
@@ -336,7 +349,9 @@ void Signage::Update()
 				// the DLL we are using
 				/*parse the file and get the DOM */
 				char tWString[512];
-				sprintf(tWString, "http://www.google.com/ig/api?weather=%s", sWLoc);
+				// http://free.worldweatheronline.com/feed/weather.ashx?q=Swynnerton,United+Kingdom&format=xml&key=80c7123c45084147121107  //
+				sprintf(tWString, "http://free.worldweatheronline.com/feed/weather.ashx?q=%s,%s&format=xml&key=%s", sWLoc, sWCountry, sWAPI);
+				printf("Checking URL - %s\n", tWString);
 				doc = xmlReadFile(tWString, NULL, 0);
 				if (doc)
 				{
@@ -360,55 +375,14 @@ void Signage::Update()
 					wOK = false;
 				}
 				/* Calculate Weather */
-				wCelcius = floorf(((5.0 / 9.0) * (wFarenheight - 32.0)) * 10 + 0.5) / 10;
+				wCelcius = floorf(((5.0 / 9.0) * (tTemp - 32.0)) * 10 + 0.5) / 10;
 				sprintf(wTemp, "%.1fºC", wCelcius);
 			}
 		}
 		if (wOK)
 		{
 			/* Set the Weather Icon */
-			if (strcmp("/ig/images/weather/chance_of_storm.gif", wIcon) == 0)
-				tIcon = 0;
-			if (strcmp("/ig/images/weather/mostly_sunny.gif", wIcon) == 0)
-				tIcon = 1;
-			if (strcmp("/ig/images/weather/dust.gif", wIcon) == 0)
-				tIcon = 2;
-			if (strcmp("/ig/images/weather/mostly_cloudy.gif", wIcon) == 0)
-				tIcon = 3;
-			if (strcmp("/ig/images/weather/cloudy.gif", wIcon) == 0)
-				tIcon = 4;
-			if (strcmp("/ig/images/weather/chance_of_tstorm.gif", wIcon) == 0)
-				tIcon = 5;
-			if (strcmp("/ig/images/weather/partly_cloudy.gif", wIcon) == 0)
-				tIcon = 6;
-			if (strcmp("/ig/images/weather/storm.gif", wIcon) == 0)
-				tIcon = 7;
-			if (strcmp("/ig/images/weather/sunny.gif", wIcon) == 0)
-				tIcon = 8;
-			if (strcmp("/ig/images/weather/flurries.gif", wIcon) == 0)
-				tIcon = 11;
-			if (strcmp("/ig/images/weather/chance_of_snow.gif", wIcon) == 0)
-				tIcon = 12;
-			if (strcmp("/ig/images/weather/chance_of_rain.gif", wIcon) == 0)
-				tIcon = 13;
-			if (strcmp("/ig/images/weather/fog.gif", wIcon) == 0)
-				tIcon = 14;
-			if (strcmp("/ig/images/weather/icy.gif", wIcon) == 0)
-				tIcon = 15;
-			if (strcmp("/ig/images/weather/sleet.gif", wIcon) == 0)
-				tIcon = 16;
-			if (strcmp("/ig/images/weather/rain.gif", wIcon) == 0)
-				tIcon = 17;
-			if (strcmp("/ig/images/weather/mist.gif", wIcon) == 0)
-				tIcon = 18;
-			if (strcmp("/ig/images/weather/haze.gif", wIcon) == 0)
-				tIcon = 19;
-			if (strcmp("/ig/images/weather/smoke.gif", wIcon) == 0)
-				tIcon = 20;
-			if (strcmp("/ig/images/weather/snow.gif", wIcon) == 0)
-				tIcon = 21;
-			if (strcmp("/ig/images/weather/thunderstorm.gif", wIcon) == 0)
-				tIcon = 23;
+			tIcon = tWeatherCode;
 
 			/* Do Looping Weather Animations */
 			if (now > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
@@ -596,9 +570,10 @@ void Signage::Update()
 					}
 					else
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
+
 					weather[0].Load(tBuff);
-					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width(), weather[0].height(), weather[0].width(),
-							weather[0].height(), 255, 1, 1, "null", false, false, "", "");
+					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2, weather[0].height() / 2,
+							weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, "null", false, false, "", "");
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -627,7 +602,16 @@ void Signage::Update()
 					wFadeA[0] = 2;
 					wFadeV[0] = 0;
 					wCurDisp++;
-					if (wCurDisp == 3)
+					tScrolling[0] = 0;
+					tScrollCycle[0] = 0;
+					tScrollSFader[0] = 0;
+					tScrollEFader[0] = 0;
+					tScrollingTimer[0] = now;
+					if (iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
+						iBoxes[2].Destroy();
+					if (iBoxes[3].isCreated() && iBoxes[3].stype() != -1)
+						iBoxes[3].Destroy();
+					if (wCurDisp >= 6)
 						wCurDisp = 0;
 				}
 				if (wFadeV[0] > 255)
@@ -1152,21 +1136,24 @@ void Signage::Draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
+	/* Global for Weather */
+	int tPXX;
+
 	/* Draw Title */
-	drawText(sHeader, fntCGothic[7], 3, 255, 255, 255, 255, 0, 1280, 680);
+	drawText(sHeader, fntCGothic[7], 3, 255, 255, 255, 255, 0, 1280, 680, 0, 0);
 
 	/* Draw Time */
-	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262, 8);
+	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262, 8, 0, 0);
 
 	if (bV1)
 	{
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 44, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 44, 11, 0, 0);
 		else
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 26, 11);
+			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 26, 11, 0, 0);
 	}
 
-	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 0, 1172, 32);
+	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 0, 1172, 32, 0, 0);
 
 	/* Draw Weather */
 	if (wOK)
@@ -1174,36 +1161,119 @@ void Signage::Draw()
 		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 0, 16, 8);
+			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 0, 16, 8, 0, 0);
 		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic[5], 1, 255, 0, 0, 255, 0, 16, 8);
+			drawText(wTemp, fntCGothic[5], 1, 255, 0, 0, 255, 0, 16, 8, 0, 0);
 		else
-			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8);
+			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
-		iBoxes[1].rePos(16 + pTWidth, 0);
+		iBoxes[1].rePos(16 + pTWidth, -6);
 
+		//int tTemp;
+		//int tWeatherCode;
+		//int tWindSpeedMPH;
+		//char tWindDir[8];
+		//int tHumidity;
+		//int tPressure;
+
+		char tWString[64];
 		switch (wCurDisp)
 		{
 		case 0:
-			drawText(wCondition, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
+			// Weather Condition //
+			sprintf(tWString, "%s", tConditionDesc);
 			;
 			break;
 		case 1:
-			drawText(wHumidity, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
-			;
+			// Wind Speed //
+			sprintf(tWString, "Wind: %s at %imph", tWindDir, tWindSpeedMPH);
 			break;
 		case 2:
-			drawText(wWind, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16, 8);
+			// Humidity //
+			sprintf(tWString, "Humidity: %i%%", tHumidity);
+			;
+			break;
+		case 3:
+			// Air Pressure //
+			sprintf(tWString, "Air Pressure: %i mb", tPressure);
+			;
+			break;
+		case 4:
+			// Cloud Cover //
+			sprintf(tWString, "Cloud Cover: %i%%", tCloudCover);
+			;
+			break;
+		case 5:
+			// Visibility //
+			sprintf(tWString, "Visibility: %ikm", tVisibility);
 			;
 			break;
 		}
 
+		int oPX = ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 32;
+		int plPX = (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2);
+
+		tPXX = ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16;
+		int tPXM = plPX - oPX;
+
+		time_t now = time(0); /* We Need this! */
+
+		if (drawText(tWString, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
+		{
+			/* We're either Scrolling or Scrolled. */
+			/* Draw End Fader (obviously) */
+
+			if (!iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
+			{
+				iBoxes[2].Create("Weather Condition Fader - Right", "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), 64,
+						tScrollTex[0].width(), 64, 255, 1, 1, "null", false, false, "", "");
+			}
+
+			tScrollSFader[0] = 0;
+			tScrollEFader[0] = 0;
+			if (wFadeV[0] >= 255)
+			{
+				wUpdateTimer[0] = now - 10;
+				if (now > tScrollingTimer[0] + 5)
+				{
+					if (!iBoxes[3].isCreated() && iBoxes[3].stype() != -1)
+					{
+						iBoxes[3].Create("Weather Condition Fader - Left", "", 0, tScrollTex[1].gltex(), 4, tPXX, 8, tScrollTex[1].width(), 64,
+								tScrollTex[1].width(), 64, 255, 1, 1, "null", false, false, "", "");
+					}
+					else
+					{
+						iBoxes[2].doUpdate();
+
+						if (tScrollCycle[0] == 1)
+						{
+							tScrolling[0]++;
+							tScrollCycle[0] = 0;
+						}
+						else
+							tScrollCycle[0] = 1;
+					}
+				}
+			}
+		}
+		else
+		{
+			/* No Scrolling/Scrolled Text Complete. */
+			if (tScrolling[0] > 0)
+			{
+				/* We did some Scrolling, we need to fade out ending fader */
+				if (iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
+					iBoxes[2].Destroy();
+			}
+			tScrollingTimer[0] = now;
+		}
 	}
 	else
 	{
-		drawText("Weather Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8);
-		iBoxes[1].Destroy();
+		drawText("Weather Currently Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
+		if (iBoxes[1].isCreated())
+			iBoxes[1].Destroy();
 	}
 
 	/* Draw Boxes */
@@ -1244,7 +1314,8 @@ void Signage::Draw()
 					{
 						drawText(iBoxes[n].txtSHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, 255,
 								tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (18 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5));
+								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (18 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5), 0,
+								0);
 					}
 					else
 					{
@@ -1252,7 +1323,8 @@ void Signage::Draw()
 						{
 							drawText(iBoxes[n].txtHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, pFade[n - 10],
 									tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (20 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5));
+									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (20 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5),
+									0, 0);
 						}
 					}
 				}
@@ -1260,6 +1332,13 @@ void Signage::Draw()
 		}
 	}
 
+	/* Draw *Weather As of: */
+	if (wOK)
+	{
+		char tWOB[64];
+		sprintf(tWOB, "Weather Observed at %s", tObservationTime);
+		drawText(tWOB, fntCGothic[1], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
+	}
 	/* Draw FPS */
 	// int currentFPS = 0;
 	// char FPSC[32] = "";
@@ -1267,7 +1346,6 @@ void Signage::Draw()
 	// currentFPS = counter.get_fps();
 	// sprintf(FPSC, "FPS - %i", currentFPS);
 	// drawText(FPSC, fntCGothic[0], 0, 255, 255, 255, 255, 0, 2, 0);
-
 	/* Swap Buffers */
 	SDL_GL_SwapBuffers();
 }
@@ -1314,15 +1392,21 @@ void Signage::Clean()
 			TTF_CloseFont(fntCGothic[n]);
 			printf("OK\n");
 		}
+
+		printf("Destroying Texture Faders... ");
+		tScrollTex[0].Destroy();
+		tScrollTex[1].Destroy();
 	}
 }
 
-void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int offset, int px, int py)
+int Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, int cr, int cg, int cb, int alpha, int offset, int px, int py, int mw,
+		int tScrollV)
 {
 	SDL_Surface* initial;
 	SDL_Color color;
 	SDL_Rect location;
-	int w, h, ax, ay;
+	int w, h, ax, ay, fw, fh, sRes;
+	float cpw, bpw;
 	GLuint texture;
 
 	color.b = cr;
@@ -1334,9 +1418,33 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	/* Use SDL_TTF to render our text */
 	initial = TTF_RenderUTF8_Blended(fntChosen, text, color);
 
-	/* Convert the rendered text to a known format */
 	w = initial->w;
 	h = initial->h;
+
+	/* Calculate Texture from Minimum Width for Scrolling Effect */
+	if ((mw > 0) && (mw < w))
+	{
+		if (tScrollV >= (w - mw))
+		{
+			tScrollV = w - mw;
+			sRes = 0;
+		}
+		else
+			sRes = 1;
+
+		cpw = (1.0f / w) * (mw + tScrollV);
+		bpw = (1.0f / w) * tScrollV;
+		fw = mw;
+		fh = initial->h;
+	}
+	else
+	{
+		cpw = 1.0f;
+		bpw = 0.0f;
+		fw = initial->w;
+		fh = initial->h;
+		sRes = 0;
+	}
 
 	/* Do the Alignment - default is left.
 	 1 = Left Align
@@ -1377,14 +1485,14 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	/* Recall that the origin is in the lower-left corner
 	 That is why the TexCoords specify different corners
 	 than the Vertex coors seem to. */
-	glTexCoord2f(0.0f, 1.0f);
+	glTexCoord2f(bpw, 1.0f);
 	glVertex2f(ax, ay);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex2f(ax + w, ay);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex2f(ax + w, ay + h);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex2f(ax, ay + h);
+	glTexCoord2f(cpw, 1.0f);
+	glVertex2f(ax + fw, ay);
+	glTexCoord2f(cpw, 0.0f);
+	glVertex2f(ax + fw, ay + fh);
+	glTexCoord2f(bpw, 0.0f);
+	glVertex2f(ax, ay + fh);
 	glEnd();
 	/* Bad things happen if we delete the texture before it finishes */
 	glFinish();
@@ -1398,6 +1506,7 @@ void Signage::drawText(const char* text, TTF_Font*& fntChosen, int alignment, in
 	/* Clean up */
 	SDL_FreeSurface(initial);
 	glDeleteTextures(1, &texture);
+	return sRes;
 }
 
 void Signage::dayInStr(char daysInWord[], int days)
@@ -1574,77 +1683,178 @@ void Signage::nthInStr(char dowInWord[], int monthday)
 void Signage::parseWeather(xmlNode * a_node)
 {
 	xmlNode *cur_node = NULL;
-	char tWord[16];
+
+	/* Temporary Variables for storing data */
+	char tTempI[32];
+
 	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
 	{
 		if (cur_node->type == XML_ELEMENT_NODE)
 		{
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "condition"))
+			/* GoogleIG Weather API is officially unsupported, and as-such, come November 1st will be disabled completely.
+			 *
+			 * http://support.google.com/websearch/bin/answer.py?hl=en&answer=2664197
+			 *
+			 * New Weather API Support to use data from http://www.worldweatheronline.com/
+			 * We want the following variables:
+			 *
+			 * 		observation_time
+			 * 		temp_F
+			 * 		weatherCode
+			 * 		windspeedMiles
+			 * 		winddir16Point
+			 * 		humidity
+			 * 		pressure
+			 * 		cloudcover
+			 * 		visibility
+			 */
+
+			// Observation Time //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "observation_time")) && (trObservationTime == 0))
 			{
-				if (tCondition == 0)
-				{
-					sprintf(wCondition, "%s", cur_node->properties->children->content);
-					tCondition = 1;
-					printf("\tItem: %s \tData: %s\n", cur_node->name, wCondition);
-				}
+				sprintf(tObservationTime, "%s", xmlNodeGetContent(cur_node));
+				trObservationTime = 1;
+				printf("\tItem: %s \tData: %s\n", cur_node->name, tObservationTime);
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_f"))
+			// Weather Temperature (Farenheight) //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "temp_F")) && (trTemp == 0))
 			{
-				sprintf(tWord, "%s", cur_node->properties->children->content);
-				if (tFarenheight == 0)
+				trTemp = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
 				{
-					wFarenheight = strtol(tWord, NULL, 0);
-					tFarenheight = wFarenheight;
-					printf("\tItem: %s \t\tData: %i\n", cur_node->name, wFarenheight);
+					if (!isdigit(tTempI[i]))
+						trTemp = 0;
 				}
+				if (trTemp == 1)
+					tTemp = atoi(tTempI);
+				printf("\tItem: %s \t\tData: %i\n", cur_node->name, tTemp);
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity"))
+			// Weather Condition Code (for description and Icon check) //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "weatherCode")) && (trWeatherCode == 0))
 			{
-				if (tHumidity == 0)
+				trWeatherCode = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
 				{
-					tHumidity = 1;
-					sprintf(wHumidity, "%s", cur_node->properties->children->content);
-					printf("\tItem: %s \t\tData: %s\n", cur_node->name, wHumidity);
+					if (!isdigit(tTempI[i]))
+						trWeatherCode = 0;
 				}
+				if (trWeatherCode == 1)
+					tWeatherCode = atoi(tTempI);
+				printf("\tItem: %s \tData: %i\n", cur_node->name, tWeatherCode);
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "icon"))
+			// Wind Speed //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "windspeedMiles")) && (trWindSpeedMPH == 0))
 			{
-				if (tIcon == 0)
+				trWindSpeedMPH = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
 				{
-					tIcon = 1;
-					sprintf(wIcon, "%s", cur_node->properties->children->content);
-					printf("\tItem: %s \t\tData: %s\n", cur_node->name, wIcon);
+					if (!isdigit(tTempI[i]))
+						trWindSpeedMPH = 0;
 				}
+				if (trWindSpeedMPH == 1)
+					tWindSpeedMPH = atoi(tTempI);
+				printf("\tItem: %s \tData: %i\n", cur_node->name, tWindSpeedMPH);
 			}
 
-			if (!xmlStrcmp(cur_node->name, (const xmlChar *) "wind_condition"))
+			// Wind Direction //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "winddir16Point")) && (trWindDir == 0))
 			{
-				if (tWind == 0)
+				sprintf(tWindDir, "%s", xmlNodeGetContent(cur_node));
+				trWindDir = 1;
+				printf("\tItem: %s \tData: %s\n", cur_node->name, tWindDir);
+			}
+
+			// Humidity //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "humidity")) && (trHumidity == 0))
+			{
+				trHumidity = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
 				{
-					tWind = 1;
-					sprintf(wWind, "%s", cur_node->properties->children->content);
-					/* Get speed of wind and convert to int */
-					for (int i = 0; i < strlen(wWind); ++i)
-					{
-						if (isdigit(wWind[i]))
-							if (wIWind == 0)
-								wIWind = atoi(&wWind[i]);
-					}
-					printf("\tItem: %s \tData: %s\n", cur_node->name, wWind);
+					if (!isdigit(tTempI[i]))
+						trHumidity = 0;
 				}
-				/* Return wOK if all variables have been set. We do this here. as all data is parsed in sequence.
-				 This way, even if only part of the data was missed, we still declare as Dirty */
-				if ((tWind != 0) && (tIcon != 0) && (tHumidity != 0) && (tFarenheight != 0) && (tCondition != 0))
-					wOK = true;
-				else
-					wOK = false;
+				if (trHumidity == 1)
+					tHumidity = atoi(tTempI);
+				printf("\tItem: %s \t\tData: %i\n", cur_node->name, tHumidity);
+			}
+
+			// Air Pressure //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "pressure")) && (trPressure == 0))
+			{
+				trPressure = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
+				{
+					if (!isdigit(tTempI[i]))
+						trPressure = 0;
+				}
+				if (trPressure == 1)
+					tPressure = atoi(tTempI);
+				printf("\tItem: %s \t\tData: %i\n", cur_node->name, tPressure);
+			}
+
+			// Cloud Cover //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "cloudcover")) && (trCloudCover == 0))
+			{
+				trCloudCover = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
+				{
+					if (!isdigit(tTempI[i]))
+						trCloudCover = 0;
+				}
+				if (trCloudCover == 1)
+					tCloudCover = atoi(tTempI);
+				printf("\tItem: %s \tData: %i\n", cur_node->name, tCloudCover);
+			}
+
+			// Visibility //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "visibility")) && (trVisibility == 0))
+			{
+				trVisibility = 1;
+				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
+				/* Get speed of wind and convert to int */
+				for (int i = 0; i < strlen(tTempI); ++i)
+				{
+					if (!isdigit(tTempI[i]))
+						trVisibility = 0;
+				}
+				if (trVisibility == 1)
+					tVisibility = atoi(tTempI);
+				printf("\tItem: %s \tData: %i\n", cur_node->name, tVisibility);
+			}
+
+			// Weather Description //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "weatherDesc")) && (trConditionDesc == 0))
+			{
+				sprintf(tConditionDesc, "%s", xmlNodeGetContent(cur_node));
+				trConditionDesc = 1;
+				printf("\tItem: %s \tData: %s\n", cur_node->name, tConditionDesc);
 			}
 		}
-		parseWeather(cur_node->children);
+
+		// Ensure we only parse data from Current Condition section.
+		if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "data")) || (!xmlStrcmp(cur_node->name, (const xmlChar *) "current_condition")))
+			parseWeather(cur_node->children);
 	}
+	if ((trObservationTime == 1) && (trTemp == 1) && (trWeatherCode == 1) && (trWindSpeedMPH == 1) && (trWindDir == 1) && (trHumidity == 1)
+			&& (trPressure == 1))
+		wOK = true;
+	else
+		wOK = false;
 }
 
 bool Signage::FileExists(const char* FileName)
