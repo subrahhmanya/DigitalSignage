@@ -1342,7 +1342,7 @@ void Signage::Draw()
 	/* Draw FPS */
 	// int currentFPS = 0;
 	// char FPSC[32] = "";
-	// counter.tick();
+	counter.tick();
 	// currentFPS = counter.get_fps();
 	// sprintf(FPSC, "FPS - %i", currentFPS);
 	// drawText(FPSC, fntCGothic[0], 0, 255, 255, 255, 255, 0, 2, 0);
