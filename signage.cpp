@@ -552,23 +552,23 @@ void Signage::Update()
 				{
 					wFadeA[1] = 2;
 					wFadeV[1] = 0;
-					if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
-					{
-						if (wFadeTI == 1)
-						{
-							if (wCelcius <= 3.0)
-								sprintf(tBuff, "%s/9.png", tBuff);
-							else
-								sprintf(tBuff, "%s/22.png", tBuff);
-						}
-						else
-							sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
-						if (wFadeTI == 1)
-							wFadeTI = 0;
-						else
-							wFadeTI = 1;
-					}
-					else
+					//if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
+					//{
+					//	if (wFadeTI == 1)
+					//	{
+					//		if (wCelcius <= 3.0)
+					//			sprintf(tBuff, "%s/freeze.png", tBuff);
+					//		else
+					//			sprintf(tBuff, "%s/roast.png", tBuff);
+					//	}
+					//	else
+					//		sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
+					//	if (wFadeTI == 1)
+					//		wFadeTI = 0;
+					//	else
+					//		wFadeTI = 1;
+					//}
+					//else
 						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 
 					weather[0].Load(tBuff);
@@ -1268,6 +1268,8 @@ void Signage::Draw()
 			}
 			tScrollingTimer[0] = now;
 		}
+
+		/* Draw Leaves if Windy */
 	}
 	else
 	{
