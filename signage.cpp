@@ -217,6 +217,9 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	pLogo.Load("/screen/textures/orblogo.png");
 	tScrollTex[0].Load("/screen/textures/fader_blft.png");
 	tScrollTex[1].Load("/screen/textures/fader_brght.png");
+	weather[1].Load("/screen/textures/weather/gales.png");
+	weather[2].Load("/screen/textures/weather/hot.png");
+	weather[3].Load("/screen/textures/weather/cold.png");
 
 	/* Load Fonts */
 	int n;
@@ -390,24 +393,22 @@ void Signage::Update()
 				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
 				{
 					wUpdateTimer[1] = now;
-					switch (wFadeA[1])
+
+					if (!iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
 					{
-					case 0:
-						wFadeA[1] = 1;
-						;
-						break;
-					case 1:
-						wFadeA[1] = 2;
-						;
-						break;
-					case 2:
-						wFadeA[1] = 1;
-						;
-						break;
+						if (wCelcius <= 3.0)
+							iBoxes[5].Create("Weather Temp Cold Alert Cycle", "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2, weather[3].height() / 2,
+									weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, "null", false, false, "", "");
+						else
+							iBoxes[5].Create("Weather Temp Hot Alert Cycle", "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2, weather[2].height() / 2,
+									weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, "null", false, false, "", "");
+
 					}
+					else if (iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
+						iBoxes[5].Destroy();
 				}
-				else
-					wFadeA[1] = 0;
+				//else
+				//	wFadeA[1] = 0;
 			}
 
 			if (now > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
@@ -552,24 +553,7 @@ void Signage::Update()
 				{
 					wFadeA[1] = 2;
 					wFadeV[1] = 0;
-					//if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
-					//{
-					//	if (wFadeTI == 1)
-					//	{
-					//		if (wCelcius <= 3.0)
-					//			sprintf(tBuff, "%s/freeze.png", tBuff);
-					//		else
-					//			sprintf(tBuff, "%s/roast.png", tBuff);
-					//	}
-					//	else
-					//		sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
-					//	if (wFadeTI == 1)
-					//		wFadeTI = 0;
-					//	else
-					//		wFadeTI = 1;
-					//}
-					//else
-						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
+					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 
 					weather[0].Load(tBuff);
 					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2, weather[0].height() / 2,
@@ -1163,12 +1147,18 @@ void Signage::Draw()
 		if (wCelcius <= 3.0)
 			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 0, 16, 8, 0, 0);
 		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic[5], 1, 255, 0, 0, 255, 0, 16, 8, 0, 0);
+			drawText(wTemp, fntCGothic[5], 1, 255, 128, 128, 255, 0, 16, 8, 0, 0);
 		else
 			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
+		//tWIPosX = 16 + pTWidth;
+		//tWIPosX = -6;
 		iBoxes[1].rePos(16 + pTWidth, -6);
+		if (iBoxes[4].isCreated())
+			iBoxes[4].rePos(16 + pTWidth, -6);
+		if (iBoxes[5].isCreated())
+			iBoxes[5].rePos(16 + pTWidth, -6);
 
 		//int tTemp;
 		//int tWeatherCode;
@@ -1270,6 +1260,19 @@ void Signage::Draw()
 		}
 
 		/* Draw Leaves if Windy */
+		if (tWindSpeedMPH >= 25)
+		{
+			if (!iBoxes[4].isCreated() && iBoxes[4].stype() != -1)
+			{
+				iBoxes[4].Create("Weather Wind Alert", "", 0, weather[1].gltex(), 4, 0, 0, weather[1].width() / 2, weather[1].height() / 2,
+						weather[1].width() / 2, weather[1].height() / 2, 255, 1, 1, "null", false, false, "", "");
+			}
+		}
+		else
+		{
+			if (iBoxes[4].isCreated() && iBoxes[4].stype() != -1)
+				iBoxes[4].Destroy();
+		}
 	}
 	else
 	{
@@ -1387,6 +1390,9 @@ void Signage::Clean()
 
 		printf("Destroying Texture weather... ");
 		weather[0].Destroy();
+		weather[1].Destroy();
+		weather[2].Destroy();
+		weather[3].Destroy();
 		int n;
 		for (n = 0; n < 10; n++)
 		{
@@ -1724,7 +1730,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trTemp = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
@@ -1740,7 +1745,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trWeatherCode = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
@@ -1756,7 +1760,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trWindSpeedMPH = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
@@ -1780,7 +1783,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trHumidity = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
@@ -1796,7 +1798,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trPressure = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
@@ -1812,7 +1813,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trCloudCover = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
@@ -1828,7 +1828,6 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				trVisibility = 1;
 				sprintf(tTempI, "%s", xmlNodeGetContent(cur_node));
-				/* Get speed of wind and convert to int */
 				for (int i = 0; i < strlen(tTempI); ++i)
 				{
 					if (!isdigit(tTempI[i]))
