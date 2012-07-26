@@ -364,7 +364,6 @@ void Signage::Update()
 				doc = xmlReadFile(tWString, NULL, 0);
 				if (doc)
 				{
-
 					/*Get the root element node */
 					root_element = xmlDocGetRootElement(doc);
 					parseWeather(root_element);
@@ -403,11 +402,11 @@ void Signage::Update()
 					if (!iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
 					{
 						if (wCelcius <= 3.0)
-							iBoxes[5].Create("Weather Temp Cold Alert Cycle", "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2, weather[3].height() / 2,
-									weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, "null", false, false, "", "");
+							iBoxes[5].Create("Weather Temp Cold Alert Cycle", "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2,
+									weather[3].height() / 2, weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, "null", false, false, "", "");
 						else
-							iBoxes[5].Create("Weather Temp Hot Alert Cycle", "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2, weather[2].height() / 2,
-									weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, "null", false, false, "", "");
+							iBoxes[5].Create("Weather Temp Hot Alert Cycle", "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2,
+									weather[2].height() / 2, weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, "null", false, false, "", "");
 
 					}
 					else if (iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
@@ -1098,7 +1097,6 @@ void Signage::Update()
 		SDL_Surface * scrimage = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
 
 		glReadBuffer(GL_FRONT);
-		//glReadPixels(0, 0, screen->w, screen->h, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 
 		void *pixels = malloc(screen->w * screen->h * 3);
 		if (pixels == NULL)
@@ -1158,20 +1156,11 @@ void Signage::Draw()
 			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
-		//tWIPosX = 16 + pTWidth;
-		//tWIPosX = -6;
 		iBoxes[1].rePos(16 + pTWidth, -6);
 		if (iBoxes[4].isCreated())
 			iBoxes[4].rePos(16 + pTWidth, -6);
 		if (iBoxes[5].isCreated())
 			iBoxes[5].rePos(16 + pTWidth, -6);
-
-		//int tTemp;
-		//int tWeatherCode;
-		//int tWindSpeedMPH;
-		//char tWindDir[8];
-		//int tHumidity;
-		//int tPressure;
 
 		char tWString[64];
 		switch (wCurDisp)
@@ -1350,13 +1339,17 @@ void Signage::Draw()
 		sprintf(tWOB, "Weather Observed at %s", tObservationTime);
 		drawText(tWOB, fntCGothic[1], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
 	}
+
+	/* Limit FPS */
+	counter.tick();
+
 	/* Draw FPS */
 	// int currentFPS = 0;
 	// char FPSC[32] = "";
-	counter.tick();
 	// currentFPS = counter.get_fps();
 	// sprintf(FPSC, "FPS - %i", currentFPS);
 	// drawText(FPSC, fntCGothic[0], 0, 255, 255, 255, 255, 0, 2, 0);
+
 	/* Swap Buffers */
 	SDL_GL_SwapBuffers();
 }
