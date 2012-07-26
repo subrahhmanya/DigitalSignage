@@ -61,7 +61,7 @@ private:
 	Texture bTex[64];
 	Texture tScrollTex[2];
 	Box iBoxes[128];
-	TTF_Font *fntCGothic[10];
+	TTF_Font *fntCGothic[49];
 	int pTWidth, pTHeight, tC1, tSrS, wFadeTI, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure, trCloudCover, trVisibility, trConditionDesc;
 
 	/* BEGIN Weather Vars */

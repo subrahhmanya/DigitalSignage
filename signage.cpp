@@ -224,10 +224,10 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	/* Load Fonts */
 	int n;
 
-	for (n = 0; n < 10; n++)
+	for (n = 0; n < 49; n++)
 	{
-		printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, 12 + (n * 4));
-		fntCGothic[n] = TTF_OpenFont("/screen/fonts/cgothic.ttf", 12 + (n * 4));
+		printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, n);
+		fntCGothic[n] = TTF_OpenFont("/screen/fonts/cgothic.ttf", n);
 		if (fntCGothic[n] == NULL)
 		{
 			fprintf(stderr, "FAILED -  %s\n", SDL_GetError());
@@ -1128,20 +1128,20 @@ void Signage::Draw()
 	int tPXX;
 
 	/* Draw Title */
-	drawText(sHeader, fntCGothic[7], 3, 255, 255, 255, 255, 0, 1280, 680, 0, 0);
+	drawText(sHeader, fntCGothic[40], 3, 255, 255, 255, 255, 0, 1280, 680, 0, 0);
 
 	/* Draw Time */
-	drawText(dateString, fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262, 8, 0, 0);
+	drawText(dateString, fntCGothic[32], 2, 255, 255, 255, 255, 0, 1262, 8, 0, 0);
 
 	if (bV1)
 	{
 		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 44, 11, 0, 0);
+			drawText(":", fntCGothic[32], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 44, 11, 0, 0);
 		else
-			drawText(":", fntCGothic[5], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 26, 11, 0, 0);
+			drawText(":", fntCGothic[32], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 26, 11, 0, 0);
 	}
 
-	drawText(nthsInWord, fntCGothic[0], 1, 255, 255, 255, 255, 0, 1172, 32, 0, 0);
+	drawText(nthsInWord, fntCGothic[12], 1, 255, 255, 255, 255, 0, 1172, 32, 0, 0);
 
 	/* Draw Weather */
 	if (wOK)
@@ -1149,14 +1149,15 @@ void Signage::Draw()
 		pTWidth = 0;
 
 		if (wCelcius <= 3.0)
-			drawText(wTemp, fntCGothic[5], 1, 128, 128, 255, 255, 0, 16, 8, 0, 0);
+			drawText(wTemp, fntCGothic[32], 1, 128, 128, 255, 255, 0, 16, 8, 0, 0);
 		else if (wCelcius >= 25.0)
-			drawText(wTemp, fntCGothic[5], 1, 255, 128, 128, 255, 0, 16, 8, 0, 0);
+			drawText(wTemp, fntCGothic[32], 1, 255, 128, 128, 255, 0, 16, 8, 0, 0);
 		else
-			drawText(wTemp, fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
+			drawText(wTemp, fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
-		iBoxes[1].rePos(16 + pTWidth, -6);
+		if (iBoxes[1].isCreated())
+			iBoxes[1].rePos(16 + pTWidth, -6);
 		if (iBoxes[4].isCreated())
 			iBoxes[4].rePos(16 + pTWidth, -6);
 		if (iBoxes[5].isCreated())
@@ -1204,15 +1205,15 @@ void Signage::Draw()
 
 		time_t now = time(0); /* We Need this! */
 
-		if (drawText(tWString, fntCGothic[5], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
+		if (drawText(tWString, fntCGothic[32], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
 		{
 			/* We're either Scrolling or Scrolled. */
 			/* Draw End Fader (obviously) */
 
 			if (!iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
 			{
-				iBoxes[2].Create("Weather Condition Fader - Right", "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), 64,
-						tScrollTex[0].width(), 64, 255, 1, 1, "null", false, false, "", "");
+				iBoxes[2].Create("Weather Condition Fader - Right", "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), pTHeight,
+						tScrollTex[0].width(), pTHeight, 255, 1, 1, "null", false, false, "", "");
 			}
 
 			tScrollSFader[0] = 0;
@@ -1271,7 +1272,7 @@ void Signage::Draw()
 	}
 	else
 	{
-		drawText("Weather Currently Unavailable", fntCGothic[5], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
+		drawText("Weather Currently Unavailable", fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
 		if (iBoxes[1].isCreated())
 			iBoxes[1].Destroy();
 	}
@@ -1314,7 +1315,7 @@ void Signage::Draw()
 					{
 						drawText(iBoxes[n].txtSHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, 255,
 								tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (18 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5), 0,
+								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10], 0,
 								0);
 					}
 					else
@@ -1323,7 +1324,7 @@ void Signage::Draw()
 						{
 							drawText(iBoxes[n].txtHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, pFade[n - 10],
 									tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - (20 - (tSHeaderSize[n - 10]) * 2) - (tSHeaderSize[n - 10] * 5),
+									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10],
 									0, 0);
 						}
 					}
@@ -1337,18 +1338,18 @@ void Signage::Draw()
 	{
 		char tWOB[64];
 		sprintf(tWOB, "Weather Observed at %s", tObservationTime);
-		drawText(tWOB, fntCGothic[1], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
+		drawText(tWOB, fntCGothic[16], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
 	}
 
 	/* Limit FPS */
 	counter.tick();
 
 	/* Draw FPS */
-	// int currentFPS = 0;
-	// char FPSC[32] = "";
-	// currentFPS = counter.get_fps();
-	// sprintf(FPSC, "FPS - %i", currentFPS);
-	// drawText(FPSC, fntCGothic[0], 0, 255, 255, 255, 255, 0, 2, 0);
+	int currentFPS = 0;
+	char FPSC[32] = "";
+	currentFPS = counter.get_fps();
+	sprintf(FPSC, "FPS - %i", currentFPS);
+	drawText(FPSC, fntCGothic[9], 0, 255, 255, 255, 255, 0, 2, 0, 0, 0);
 
 	/* Swap Buffers */
 	SDL_GL_SwapBuffers();
@@ -1393,7 +1394,7 @@ void Signage::Clean()
 		weather[2].Destroy();
 		weather[3].Destroy();
 		int n;
-		for (n = 0; n < 10; n++)
+		for (n = 0; n < 49; n++)
 		{
 			printf("Destroying Font fntCGothic[%i]... ", n);
 			TTF_CloseFont(fntCGothic[n]);
