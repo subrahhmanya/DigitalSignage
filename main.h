@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include <time.h>
+#include <fstream>
 #include "inifile.h"
 
 int main(int argc, char* argv[]);

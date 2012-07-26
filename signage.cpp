@@ -126,7 +126,7 @@ Signage::Signage()
 }
 
 void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc, const char* weathercountry,
-		const char* weatherapi)
+		const char* weatherapi, const char* versionstr)
 {
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
@@ -243,10 +243,14 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	sprintf(sWCountry, "%s", weathercountry);
 	sprintf(sWAPI, "%s", weatherapi);
 
+	sprintf(sVersionString, "%s", versionstr);
+
 	/* FPS Timer */
 	counter = fps_counter();
 	counter.set_cap(30);
 	counter.cap_on();
+	time_t now = time(0);
+	dTimeEvent = now;
 }
 
 void Signage::HandleEvents(Signage* signage)
@@ -1315,8 +1319,7 @@ void Signage::Draw()
 					{
 						drawText(iBoxes[n].txtSHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, 255,
 								tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10], 0,
-								0);
+								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10], 0, 0);
 					}
 					else
 					{
@@ -1324,8 +1327,7 @@ void Signage::Draw()
 						{
 							drawText(iBoxes[n].txtHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, pFade[n - 10],
 									tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10],
-									0, 0);
+									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10], 0, 0);
 						}
 					}
 				}
@@ -1344,12 +1346,21 @@ void Signage::Draw()
 	/* Limit FPS */
 	counter.tick();
 
-	/* Draw FPS */
-	int currentFPS = 0;
-	char FPSC[32] = "";
-	currentFPS = counter.get_fps();
-	sprintf(FPSC, "FPS - %i", currentFPS);
-	drawText(FPSC, fntCGothic[9], 0, 255, 255, 255, 255, 0, 2, 0, 0, 0);
+	/* Draw FPS and Versioning Debug String for 5 minutes only. */
+
+	time_t now = time(0);
+
+	if (now < (dTimeEvent + 180))
+	{
+		int currentFPS = 0;
+		char FPSC[32] = "";
+		currentFPS = counter.get_fps();
+		sprintf(FPSC, "FPS - %i", currentFPS);
+		drawText(FPSC, fntCGothic[9], 1, 255, 255, 255, 255, 0, 2, 0, 0, 0);
+
+		/* Draw Version String */
+		drawText(sVersionString, fntCGothic[9], 2, 255, 255, 255, 255, 0, 1278, 0, 0, 0);
+	}
 
 	/* Swap Buffers */
 	SDL_GL_SwapBuffers();

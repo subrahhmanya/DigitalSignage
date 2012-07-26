@@ -49,7 +49,14 @@ int main(int argc, char* argv[])
 					sprintf(tWCountry, "%s", ini.GetKeyValue("GeneralSettings", "WeatherCountry").c_str());
 					sprintf(tWAPI, "%s", ini.GetKeyValue("GeneralSettings", "WeatherAPI").c_str());
 
-					signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc, tWCountry, tWAPI);
+					/* Load Version String */
+					char tVS[32];
+					ifstream vFile("/screen/src/orbital_infodisplay/version");
+					string line;
+					getline(vFile, line);
+					sprintf(tVS, "Version %s", line.c_str());
+
+					signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc, tWCountry, tWAPI, tVS);
 
 					while (signage.Running())
 					{
