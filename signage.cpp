@@ -247,7 +247,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	/* FPS Timer */
 	counter = fps_counter();
-	counter.set_cap(30);
+	counter.set_cap(20);
 	counter.cap_on();
 	time_t now = time(0);
 	dTimeEvent = now;
