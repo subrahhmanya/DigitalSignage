@@ -351,9 +351,15 @@ void Signage::Update()
 				// Macro to check API for match with
 				// the DLL we are using
 				/*parse the file and get the DOM */
+
+				/* We also need to ensure we remove any white spacing from the Country and Location variables, replacing with + */
 				char tWString[512];
-				// http://free.worldweatheronline.com/feed/weather.ashx?q=Swynnerton,United+Kingdom&format=xml&key=80c7123c45084147121107  //
-				sprintf(tWString, "http://free.worldweatheronline.com/feed/weather.ashx?q=%s,%s&format=xml&key=%s", sWLoc, sWCountry, sWAPI);
+				string tsWCountry = string(sWCountry);
+				replace(tsWCountry.begin(), tsWCountry.end(), ' ', '+');
+				string tsWLoc = string(sWLoc);
+				replace(tsWLoc.begin(), tsWLoc.end(), ' ', '+');
+
+				sprintf(tWString, "http://free.worldweatheronline.com/feed/weather.ashx?q=%s,%s&format=xml&key=%s", tsWLoc.c_str(), tsWCountry.c_str(), sWAPI);
 				printf("Checking URL - %s\n", tWString);
 				doc = xmlReadFile(tWString, NULL, 0);
 				if (doc)
