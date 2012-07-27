@@ -249,8 +249,10 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	counter = fps_counter();
 	counter.set_cap(20);
 	counter.cap_on();
-	time_t now = time(0);
-	dTimeEvent = now;
+
+	/* Reset Debug Timer */
+	cTime = time(0);
+	dTimeEvent = cTime;
 }
 
 void Signage::HandleEvents(Signage* signage)
@@ -271,6 +273,11 @@ void Signage::HandleEvents(Signage* signage)
 			case SDLK_ESCAPE:
 				signage->Quit();
 				break;
+
+			case SDLK_d:
+				/* Reset Debug Timer */
+				dTimeEvent = cTime;
+				break;
 			}
 			break;
 		}
@@ -284,8 +291,8 @@ void Signage::Update()
 	char monthsInWord[8];
 	char mins[8];
 
-	time_t now = time(0);
-	ltm = localtime(&now);
+	cTime = time(0);
+	ltm = localtime(&cTime);
 
 	/* Only perform Update if Running */
 	if (m_bQuitting == false)
@@ -397,11 +404,11 @@ void Signage::Update()
 			tIcon = tWeatherCode;
 
 			/* Do Looping Weather Animations */
-			if (now > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
+			if (cTime > (wUpdateTimer[1] + 5)) /* Temperature Alert Flash */
 			{
 				if ((wCelcius <= 3.0) || (wCelcius >= 25.0))
 				{
-					wUpdateTimer[1] = now;
+					wUpdateTimer[1] = cTime;
 
 					if (!iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
 					{
@@ -420,9 +427,9 @@ void Signage::Update()
 				//	wFadeA[1] = 0;
 			}
 
-			if (now > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
+			if (cTime > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
 			{
-				wUpdateTimer[0] = now;
+				wUpdateTimer[0] = cTime;
 				wFadeA[0] = 1;
 			}
 
@@ -542,7 +549,7 @@ void Signage::Update()
 			/* Weather Icon Fading Transition */
 			if ((tIcon != tOIcon) && (wFadeA[1] == 0))
 			{
-				wUpdateTimer[1] = now;
+				wUpdateTimer[1] = cTime;
 				wFadeA[1] = 1;
 			}
 			if ((wFadeA[1] == 1) || (wFadeA[1] == 2))
@@ -599,7 +606,7 @@ void Signage::Update()
 					tScrollCycle[0] = 0;
 					tScrollSFader[0] = 0;
 					tScrollEFader[0] = 0;
-					tScrollingTimer[0] = now;
+					tScrollingTimer[0] = cTime;
 					if (iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
 						iBoxes[2].Destroy();
 					if (iBoxes[3].isCreated() && iBoxes[3].stype() != -1)
@@ -615,11 +622,11 @@ void Signage::Update()
 			}
 		}
 
-		if (now > (wUpdateTimer[2] + 10))
+		if (cTime > (wUpdateTimer[2] + 10))
 		{
 			/* Check Board Information */
 			printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-			wUpdateTimer[2] = now;
+			wUpdateTimer[2] = cTime;
 			DIR *d;
 			vector<string> dList;
 			struct dirent *dir;
@@ -814,10 +821,10 @@ void Signage::Update()
 			}
 		}
 
-		if (now > (wUpdateTimer[3] + 1))
+		if (cTime > (wUpdateTimer[3] + 1))
 		{
 			/* Do Forward Board Sorting to add/update boards when configs change */
-			wUpdateTimer[3] = now;
+			wUpdateTimer[3] = cTime;
 			for (int tB = 0; tB < 64; tB++)
 			{
 				bool bFound = false;
@@ -939,26 +946,26 @@ void Signage::Update()
 							bool resetClicks = false;
 							bool scrUpdate = false;
 
-							if (((now > (iBoxes[pB].getClicks() + (tDuration[tB][iBoxes[pB].getScreen()] - 6))))
+							if (((cTime > (iBoxes[pB].getClicks() + (tDuration[tB][iBoxes[pB].getScreen()] - 6))))
 									&& ((strlen(bPluginCmd[tB]) != 0) && (tPRunning[tB] == false)))
 							{
 								/* Run Plugin 5 seconds before transition.*/
 								/* Plugin exists - Run Command! */
-								printf("Plugin Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+								printf("Plugin Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, pB,
 										iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB], tScrollV[tB]);
 								tPRunning[tB] = true;
 								pPluginCMD[tB] = NULL;
 								pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
 							}
 
-							if ((now > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
+							if ((cTime > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
 							{
 								if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
 								{
 									if ((tScrollV[tB] == 0)
 											|| ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
 													== (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255))))
-										printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", now, pB,
+										printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, pB,
 												iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
 												tScrollV[tB]);
 
@@ -977,7 +984,7 @@ void Signage::Update()
 										{
 											/* Instead of eventually hitting an upper limit on the scroll
 											 we loop the scroll value to keep things clean */
-											iBoxes[pB].setClicks(now);
+											iBoxes[pB].setClicks(cTime);
 											tPRunning[tB] = false;
 											scrUpdate = true;
 											tSComp[tB] = 1;
@@ -1080,7 +1087,7 @@ void Signage::Update()
 								/* Reset Clicks */
 								if ((resetClicks == true) && (scrUpdate == false))
 								{
-									iBoxes[pB].setClicks(now);
+									iBoxes[pB].setClicks(cTime);
 									tPRunning[tB] = false;
 								}
 							}
@@ -1092,12 +1099,12 @@ void Signage::Update()
 	}
 	/* Save Screenshot every 29 seconds */
 	if (wUpdateTimer[4] == 0)
-		wUpdateTimer[4] = now;
+		wUpdateTimer[4] = cTime;
 
-	if (now >= wUpdateTimer[4] + 29)
+	if (cTime >= wUpdateTimer[4] + 29)
 	{
 		printf("Generating Screendump...");
-		wUpdateTimer[4] = now;
+		wUpdateTimer[4] = cTime;
 		SDL_Surface * scrimage = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
 
 		glReadBuffer(GL_FRONT);
@@ -1119,7 +1126,7 @@ void Signage::Update()
 
 		SDL_SaveBMP(scrimage, "/screen/SCRDUMP.bmp");
 		SDL_FreeSurface(scrimage);
-		printf("[OK] (%is)\n", now - wUpdateTimer[4]);
+		printf("[OK] (%is)\n", cTime - wUpdateTimer[4]);
 	}
 }
 
@@ -1207,8 +1214,6 @@ void Signage::Draw()
 		tPXX = ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16;
 		int tPXM = plPX - oPX;
 
-		time_t now = time(0); /* We Need this! */
-
 		if (drawText(tWString, fntCGothic[32], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
 		{
 			/* We're either Scrolling or Scrolled. */
@@ -1224,8 +1229,8 @@ void Signage::Draw()
 			tScrollEFader[0] = 0;
 			if (wFadeV[0] >= 255)
 			{
-				wUpdateTimer[0] = now - 10;
-				if (now > tScrollingTimer[0] + 5)
+				wUpdateTimer[0] = cTime - 10;
+				if (cTime > tScrollingTimer[0] + 5)
 				{
 					if (!iBoxes[3].isCreated() && iBoxes[3].stype() != -1)
 					{
@@ -1256,7 +1261,7 @@ void Signage::Draw()
 				if (iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
 					iBoxes[2].Destroy();
 			}
-			tScrollingTimer[0] = now;
+			tScrollingTimer[0] = cTime;
 		}
 
 		/* Draw Leaves if Windy */
@@ -1348,9 +1353,7 @@ void Signage::Draw()
 
 	/* Draw FPS and Versioning Debug String for 5 minutes only. */
 
-	time_t now = time(0);
-
-	if (now < (dTimeEvent + 180))
+	if (cTime < (dTimeEvent + 180))
 	{
 		int currentFPS = 0;
 		char FPSC[32] = "";

@@ -54,6 +54,7 @@ public:
 		m_bRunning = false;
 	}
 private:
+	time_t cTime;
 	SDL_Surface* screen;
 	bool m_bFullscreen, m_bRunning, m_bQuitting;
 	Texture pLogo;
