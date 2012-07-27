@@ -1351,7 +1351,7 @@ void Signage::Draw()
 	/* Limit FPS */
 	counter.tick();
 
-	/* Draw FPS and Versioning Debug String for 5 minutes only. */
+	/* Draw FPS and Version Debug String for 5 minutes only. */
 
 	if (cTime < (dTimeEvent + 180))
 	{
