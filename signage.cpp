@@ -8,6 +8,8 @@
 #include "signage.h"
 #include "textures.h"
 
+int FPSLimit = 20;
+
 /* Sunrise */
 double pi = 3.14;
 double tpi = 2 * pi;
@@ -247,7 +249,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	/* FPS Timer */
 	counter = fps_counter();
-	counter.set_cap(20);
+	counter.set_cap(FPSLimit);
 	counter.cap_on();
 
 	/* Reset Debug Timer */
@@ -647,6 +649,7 @@ void Signage::Update()
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
 					validConfig[dS] = false;
+
 					bChanger[dS] = false;
 					printf("Parsing Board '%s'.", dList[dS].c_str());
 					/* Check for valid Configuration Files and Contents */
@@ -1351,18 +1354,33 @@ void Signage::Draw()
 	/* Limit FPS */
 	counter.tick();
 
-	/* Draw FPS and Version Debug String for 5 minutes only. */
+	/* Draw FPS and Version Debug Info for 10 seconds only. */
 
-	if (cTime < (dTimeEvent + 180))
+	if (cTime <= (dTimeEvent + 10) && m_bQuitting == false)
 	{
+		if (!iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
+		{
+			iBoxes[6].Create("Debug Info Pane", "", 0, 0, 2, 1060, 688, 260,
+							30, 260, 30, 200, 1, 1, "null", false, false, "", "");
+		}
+
 		int currentFPS = 0;
 		char FPSC[32] = "";
 		currentFPS = counter.get_fps();
 		sprintf(FPSC, "FPS - %i", currentFPS);
-		drawText(FPSC, fntCGothic[9], 1, 255, 255, 255, 255, 0, 2, 0, 0, 0);
+		char FPSL[32] = "";
+		sprintf(FPSL, "(FPS Limit - %i)", FPSLimit);
+		drawText("Debug Information", fntCGothic[14], 1, 0, 0, 0, 255, 0, 1100, 702, 0, 0);
+
+		/* Draw Debug Variables */
+		drawText(FPSC, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1080, 692, 0, 0);
+		drawText(FPSL, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1160, 692, 0, 0);
 
 		/* Draw Version String */
-		drawText(sVersionString, fntCGothic[9], 2, 255, 255, 255, 255, 0, 1278, 0, 0, 0);
+		drawText(sVersionString, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1060, 682, 0, 0);
+	} else {
+		if (iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
+			iBoxes[6].Destroy();
 	}
 
 	/* Swap Buffers */

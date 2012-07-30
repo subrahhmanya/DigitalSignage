@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 					ifstream vFile("/screen/src/orbital_infodisplay/version");
 					string line;
 					getline(vFile, line);
-					sprintf(tVS, "Version %s", line.c_str());
+					sprintf(tVS, "Client Version %s", line.c_str());
 
 					signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc, tWCountry, tWAPI, tVS);
 
