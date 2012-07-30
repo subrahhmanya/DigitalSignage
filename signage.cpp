@@ -1362,7 +1362,15 @@ void Signage::Draw()
 		{
 			iBoxes[6].Create("Debug Info Pane", "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, "null", false, false, "", "");
 		}
+	}
+	else
+	{
+		if (iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
+			iBoxes[6].Destroy();
+	}
 
+	if (iBoxes[6].isCreated())
+	{
 		int currentFPS = 0;
 		char FPSC[32] = "";
 		currentFPS = counter.get_fps();
@@ -1377,11 +1385,6 @@ void Signage::Draw()
 
 		/* Draw Version String */
 		drawText(sVersionString, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1068, 682, 0, 0);
-	}
-	else
-	{
-		if (iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
-			iBoxes[6].Destroy();
 	}
 
 	/* Swap Buffers */
