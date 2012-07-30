@@ -1360,7 +1360,7 @@ void Signage::Draw()
 	{
 		if (!iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
 		{
-			iBoxes[6].Create("Debug Info Pane", "", 0, 0, 2, 1060, 688, 260,
+			iBoxes[6].Create("Debug Info Pane", "", 0, 0, 2, 1068, 688, 260,
 							30, 260, 30, 200, 1, 1, "null", false, false, "", "");
 		}
 
@@ -1370,14 +1370,14 @@ void Signage::Draw()
 		sprintf(FPSC, "FPS - %i", currentFPS);
 		char FPSL[32] = "";
 		sprintf(FPSL, "(FPS Limit - %i)", FPSLimit);
-		drawText("Debug Information", fntCGothic[14], 1, 0, 0, 0, 255, 0, 1100, 702, 0, 0);
+		drawText("Debug Information", fntCGothic[14], 1, 0, 0, 0, 255, 0, 1108, 702, 0, 0);
 
 		/* Draw Debug Variables */
-		drawText(FPSC, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1080, 692, 0, 0);
-		drawText(FPSL, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1160, 692, 0, 0);
+		drawText(FPSC, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1088, 692, 0, 0);
+		drawText(FPSL, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1168, 692, 0, 0);
 
 		/* Draw Version String */
-		drawText(sVersionString, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1060, 682, 0, 0);
+		drawText(sVersionString, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1068, 682, 0, 0);
 	} else {
 		if (iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
 			iBoxes[6].Destroy();
