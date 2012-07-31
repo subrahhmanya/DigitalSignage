@@ -322,8 +322,8 @@ void Signage::Update()
 		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
-			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), pLogo.width(), pLogo.height(), 200, 1, 1, "null", false, false, "", "");
+			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10, pLogo.width(),
+					pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, "null", false, false, "", "");
 		else
 			iBoxes[0].doUpdate();
 
@@ -1355,7 +1355,6 @@ void Signage::Draw()
 	counter.tick();
 
 	/* Draw FPS and Version Debug Info for 10 seconds only. */
-
 	if (cTime <= (dTimeEvent + 10) && m_bQuitting == false)
 	{
 		if (!iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
