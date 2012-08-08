@@ -1,4 +1,15 @@
-Information Display
--------------------
+Digital Signage System
+----------------------
 
-Coded by Paul Wollaston
+The aim of this project, is to provide a simple Digital Signage Solution for use on Linux-based clients.
+
+Information is displayed as a 'Board', which can contain various forms of information, from Static Notifications, to Media streams.
+
+Current Features:
+
+ * Allow use of multiple Boards.
+ * BBC iPlayer Integration
+ * Allow streaming of Video/Sound for various board/slides.
+ * Built-in Weather API Included supports feeds from WorldWeatherOnline.com
+ * Scaling support for various display types (Default 16:9)
+ * WebUI Preview System (required Apache support and use of orbital_wui)
