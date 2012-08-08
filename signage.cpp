@@ -653,9 +653,6 @@ void Signage::Update()
 				printf("Found %i Folders to check...\n", dList.size());
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
-					// mBoard[curB].ConfigValid = false;
-					// mBoard[curB].ChangeRequired = false;
-
 					char tFName[128];
 					sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
 					if (FileExists(tFName))
@@ -961,7 +958,6 @@ void Signage::Update()
 					mBoard[cB].rPluginCMD = false;
 					mBoard[cB].TimeStampCFG = 0;
 					mBoard[cB].TimeStampCheck = 0;
-					mBoard[cB].ConfigValid = false;
 					mBoard[cB].isDestroying = false;
 					mBoard[cB].CreatedID = 0;
 					for (int bClean = 0; bClean < 64; bClean++)

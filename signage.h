@@ -135,7 +135,6 @@ private:
 		bool rPluginCMD;
 		int TimeStampCFG;
 		int TimeStampCheck;
-		bool ConfigValid;
 		bool isDestroying;
 		int CreatedID;
 
