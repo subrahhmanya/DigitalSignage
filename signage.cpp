@@ -8,7 +8,7 @@
 #include "signage.h"
 #include "textures.h"
 
-int FPSLimit = 20;
+int FPSLimit = 30;
 
 /* Sunrise */
 double pi = 3.14;
@@ -133,6 +133,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
 	m_bQuitting = false;
+	m_bOKKill = false;
 	wCurDisp = 99;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -321,11 +322,11 @@ void Signage::Update()
 		}
 		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
-		if (!iBoxes[0].isCreated() && iBoxes[0].stype() != -1)
-			iBoxes[0].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10, pLogo.width(),
+		if (!iBoxes[100].isCreated() && iBoxes[100].stype() != -1)
+			iBoxes[100].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10, pLogo.width(),
 					pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, "null", false, false, "", "");
 		else
-			iBoxes[0].doUpdate();
+			iBoxes[100].doUpdate();
 
 		/* Process Weather Information */
 		/* Do Weather Check (update once every 15 minutes) */
@@ -360,7 +361,7 @@ void Signage::Update()
 				xmlDoc *doc = NULL;
 				xmlNode *root_element = NULL;
 
-				LIBXML_TEST_VERSION
+				//LIBXML_TEST_VERSION
 				// Macro to check API for match with
 				// the DLL we are using
 				/*parse the file and get the DOM */
@@ -412,18 +413,18 @@ void Signage::Update()
 				{
 					wUpdateTimer[1] = cTime;
 
-					if (!iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
+					if (!iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
 					{
 						if (wCelcius <= 3.0)
-							iBoxes[5].Create("Weather Temp Cold Alert Cycle", "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2,
+							iBoxes[105].Create("Weather Temp Cold Alert Cycle", "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2,
 									weather[3].height() / 2, weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, "null", false, false, "", "");
 						else
-							iBoxes[5].Create("Weather Temp Hot Alert Cycle", "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2,
+							iBoxes[105].Create("Weather Temp Hot Alert Cycle", "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2,
 									weather[2].height() / 2, weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, "null", false, false, "", "");
 
 					}
-					else if (iBoxes[5].isCreated() && iBoxes[4].stype() != -1)
-						iBoxes[5].Destroy();
+					else if (iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
+						iBoxes[105].Destroy();
 				}
 				//else
 				//	wFadeA[1] = 0;
@@ -465,7 +466,7 @@ void Signage::Update()
 
 			double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
 			double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-			double noont = riset + 12.0 * ha / pi;
+			//double noont = riset + 12.0 * ha / pi;
 			double altmax = 90.0 + delta * degs - latit;
 			/* Express as degrees from the N horizon */
 
@@ -574,7 +575,7 @@ void Signage::Update()
 					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 
 					weather[0].Load(tBuff);
-					iBoxes[1].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2, weather[0].height() / 2,
+					iBoxes[101].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2, weather[0].height() / 2,
 							weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, "null", false, false, "", "");
 				}
 				if (wFadeV[1] > 255)
@@ -609,10 +610,10 @@ void Signage::Update()
 					tScrollSFader[0] = 0;
 					tScrollEFader[0] = 0;
 					tScrollingTimer[0] = cTime;
-					if (iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
-						iBoxes[2].Destroy();
-					if (iBoxes[3].isCreated() && iBoxes[3].stype() != -1)
-						iBoxes[3].Destroy();
+					if (iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
+						iBoxes[102].Destroy();
+					if (iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
+						iBoxes[103].Destroy();
 					if (wCurDisp >= 6)
 						wCurDisp = 0;
 				}
@@ -626,15 +627,19 @@ void Signage::Update()
 
 		if (cTime > (wUpdateTimer[2] + 10))
 		{
-			/* Check Board Information */
+			/* Start Board Checking Loop */
+
+			/* Check Board Configurations */
 			printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			wUpdateTimer[2] = cTime;
+
 			DIR *d;
 			vector<string> dList;
 			struct dirent *dir;
 			d = opendir("/screen/boards/");
 			if (d)
 			{
+				/* Boards Folder Exists, check contents */
 				while ((dir = readdir(d)) != NULL)
 				{
 					if ((strcmp(".", dir->d_name) != 0) && (strcmp("..", dir->d_name) != 0))
@@ -642,464 +647,507 @@ void Signage::Update()
 						dList.push_back(dir->d_name);
 					}
 				}
+
 				closedir(d);
 				sort(dList.begin(), dList.end()); /* Sort Array */
-				printf("Directories Found = %i\n", dList.size());
-				int curD = 0;
+				printf("Found %i Folders to check...\n", dList.size());
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
-					validConfig[dS] = false;
+					// mBoard[curB].ConfigValid = false;
+					// mBoard[curB].ChangeRequired = false;
 
-					bChanger[dS] = false;
-					printf("Parsing Board '%s'.", dList[dS].c_str());
-					/* Check for valid Configuration Files and Contents */
 					char tFName[128];
 					sprintf(tFName, "/screen/boards/%s/config.ini", dList[dS].c_str());
 					if (FileExists(tFName))
 					{
-						/* Found a config gile, parse it... */
+						/* Found a config file, parse it... */
 						CIniFile ini;
 						ini.Load(tFName);
 						CIniSection* pSection = ini.GetSection("BoardSettings");
 						if (pSection)
 						{
-							CIniKey* pKey;
-							if (pSection->GetKey("Enabled"))
+							if ((pSection->GetKey("Enabled"))
+									&& ((pSection->GetKey("UID")) && (pSection->GetKey("UIDS")) && (pSection->GetKey("UIDI")) && (pSection->GetKey("PosX"))
+											&& (pSection->GetKey("PosY")) && (pSection->GetKey("Scale")) && (pSection->GetKey("Border"))
+											&& (pSection->GetKey("Width")) && (pSection->GetKey("Height")) && (pSection->GetKey("Boards"))
+											&& (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp"))))
 							{
-								tEn[curD] = atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str());
-								if ((tEn[curD] == 1)
-										&& ((pSection->GetKey("UID")) && (pSection->GetKey("PosX")) && (pSection->GetKey("PosY")) && (pSection->GetKey("Scale"))
-												&& (pSection->GetKey("Border")) && (pSection->GetKey("Width")) && (pSection->GetKey("Height"))
-												&& (pSection->GetKey("Boards")) && (pSection->GetKey("Alert")) && (pSection->GetKey("TimeStamp"))))
+								/* We have a Board which we can use.  Let's check against current mBoard members first, see if
+								 * it exists. */
+								bool tBFound = false;
+								for (int cB = 0; cB < 64; cB++)
 								{
-									/* Only alter these details if UID or TS differ */
-									if ((strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), tUID[curD]) != 0)
-											|| (tTs[curD] != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str())))
+									if ((atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str()) == 1)
+											&& (strcmp(ini.GetKeyValue("BoardSettings", "UID").c_str(), mBoard[cB].UID) == 0))
 									{
-										tBC[curD] = -1;
-										tBR[curD] = 0;
-										sprintf(tFldr[curD], "%s", dList[dS].c_str());
-										sprintf(tUID[curD], "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
-										tPX[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
-										tPY[curD] = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
-										tSc[curD] = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
-										tBr[curD] = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
-										tW[curD] = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
-										tH[curD] = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
-										tBt[curD] = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
-										tA[curD] = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
-										sprintf(tSHeaderTxt[curD], "%s", ini.GetKeyValue("BoardSettings", "Header").c_str());
-										tSHeaderSize[curD] = atoi(ini.GetKeyValue("BoardSettings", "HeaderSize").c_str());
-										if (atoi(ini.GetKeyValue("BoardSettings", "HeaderEn").c_str()) == 1)
-											tHeaderVis[curD] = true;
+										/* We found matching UID
+										 *
+										 * We now need to check TimeStamp, see if we are matching or not, so we can decide if
+										 * board information is changing. */
+										tBFound = true;
+										printf("\n\tFound Existing board at ID '%i'. Checking to see if it's changed...\n", cB);
+										if (mBoard[cB].TimeStampCFG != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str()))
+										{
+											printf("\t\tNew TimeStamp Detected - Marking as Dirty...\n");
+											mBoard[cB].TimeStampCheck = 0;
+											mBoard[cB].isDestroying = true;
+										}
 										else
-											tHeaderVis[curD] = false;
-										tTs[curD] = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
-										sprintf(bPluginCmd[curD], "%s", ini.GetKeyValue("BoardSettings", "Plugin").c_str());
-										bChanger[curD] = true;
-										//char str[] = bPluginCmd[curD].c_str;
-									}
-									validConfig[curD] = true;
-								}
-							}
-						}
-						if ((validConfig[curD] == true) && (bChanger[curD] == true))
-						{
-							/* Check Each Board for this item */
-							int tBtC = tBt[curD];
-							for (int brdC = 0; brdC < tBtC; brdC++)
-							{
-								sprintf(bSection[curD], "Board-%i", brdC + 1);
-								pSection = ini.GetSection(bSection[curD]);
-								if (pSection)
-								{
-									printf(".");
-									/* Now get the Data */
-									if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
-									{
-										sprintf(tType[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Type").c_str());
-										sprintf(tSrc[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Src").c_str());
-										tDuration[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Duration").c_str());
-										tSType[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
-										tSSpeed[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
-										sprintf(tHeaderTxt[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "Header").c_str());
-										tBHeaderSize[curD][brdC] = atoi(ini.GetKeyValue(bSection[curD], "HeaderSize").c_str());
-										if (atoi(ini.GetKeyValue(bSection[curD], "HeaderEn").c_str()) == 1)
-											bHeaderVis[curD][brdC] = true;
-										else
-											bHeaderVis[curD][brdC] = false;
-										sprintf(tAudEnable[curD][brdC], "%s", ini.GetKeyValue(bSection[curD], "EnableAudio").c_str());
-									}
-									else
-										validConfig[curD] = false;
-								}
-								else
-								{
-									printf(".");
-									tBt[curD]--;
-								}
-							}
+										{
+											printf("\t\tConfiguration is unchanged.\n\t\tBoard ID - %i\n", mBoard[cB].CreatedID);
+											/* Reset TimeStampCheck */
+											mBoard[cB].TimeStampCheck = cTime;
+										}
 
-							/* Get Alert Board Information */
-							sprintf(bSection[curD], "Alert");
-							pSection = ini.GetSection(bSection[curD]);
-							if (pSection)
-							{
-								printf(".");
-								/* Now get the Data */
-								if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
-								{
-									sprintf(aType[curD], "%s", ini.GetKeyValue(bSection[curD], "Type").c_str());
-									sprintf(aSrc[curD], "%s", ini.GetKeyValue(bSection[curD], "Src").c_str());
-									aDuration[curD] = atoi(ini.GetKeyValue(bSection[curD], "Duration").c_str());
-									aSType[curD] = atoi(ini.GetKeyValue(bSection[curD], "Quality").c_str());
-									aSSpeed[curD] = atoi(ini.GetKeyValue(bSection[curD], "ScrollSpeed").c_str());
-									/* Set Mirror Config */
-									sprintf(tHeaderTxt[curD][tBt[curD]], "%s", ini.GetKeyValue(bSection[curD], "Header").c_str());
-									if (atoi(ini.GetKeyValue(bSection[curD], "HeaderEn").c_str()) == 1)
-										bHeaderVis[curD][tBt[curD]] = true;
-									else
-										bHeaderVis[curD][tBt[curD]] = false;
-									tDuration[curD][tBt[curD]] = aDuration[curD];
-									tSSpeed[curD][tBt[curD]] = aSSpeed[curD];
-									sprintf(tAudEnable[curD][tBt[curD]], "%s", ini.GetKeyValue(bSection[curD], "EnableAudio").c_str());
+										/* Break out of loop */
+										break;
+									}
 								}
-								else
-									tA[curD] = 0;
+								if ((atoi(ini.GetKeyValue("BoardSettings", "Enabled").c_str()) == 1) && (tBFound == false))
+								{
+									/* No board with matching UID was found, add.
+									 *
+									 * This is also performed when a board TimeStamp changes, as we destroy the old board before
+									 * creating the new one, so to ensure no dirty variables are left. */
+									for (int cB = 0; cB < 64; cB++)
+									{
+										if (strcmp("", mBoard[cB].UID) == 0)
+										{
+											/* Construct Main Boards */
+											sprintf(mBoard[cB].UID, "%s", ini.GetKeyValue("BoardSettings", "UID").c_str());
+											sprintf(mBoard[cB].UIDS, "%s", ini.GetKeyValue("BoardSettings", "UIDS").c_str());
+											mBoard[cB].UIDI = atoi(ini.GetKeyValue("BoardSettings", "UIDI").c_str());
+											mBoard[cB].TimeStampCFG = atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str());
+											mBoard[cB].TimeStampCheck = cTime;
+											mBoard[cB].curBoard = -1;
+											mBoard[cB].reqBoard = 0;
+											sprintf(mBoard[cB].Folder, "%s", dList[dS].c_str());
+											mBoard[cB].X = atoi(ini.GetKeyValue("BoardSettings", "PosX").c_str());
+											mBoard[cB].Y = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
+											mBoard[cB].Scale = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
+											mBoard[cB].Border = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+											mBoard[cB].Width = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
+											mBoard[cB].Height = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
+											mBoard[cB].nBoards = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
+											mBoard[cB].Alert = atoi(ini.GetKeyValue("BoardSettings", "Alert").c_str());
+											sprintf(mBoard[cB].Header, "%s", ini.GetKeyValue("BoardSettings", "Header").c_str());
+											mBoard[cB].HeaderSize = atoi(ini.GetKeyValue("BoardSettings", "HeaderSize").c_str());
+											if (atoi(ini.GetKeyValue("BoardSettings", "HeaderEn").c_str()) == 1)
+												mBoard[cB].HeaderVis = true;
+											else
+												mBoard[cB].HeaderVis = false;
+											sprintf(mBoard[cB].sPluginCMD, "%s", ini.GetKeyValue("BoardSettings", "Plugin").c_str());
+											mBoard[cB].isDestroying = false;
+
+											/* Construct Child Boards */
+											int tcBoardCount = 0;
+											for (int brdC = 0; brdC < mBoard[cB].nBoards; brdC++)
+											{
+												sprintf(mBoard[cB].cBoard[tcBoardCount].Section, "Board-%i", brdC + 1);
+												pSection = ini.GetSection(mBoard[cB].cBoard[tcBoardCount].Section);
+												if (pSection)
+												{
+													/* Now get the Data */
+													if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
+													{
+														sprintf(mBoard[cB].cBoard[tcBoardCount].Type, "%s",
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Type").c_str());
+														sprintf(mBoard[cB].cBoard[tcBoardCount].Src, "%s",
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Src").c_str());
+														mBoard[cB].cBoard[tcBoardCount].Duration = atoi(
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Duration").c_str());
+														mBoard[cB].cBoard[tcBoardCount].Quality = atoi(
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Quality").c_str());
+														mBoard[cB].cBoard[tcBoardCount].ScrollSpeed = atoi(
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "ScrollSpeed").c_str());
+														sprintf(mBoard[cB].cBoard[tcBoardCount].Header, "%s",
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Header").c_str());
+														mBoard[cB].cBoard[tcBoardCount].HeaderSize = atoi(
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "HeaderSize").c_str());
+														if (atoi(ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "HeaderEn").c_str()) == 1)
+															mBoard[cB].cBoard[tcBoardCount].HeaderVis = true;
+														else
+															mBoard[cB].cBoard[tcBoardCount].HeaderVis = false;
+														sprintf(mBoard[cB].cBoard[tcBoardCount].AudioOut, "%s",
+																ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "EnableAudio").c_str());
+														mBoard[cB].cBoard[tcBoardCount].isAlert = false;
+														tcBoardCount++;
+													}
+												}
+											}
+
+											/* Get Alert Board Information */
+											sprintf(mBoard[cB].cBoard[tcBoardCount].Section, "Alert");
+											pSection = ini.GetSection(mBoard[cB].cBoard[tcBoardCount].Section);
+											if (pSection)
+											{
+												/* Now get the Data */
+												if ((pSection->GetKey("Type")) && (pSection->GetKey("Src")) && (pSection->GetKey("Duration")))
+												{
+													sprintf(mBoard[cB].cBoard[tcBoardCount].Type, "%s",
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Type").c_str());
+													sprintf(mBoard[cB].cBoard[tcBoardCount].Src, "%s",
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Src").c_str());
+													mBoard[cB].cBoard[tcBoardCount].Duration = atoi(
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Duration").c_str());
+													mBoard[cB].cBoard[tcBoardCount].Quality = atoi(
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Quality").c_str());
+													mBoard[cB].cBoard[tcBoardCount].ScrollSpeed = atoi(
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "ScrollSpeed").c_str());
+													sprintf(mBoard[cB].cBoard[tcBoardCount].Header, "%s",
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "Header").c_str());
+													mBoard[cB].cBoard[tcBoardCount].HeaderSize = atoi(
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "HeaderSize").c_str());
+													if (atoi(ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "HeaderEn").c_str()) == 1)
+														mBoard[cB].cBoard[tcBoardCount].HeaderVis = true;
+													else
+														mBoard[cB].cBoard[tcBoardCount].HeaderVis = false;
+													sprintf(mBoard[cB].cBoard[tcBoardCount].AudioOut, "%s",
+															ini.GetKeyValue(mBoard[cB].cBoard[tcBoardCount].Section, "EnableAudio").c_str());
+													mBoard[cB].cBoard[tcBoardCount].isAlert = true;
+													tcBoardCount++;
+												}
+											}
+
+											/* Reset nBoards variable to coincide with number of actual boards configured */
+											//mBoard[cB].nBoards = tcBoardCount - 1;
+											printf("\nBoard '%s':\n\tUIDS:\t'%s'\n\tUID:\t'%s'\n\tUIDI:\t%i\n\tBoards:\t%i\n", dList[dS].c_str(),
+													mBoard[cB].UIDS, mBoard[cB].UID, mBoard[cB].UIDI, mBoard[cB].nBoards);
+											for (int brdO = 0; brdO < mBoard[cB].nBoards; brdO++)
+											{
+												printf("\t\tChild Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, cB,
+														brdO, mBoard[cB].cBoard[brdO].Type, mBoard[cB].cBoard[brdO].Src, mBoard[cB].cBoard[brdO].Duration);
+											}
+											if (mBoard[cB].cBoard[mBoard[cB].nBoards].isAlert == true)
+											{
+												printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n",
+														mBoard[cB].nBoards, cB, mBoard[cB].nBoards, mBoard[cB].cBoard[mBoard[cB].nBoards].Type,
+														mBoard[cB].cBoard[mBoard[cB].nBoards].Src, mBoard[cB].cBoard[mBoard[cB].nBoards].Duration);
+											}
+											break;
+										}
+									}
+								}
 							}
 						}
-					}
-					if (validConfig[curD] == true)
-					{
-						/* We need to check to see if the board already exists, with the correct timestamp data. */
-						if (bChanger[curD] == false)
-						{
-							printf("\n\tBoard '%s' ('%s') configuration is unchanged.\n", dList[dS].c_str(), tUID[curD]);
-						}
-						else
-						{
-							printf("\n\tBoard '%s' ('%s') with %i boards configured.\n", dList[dS].c_str(), tUID[curD], tBt[curD]);
-							for (int brdO = 0; brdO < tBt[curD]; brdO++)
-							{
-								printf("\t\tBoard %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, dS, brdO, tType[curD][brdO],
-										tSrc[curD][brdO], tDuration[curD][brdO]);
-							}
-							if (tA[dS] == 1)
-							{
-								printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", tBt[dS] + 1, dS, tBt[curD],
-										aType[curD], aSrc[curD], aDuration[curD]);
-							}
-						}
-						/* Increase curD */
-						curD++;
-					}
-					else
-					{
-						/* Clear old Board Variables */
-						for (int vC = 0; vC < 64; vC++)
-						{
-							tDuration[curD][vC] = 0;
-							sprintf(tType[curD][vC], "");
-							sprintf(tSrc[curD][vC], "");
-						}
-						tEn[curD] = 0;
-						tPX[curD] = 0;
-						tPY[curD] = 0;
-						tSc[curD] = 0;
-						tBr[curD] = 0;
-						tW[curD] = 0;
-						tH[curD] = 0;
-						tBt[curD] = 0;
-						tA[curD] = 0;
-						tHeaderVis[curD] = false;
-						sprintf(tSHeaderTxt[curD], "%s", "");
-						tTs[curD] = 0;
-						sprintf(bPluginCmd[curD], "%s", "");
-						sprintf(bSection[curD], "%s", "");
-						sprintf(tFldr[curD], "%s", "");
-						sprintf(tUID[curD], "%s", "");
-						printf("\n\tBoard '%s' has been marked as Disabled.\n", dList[dS].c_str());
 					}
 				}
 			}
+			else
+			{
+				printf("**Error Parsing Boards - Does the folder exist?\n");
+			}
+			/* End Board Checking Loop */
 		}
 
 		if (cTime > (wUpdateTimer[3] + 1))
 		{
-			/* Do Forward Board Sorting to add/update boards when configs change */
+			/* Sort out Board Creation/Destruction methods. */
 			wUpdateTimer[3] = cTime;
-			for (int tB = 0; tB < 64; tB++)
+			for (int cB = 0; cB < 64; cB++)
 			{
-				bool bFound = false;
-				for (int pB = 10; pB < 74; pB++)
+				bool bWipeNeed = false;
+				if (mBoard[cB].TimeStampCheck >= (cTime - 15))
 				{
-					if (iBoxes[pB].isCreated())
+					/* We've got something... Check it */
+					if (mBoard[cB].CreatedID == 0)
 					{
-						for (int ttB = 0; ttB < 64; ttB++)
+						/* Board needs creating */
+						for (int cBC = 1; cBC < 65; cBC++) /* Intentionally do 1 to 65 */
 						{
-							if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0))
+							/* We also want sanity checking, incase we double up on board ID's (shouldn't happen) */
+							if (!iBoxes[cBC].isCreated())
 							{
-								/* We Found a Board!  Check the TimeStamp */
-								if ((tTs[tB] != iBoxes[pB].GetTStamp()) && (iBoxes[pB].stype() != -1))
+								/* Empty ID Found - Create*/
+								mBoard[cB].pFade = 0;
+								mBoard[cB].Scroll = 0;
+								bool mBoardMod = false;
+								if (mBoard[cB].curBoard == -1)
 								{
-									/* Time Stamp Not Match - Signal for Board Destroy */
-									iBoxes[pB].Destroy();
-									tBC[tB] = -1;
+									mBoard[cB].curBoard = 0;
+									mBoardMod = true;
 								}
-								bFound = true;
-								break;
-							}
-						}
-					}
-					else if (bFound == true)
-						break;
-				}
-				if (bFound == false)
-				{
-					/* Add Board Config */
-					for (int pB = 10; pB < 74; pB++)
-					{
-						if ((strlen(tSrc[tB][0]) > 0) && (iBoxes[pB].isCreated() == false))
-						{
-							/* Empty Board Location - Create */
-							/* Reset Variables which rely first */
-							pFade[tB] = 0;
-							tScrollV[tB] = 0;
-							bool tBCMod = false;
-							if (tBC[tB] == -1)
-							{
-								tBC[tB] = 0;
-								tBCMod = true;
-							}
 
-							/* Run Plugin 5 seconds before transition.*/
-							if (strlen(bPluginCmd[tB]) != 0)
-							{
-								/* Plugin exists - Run Command! */
-								pPluginCMD[tB] = NULL;
-								pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
-							}
+								/* Run Plugin (Initial) */
+								if (strlen(mBoard[cB].sPluginCMD) != 0)
+								{
+									mBoard[cB].fPluginCMD = NULL;
+									mBoard[cB].fPluginCMD = popen(mBoard[cB].sPluginCMD, "w");
+								}
 
-							/* Create Board Objects */
-							if (strcmp(*tType[tB], "image") == 0)
-							{
-								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 1);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										1, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderVis[tB], tHeaderTxt[tB][tBC[tB]], tSHeaderTxt[tB]);
-								if (tBCMod == true)
-									tBC[tB] = -1;
-								break;
-							}
-							if (strcmp(*tType[tB], "mplayer") == 0)
-							{
-								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], 3);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										3, tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderVis[tB], tHeaderTxt[tB][tBC[tB]], tSHeaderTxt[tB]);
-								if (tBCMod == true)
-									tBC[tB] = -1;
-								break;
-							}
-							if (strcmp(*tType[tB], "iplayer") == 0)
-							{
-								printf("Creating Board SRC(%i) = %s (%s) Type %i\n", tB, tUID[tB], tSrc[tB][0], tSType[tB][0]);
-								iBoxes[pB].Create(tUID[tB], tSrc[tB][tBC[tB]], tTs[tB], 0, tBr[tB], tPX[tB], tPY[tB], tW[tB], tH[tB], sWidth, sHeight, tSc[tB],
-										tSType[tB][0], tBC[tB], tAudEnable[tB][tBC[tB]], bHeaderVis[tB][tBC[tB]], tHeaderVis[tB], tHeaderTxt[tB][tBC[tB]],
-										tSHeaderTxt[tB]);
-								if (tBCMod == true)
-									tBC[tB] = -1;
+								/* Create Board (Initial) */
+								int tBoardType;
+								if (strcmp(mBoard[cB].cBoard[0].Type, "image") == 0)
+								{
+									tBoardType = 1;
+								}
+
+								if (strcmp(mBoard[cB].cBoard[0].Type, "mplayer") == 0)
+								{
+									tBoardType = 3;
+								}
+
+								if (strcmp(mBoard[cB].cBoard[0].Type, "iplayer") == 0)
+								{
+									tBoardType = mBoard[cB].cBoard[mBoard[cB].curBoard].Quality;
+								}
+
+								printf("Creating Board '%s' with BoardID (%i,%i) - Type %i...\n", mBoard[cB].UIDS, cBC, cB, tBoardType);
+								iBoxes[cBC].Create(mBoard[cB].UID, mBoard[cB].cBoard[mBoard[cB].curBoard].Src, mBoard[cB].TimeStampCFG, 0, mBoard[cB].Border,
+										mBoard[cB].X, mBoard[cB].Y, mBoard[cB].Width, mBoard[cB].Height, sWidth, sHeight, mBoard[cB].Scale, tBoardType,
+										mBoard[cB].curBoard, mBoard[cB].cBoard[mBoard[cB].curBoard].AudioOut, mBoard[cB].cBoard[mBoard[cB].curBoard].HeaderVis,
+										mBoard[cB].HeaderVis, mBoard[cB].cBoard[mBoard[cB].curBoard].Header, mBoard[cB].Header);
+								mBoard[cB].CreatedID = cBC;
+								if (mBoardMod == true)
+									mBoard[cB].curBoard = -1;
 								break;
 							}
 						}
 					}
 				}
-			}
-			/* Do Reverse Sorting - Remove Boards which are no longer present/disabled */
-			for (int pB = 10; pB < 74; pB++)
-			{
-				if (iBoxes[pB].isCreated())
+				else
 				{
-					bool bFound = false;
-					for (int tB = 0; tB < 64; tB++)
+					/* Something or nothing... Destroy/Clean Event */
+					/* We've got something... Check it */
+					if (mBoard[cB].CreatedID != 0)
 					{
-						if ((strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (tTs[tB] == iBoxes[pB].GetTStamp()))
+						/* Something Exists which needs destroying */
+						if (!iBoxes[mBoard[cB].CreatedID].isCreated())
 						{
-							/* We Found a Board!  Check the TimeStamp */
-							bFound = true;
+							/* Destroy board information (if not already flagged) */
+							bWipeNeed = true;
+						}
+						else
+						{
+							/* Board is created, we need to destroy it */
+							if (iBoxes[mBoard[cB].CreatedID].stype() != -1)
+								iBoxes[mBoard[cB].CreatedID].Destroy();
 						}
 					}
-					if (bFound == false)
-						iBoxes[pB].Destroy();
+					else
+					{
+						if (strcmp("", mBoard[cB].UID) != 0)
+							bWipeNeed = true;
+					}
+				}
+				if (bWipeNeed)
+				{
+					printf("\tWiping Board ID '%i' (%s)...", cB, mBoard[cB].UIDS);
+					/* Clear Variables */
+					sprintf(mBoard[cB].UID, "");
+					sprintf(mBoard[cB].UIDS, "");
+					mBoard[cB].UIDI = 0;
+					sprintf(mBoard[cB].Folder, "");
+					mBoard[cB].curBoard = 0;
+					mBoard[cB].reqBoard = 0;
+					mBoard[cB].oldBoard = 0;
+					mBoard[cB].X = 0;
+					mBoard[cB].Y = 0;
+					mBoard[cB].Scale = 0;
+					mBoard[cB].Border = 0;
+					mBoard[cB].Width = 0;
+					mBoard[cB].Height = 0;
+					mBoard[cB].Scroll = 0;
+					mBoard[cB].ScrollComplete = 0;
+					mBoard[cB].pFade = 0;
+					mBoard[cB].nBoards = 0;
+					mBoard[cB].Alert = 0;
+					mBoard[cB].AlertActive = 0;
+					sprintf(mBoard[cB].Header, "");
+					mBoard[cB].HeaderSize = 0;
+					mBoard[cB].HeaderVis = false;
+					sprintf(mBoard[cB].sPluginCMD, "");
+					mBoard[cB].fPluginCMD = NULL;
+					mBoard[cB].rPluginCMD = false;
+					mBoard[cB].TimeStampCFG = 0;
+					mBoard[cB].TimeStampCheck = 0;
+					mBoard[cB].ConfigValid = false;
+					mBoard[cB].isDestroying = false;
+					mBoard[cB].CreatedID = 0;
+					for (int bClean = 0; bClean < 64; bClean++)
+					{
+						sprintf(mBoard[cB].cBoard[bClean].Section, "");
+						mBoard[cB].cBoard[bClean].Duration = 0;
+						sprintf(mBoard[cB].cBoard[bClean].Type, "");
+						sprintf(mBoard[cB].cBoard[bClean].Src, "");
+						mBoard[cB].cBoard[bClean].Quality = 0;
+						mBoard[cB].cBoard[bClean].ScrollSpeed = 0;
+						sprintf(mBoard[cB].cBoard[bClean].Header, "");
+						mBoard[cB].cBoard[bClean].HeaderSize = 0;
+						mBoard[cB].cBoard[bClean].HeaderVis = false;
+						sprintf(mBoard[cB].cBoard[bClean].AudioOut, "");
+						mBoard[cB].cBoard[bClean].isAlert = false;
+					}
+					printf(" [OK]\n");
 				}
 			}
 		}
 
-		/* Do Board Timer Events */
-		for (int tB = 0; tB < 64; tB++)
+		/* Do Board Timer Events - Only process boards where we are valid */
+		for (int cB = 0; cB < 64; cB++)
 		{
-			for (int pB = 10; pB < 74; pB++)
+			if ((iBoxes[mBoard[cB].CreatedID].isCreated()) && (iBoxes[mBoard[cB].CreatedID].stype() != -1))
 			{
-				if (iBoxes[pB].isCreated())
+				/* Board is created, and we are not in a destructor mode.  Process */
+				bool resetClicks = false;
+				bool scrUpdate = false;
+
+				/* Check and run Plugin */
+				if (((cTime > (iBoxes[mBoard[cB].CreatedID].getClicks() + (mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration - 6))))
+						&& ((strlen(mBoard[cB].sPluginCMD) != 0) && (mBoard[cB].rPluginCMD == false)))
 				{
-					for (int ttB = 0; ttB < 64; ttB++)
+					/* Run Plugin Command */
+					printf("Plugin Timer Event Check (%i) - Board %i, Screen %i of %i (%i seconds) - FLAG #%ix%ix%i\n", cTime, cB,
+							iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards, mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration,
+							iBoxes[mBoard[cB].CreatedID].stype(), mBoard[cB].pFade, mBoard[cB].Scroll);
+					printf("\tCommand:\t%s\n", mBoard[cB].sPluginCMD);
+					mBoard[cB].rPluginCMD = true;
+					mBoard[cB].fPluginCMD = NULL;
+					mBoard[cB].fPluginCMD = popen(mBoard[cB].sPluginCMD, "w");
+				}
+
+				if ((cTime > (iBoxes[mBoard[cB].CreatedID].getClicks() + mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration)))
+				{
+					if ((mBoard[cB].reqBoard == mBoard[cB].curBoard) && (mBoard[cB].pFade == 255))
 					{
-						if ((strlen(tSrc[tB][ttB]) > 0) && (strcmp(iBoxes[pB].GetUID(), tUID[tB]) == 0) && (iBoxes[pB].getScreen() != -1)
-								&& (iBoxes[pB].stype() != -1))
+						if ((mBoard[cB].Scroll == 0)
+								|| ((mBoard[cB].Scroll / mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].ScrollSpeed)
+										== (mBoard[cB].Scale * (mBoardTex[iBoxes[mBoard[cB].CreatedID].getScreen()].height() / 255))
+												- (mBoard[cB].Scale * (mBoard[cB].Height / 255))))
+							printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, cB,
+									iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards,
+									mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration, iBoxes[mBoard[cB].CreatedID].stype(),
+									mBoard[cB].pFade, mBoard[cB].Scroll);
+
+						/* Scrolling Event */
+						if ((mBoardTex[cB].height() > mBoard[cB].Height) && (mBoard[cB].pFade == 255.0))
 						{
-							/* Valid Board Found */
-							bool resetClicks = false;
-							bool scrUpdate = false;
-
-							if (((cTime > (iBoxes[pB].getClicks() + (tDuration[tB][iBoxes[pB].getScreen()] - 6))))
-									&& ((strlen(bPluginCmd[tB]) != 0) && (tPRunning[tB] == false)))
+							/* We need to scroll! */
+							if (((mBoard[cB].Scroll / mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].ScrollSpeed)
+									< (mBoard[cB].Scale * (mBoardTex[cB].height() / 255.0)) - (mBoard[cB].Scale * (mBoard[cB].Height / 255.0))))
 							{
-								/* Run Plugin 5 seconds before transition.*/
-								/* Plugin exists - Run Command! */
-								printf("Plugin Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, pB,
-										iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB], tScrollV[tB]);
-								tPRunning[tB] = true;
-								pPluginCMD[tB] = NULL;
-								pPluginCMD[tB] = popen(bPluginCmd[tB], "w");
+								mBoard[cB].Scroll++;
+								scrUpdate = true;
 							}
-
-							if ((cTime > (iBoxes[pB].getClicks() + tDuration[tB][iBoxes[pB].getScreen()])))
+							if (((mBoard[cB].Scroll / mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].ScrollSpeed)
+									>= (mBoard[cB].Scale * (mBoardTex[cB].height() / 255.0)) - (mBoard[cB].Scale * (mBoard[cB].Height / 255.0)))
+									&& (mBoard[cB].ScrollComplete == 0))
 							{
-								if ((tBR[tB] == tBC[tB]) && (pFade[tB] == 255))
+								/* Instead of eventually hitting an upper limit on the scroll
+								 we loop the scroll value to keep things clean */
+								iBoxes[mBoard[cB].CreatedID].setClicks(cTime);
+								mBoard[cB].rPluginCMD = false;
+								scrUpdate = true;
+								mBoard[cB].ScrollComplete = 1;
+							}
+							iBoxes[mBoard[cB].CreatedID].setScrollV(
+									mBoard[cB].Scroll / mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].ScrollSpeed);
+						}
+
+						if ((scrUpdate == false) && (iBoxes[mBoard[cB].CreatedID].stype() != -1))
+						{
+							/* Destroy broken Streaming Events */
+							if ((iBoxes[mBoard[cB].CreatedID].stype() != 1) && (iBoxes[mBoard[cB].CreatedID].stype() == 2))
+							{
+								/* Destroy iPlayer/Media Reference */
+								printf("Destroying ID %i\n", iBoxes[mBoard[cB].CreatedID].stype());
+								iBoxes[mBoard[cB].CreatedID].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+							}
+							else
+							{
+								if (mBoard[cB].Alert == 1)
 								{
-									if ((tScrollV[tB] == 0)
-											|| ((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
-													== (tSc[tB] * (bTex[tB].height() / 255)) - (tSc[tB] * (tH[tB] / 255))))
-										printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, pB,
-												iBoxes[pB].getScreen(), tBt[tB], tDuration[tB][iBoxes[pB].getScreen()], iBoxes[pB].stype(), pFade[tB],
-												tScrollV[tB]);
-
-									/* Check and Scroll if it's a big image */
-									if ((bTex[tB].height() > tH[tB]) && (pFade[tB] == 255.0))
+									/* Alert Board Configured */
+									if (mBoard[cB].AlertActive == 1)
 									{
-										/* We need to scroll! */
-										if (((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
-												< (tSc[tB] * (bTex[tB].height() / 255.0)) - (tSc[tB] * (tH[tB] / 255.0))))
-										{
-											tScrollV[tB]++;
-											scrUpdate = true;
-										}
-										if (((tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()])
-												>= (tSc[tB] * (bTex[tB].height() / 255.0)) - (tSc[tB] * (tH[tB] / 255.0))) && (tSComp[tB] == 0))
-										{
-											/* Instead of eventually hitting an upper limit on the scroll
-											 we loop the scroll value to keep things clean */
-											iBoxes[pB].setClicks(cTime);
-											tPRunning[tB] = false;
-											scrUpdate = true;
-											tSComp[tB] = 1;
-										}
-										iBoxes[pB].setScrollV(tScrollV[tB] / tSSpeed[tB][iBoxes[pB].getScreen()]);
-									}
-
-									if ((scrUpdate == false) && (iBoxes[pB].stype() != -1))
-									{
-										/* Destroy broken Streaming Events */
-										if ((iBoxes[pB].stype() != 1) && (iBoxes[pB].stype() == 2))
-										{
-											/* Destroy iPlayer/Media Reference */
-											printf("Destroying ID %i\n", iBoxes[pB].stype());
-											iBoxes[pB].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
-										}
-										else
-										{
-											if (tA[tB] == 1)
-											{
-												/* Alert Board Configured */
-												if (aActive[tB] == 1)
-												{
-													/* Alert Board currently showing - Turn Off and resume as normal */
-													aActive[tB] = 0;
-													tBR[tB] = tOR[tB] + 1;
-													if (tBR[tB] > tBt[tB] - 1)
-														tBR[tB] = 0;
-												}
-												else
-												{
-													tOR[tB] = tBR[tB];
-													tBR[tB] = tBt[tB];
-													aActive[tB] = 1;
-												}
-											}
-											else
-											{
-												/* No Alerts Showing - Run as Normal */
-												tBR[tB]++;
-												if (tBR[tB] > tBt[tB] - 1)
-													tBR[tB] = 0;
-											}
-										}
-									}
-								}
-
-								/* Process Fade Out Events */
-								if (tBR[tB] != tBC[tB])
-								{
-									pFade[tB] = pFade[tB] - 5;
-									if (pFade[tB] < 0)
-										pFade[tB] = 0;
-								}
-
-								/* Swap Textures (if applicable) */
-								if (((tBR[tB] != tBC[tB]) && (pFade[tB] == 0)) && (iBoxes[pB].stype() != -1))
-								{
-									tBC[tB] = tBR[tB];
-									char bdID[128];
-									if ((aActive[tB] == 1) && (tA[tB] == 1))
-									{
-										sprintf(bdID, "/screen/boards/%s/alert/%s", tFldr[tB], aSrc[tB]);
+										/* Alert Board currently showing - Turn Off and resume as normal */
+										mBoard[cB].AlertActive = 0;
+										mBoard[cB].reqBoard = mBoard[cB].oldBoard + 1;
+										if (mBoard[cB].reqBoard > mBoard[cB].nBoards - 1)
+											mBoard[cB].reqBoard = 0;
 									}
 									else
 									{
-										sprintf(bdID, "/screen/boards/%s/boards/%s", tFldr[tB], tSrc[tB][tBC[tB]]);
+										mBoard[cB].oldBoard = mBoard[cB].reqBoard;
+										mBoard[cB].reqBoard = mBoard[cB].nBoards;
+										mBoard[cB].AlertActive = 1;
 									}
-									iBoxes[pB].setScreen(tBC[tB]);
-									printf("Attempting to load Texture '%s'...", bdID);
-									if (FileExists(bdID) == false)
-										sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
-									bTex[tB].Destroy();
-									bTex[tB].Load(bdID);
-									/* Scale Texture to Box unless we scroll */
-									int texH = 0;
-									if (bTex[tB].height() < tH[tB])
-										texH = tH[tB];
-									else
-										texH = bTex[tB].height();
-									iBoxes[pB].SwapTex(bTex[tB].gltex(), bTex[tB].width(), texH);
-									tScrollV[tB] = 0;
-									tSComp[tB] = 0;
-									iBoxes[pB].setScrollV(tScrollV[tB]);
-									iBoxes[pB].setClicks(0); /* Set to 0 to take into account of different timings per page */
 								}
-
-								/* Process Fade In Events */
-								if ((tBR[tB] == tBC[tB]) && (iBoxes[pB].stype() != -1) && (iBoxes[pB].stype() < 3))
+								else
 								{
-									pFade[tB] = pFade[tB] + 5;
-									if (pFade[tB] > 255)
-									{
-										pFade[tB] = 255;
-									}
-									if (pFade[tB] == 255)
-										resetClicks = true;
-								}
-
-								/* Reset Clicks */
-								if ((resetClicks == true) && (scrUpdate == false))
-								{
-									iBoxes[pB].setClicks(cTime);
-									tPRunning[tB] = false;
+									/* No Alerts Showing - Run as Normal */
+									mBoard[cB].reqBoard++;
+									if (mBoard[cB].reqBoard > mBoard[cB].nBoards - 1)
+										mBoard[cB].reqBoard = 0;
 								}
 							}
 						}
+					}
+
+					/* Fade Out Event */
+					if (mBoard[cB].reqBoard != mBoard[cB].curBoard)
+					{
+						mBoard[cB].pFade = mBoard[cB].pFade - 5;
+						if (mBoard[cB].pFade < 0)
+							mBoard[cB].pFade = 0;
+					}
+
+					/* Swap Texture Event */
+					if (((mBoard[cB].reqBoard != mBoard[cB].curBoard) && (mBoard[cB].pFade == 0)) && (iBoxes[mBoard[cB].CreatedID].stype() != -1))
+					{
+						mBoard[cB].curBoard = mBoard[cB].reqBoard;
+						char bdID[128];
+						if ((mBoard[cB].AlertActive == 1) && (mBoard[cB].Alert == 1))
+						{
+							sprintf(bdID, "/screen/boards/%s/alert/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
+						}
+						else
+						{
+							sprintf(bdID, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+						}
+						iBoxes[mBoard[cB].CreatedID].setScreen(mBoard[cB].curBoard);
+						printf("Attempting to load Texture '%s'...", bdID);
+						if (FileExists(bdID) == false)
+							sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
+						mBoardTex[cB].Destroy();
+						mBoardTex[cB].Load(bdID);
+						/* Scale Texture to Box unless we scroll */
+						int texH = 0;
+						if (mBoardTex[cB].height() < mBoard[cB].Height)
+							texH = mBoard[cB].Height;
+						else
+							texH = mBoardTex[cB].height();
+						iBoxes[mBoard[cB].CreatedID].SwapTex(mBoardTex[cB].gltex(), mBoardTex[cB].width(), texH);
+						mBoard[cB].Scroll = 0;
+						mBoard[cB].ScrollComplete = 0;
+						iBoxes[mBoard[cB].CreatedID].setScrollV(mBoard[cB].Scroll);
+						iBoxes[mBoard[cB].CreatedID].setClicks(0); /* Set to 0 to take into account of different timings per page */
+					}
+
+					/* Fade In Event */
+					if ((mBoard[cB].reqBoard == mBoard[cB].curBoard) && (iBoxes[mBoard[cB].CreatedID].stype() != -1)
+							&& (iBoxes[mBoard[cB].CreatedID].stype() < 3))
+					{
+						mBoard[cB].pFade = mBoard[cB].pFade + 5;
+						if (mBoard[cB].pFade > 255)
+						{
+							mBoard[cB].pFade = 255;
+						}
+						if (mBoard[cB].pFade == 255)
+							resetClicks = true;
+					}
+
+					/* Reset Clicks */
+					if ((resetClicks == true) && (scrUpdate == false))
+					{
+						iBoxes[mBoard[cB].CreatedID].setClicks(cTime);
+						mBoard[cB].rPluginCMD = false;
 					}
 				}
 			}
 		}
 	}
+
 	/* Save Screenshot every 29 seconds */
 	if (wUpdateTimer[4] == 0)
 		wUpdateTimer[4] = cTime;
@@ -1170,12 +1218,12 @@ void Signage::Draw()
 			drawText(wTemp, fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
 
 		/* Still check Icon position and move if required.  Temp could change, but if Icon remains same, we need to refresh */
-		if (iBoxes[1].isCreated())
-			iBoxes[1].rePos(16 + pTWidth, -6);
-		if (iBoxes[4].isCreated())
-			iBoxes[4].rePos(16 + pTWidth, -6);
-		if (iBoxes[5].isCreated())
-			iBoxes[5].rePos(16 + pTWidth, -6);
+		if (iBoxes[101].isCreated())
+			iBoxes[101].rePos(16 + pTWidth, -6);
+		if (iBoxes[104].isCreated())
+			iBoxes[104].rePos(16 + pTWidth, -6);
+		if (iBoxes[105].isCreated())
+			iBoxes[105].rePos(16 + pTWidth, -6);
 
 		char tWString[64];
 		switch (wCurDisp)
@@ -1211,10 +1259,10 @@ void Signage::Draw()
 			break;
 		}
 
-		int oPX = ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 32;
+		int oPX = ((iBoxes[101].width() / 255.0) * iBoxes[101].scale()) + pTWidth + 32;
 		int plPX = (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2);
 
-		tPXX = ((iBoxes[1].width() / 255.0) * iBoxes[1].scale()) + pTWidth + 16;
+		tPXX = ((iBoxes[101].width() / 255.0) * iBoxes[101].scale()) + pTWidth + 16;
 		int tPXM = plPX - oPX;
 
 		if (drawText(tWString, fntCGothic[32], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
@@ -1222,9 +1270,9 @@ void Signage::Draw()
 			/* We're either Scrolling or Scrolled. */
 			/* Draw End Fader (obviously) */
 
-			if (!iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
+			if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 			{
-				iBoxes[2].Create("Weather Condition Fader - Right", "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), pTHeight,
+				iBoxes[102].Create("Weather Condition Fader - Right", "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), pTHeight,
 						tScrollTex[0].width(), pTHeight, 255, 1, 1, "null", false, false, "", "");
 			}
 
@@ -1235,14 +1283,14 @@ void Signage::Draw()
 				wUpdateTimer[0] = cTime - 10;
 				if (cTime > tScrollingTimer[0] + 5)
 				{
-					if (!iBoxes[3].isCreated() && iBoxes[3].stype() != -1)
+					if (!iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 					{
-						iBoxes[3].Create("Weather Condition Fader - Left", "", 0, tScrollTex[1].gltex(), 4, tPXX, 8, tScrollTex[1].width(), 64,
+						iBoxes[103].Create("Weather Condition Fader - Left", "", 0, tScrollTex[1].gltex(), 4, tPXX, 8, tScrollTex[1].width(), 64,
 								tScrollTex[1].width(), 64, 255, 1, 1, "null", false, false, "", "");
 					}
 					else
 					{
-						iBoxes[2].doUpdate();
+						iBoxes[102].doUpdate();
 
 						if (tScrollCycle[0] == 1)
 						{
@@ -1261,8 +1309,8 @@ void Signage::Draw()
 			if (tScrolling[0] > 0)
 			{
 				/* We did some Scrolling, we need to fade out ending fader */
-				if (iBoxes[2].isCreated() && iBoxes[2].stype() != -1)
-					iBoxes[2].Destroy();
+				if (iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
+					iBoxes[102].Destroy();
 			}
 			tScrollingTimer[0] = cTime;
 		}
@@ -1270,75 +1318,64 @@ void Signage::Draw()
 		/* Draw Leaves if Windy */
 		if (tWindSpeedMPH >= 25)
 		{
-			if (!iBoxes[4].isCreated() && iBoxes[4].stype() != -1)
+			if (!iBoxes[104].isCreated() && iBoxes[104].stype() != -1)
 			{
-				iBoxes[4].Create("Weather Wind Alert", "", 0, weather[1].gltex(), 4, 0, 0, weather[1].width() / 2, weather[1].height() / 2,
+				iBoxes[104].Create("Weather Wind Alert", "", 0, weather[1].gltex(), 4, 0, 0, weather[1].width() / 2, weather[1].height() / 2,
 						weather[1].width() / 2, weather[1].height() / 2, 255, 1, 1, "null", false, false, "", "");
 			}
 		}
 		else
 		{
-			if (iBoxes[4].isCreated() && iBoxes[4].stype() != -1)
-				iBoxes[4].Destroy();
+			if (iBoxes[104].isCreated() && iBoxes[104].stype() != -1)
+				iBoxes[104].Destroy();
 		}
 	}
 	else
 	{
 		drawText("Weather Currently Unavailable", fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
-		if (iBoxes[1].isCreated())
-			iBoxes[1].Destroy();
+		if (iBoxes[101].isCreated())
+			iBoxes[101].Destroy();
 	}
 
-	/* Draw Boxes */
-	for (int n = 0; n < 128; n++)
+	/* Draw Standard Boxes */
+	for (int n = 100; n < 128; n++)
 	{
 		if (iBoxes[n].isCreated())
 		{
-			if (n < 10)
+			if ((n == 1))
 			{
-				if ((n == 1))
+				/* Weather Box */
+				if (!iBoxes[n].doDraw(wFadeV[1]))
 				{
-					/* Weather Box */
-					if (!iBoxes[n].doDraw(wFadeV[1]))
-					{
-						m_bQuitting = true;
-						m_bRunning = false;
-					}
-				}
-				else
-				{
-					if (!iBoxes[n].doDraw(-1))
-					{
-						m_bQuitting = true;
-						m_bRunning = false;
-					}
+					m_bQuitting = true;
+					m_bRunning = false;
 				}
 			}
 			else
 			{
-				if (!iBoxes[n].doDraw(pFade[n - 10]))
+				if (!iBoxes[n].doDraw(-1))
 				{
-					m_bRunning = false;
 					m_bQuitting = true;
+					m_bRunning = false;
 				}
-				else
-				{
-					if (iBoxes[n].hasSHeader() == true)
-					{
-						drawText(iBoxes[n].txtSHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, 255,
-								tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-								((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10], 0, 0);
-					}
-					else
-					{
-						if (iBoxes[n].hasHeader() == true)
-						{
-							drawText(iBoxes[n].txtHeader(), fntCGothic[tSHeaderSize[n - 10]], 3, 0, 0, 0, pFade[n - 10],
-									tPX[n - 10] + ((tW[n - 10] / 255.0) * iBoxes[n].scale()), tPX[n - 10],
-									((tH[n - 10] / 255.0) * iBoxes[n].scale()) + tPY[n - 10] - tSHeaderSize[n - 10], 0, 0);
-						}
-					}
-				}
+			}
+		}
+	}
+
+	for (int cB = 0; cB < 64; cB++)
+	{
+		if (!iBoxes[mBoard[cB].CreatedID].doDraw(mBoard[cB].pFade))
+		{
+			m_bRunning = false;
+			m_bQuitting = true;
+		}
+		else
+		{
+			if (iBoxes[mBoard[cB].CreatedID].hasSHeader() == true)
+			{
+				drawText(iBoxes[mBoard[cB].CreatedID].txtSHeader(), fntCGothic[mBoard[cB].HeaderSize], 3, 0, 0, 0, 255,
+						mBoard[cB].X + ((mBoard[cB].Width / 255.0) * iBoxes[mBoard[cB].CreatedID].scale()), mBoard[cB].X,
+						((mBoard[cB].Height / 255.0) * iBoxes[mBoard[cB].CreatedID].scale()) + mBoard[cB].Y - mBoard[cB].HeaderSize, 0, 0);
 			}
 		}
 	}
@@ -1357,18 +1394,18 @@ void Signage::Draw()
 	/* Draw FPS and Version Debug Info for 10 seconds only. */
 	if (cTime <= (dTimeEvent + 10) && m_bQuitting == false)
 	{
-		if (!iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
+		if (!iBoxes[106].isCreated() && iBoxes[106].stype() != -1)
 		{
-			iBoxes[6].Create("Debug Info Pane", "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, "null", false, false, "", "");
+			iBoxes[106].Create("Debug Info Pane", "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, "null", false, false, "", "");
 		}
 	}
 	else
 	{
-		if (iBoxes[6].isCreated() && iBoxes[6].stype() != -1)
-			iBoxes[6].Destroy();
+		if (iBoxes[106].isCreated() && iBoxes[106].stype() != -1)
+			iBoxes[106].Destroy();
 	}
 
-	if (iBoxes[6].isCreated())
+	if (iBoxes[106].isCreated())
 	{
 		int currentFPS = 0;
 		char FPSC[32] = "";
@@ -1439,6 +1476,9 @@ void Signage::Clean()
 		printf("Destroying Texture Faders... ");
 		tScrollTex[0].Destroy();
 		tScrollTex[1].Destroy();
+
+		/* Set Destroy Flag */
+		m_bOKKill = true;
 	}
 }
 

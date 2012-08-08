@@ -53,17 +53,21 @@ public:
 	{
 		m_bRunning = false;
 	}
+	bool OKToQuit()
+	{
+		return m_bOKKill;
+	}
 private:
 	time_t cTime;
 	SDL_Surface* screen;
-	bool m_bFullscreen, m_bRunning, m_bQuitting;
+	bool m_bFullscreen, m_bRunning, m_bQuitting, m_bOKKill;
 	Texture pLogo;
 	Texture weather[4];
-	Texture bTex[64];
 	Texture tScrollTex[2];
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[49];
-	int pTWidth, pTHeight, tC1, tSrS, wFadeTI, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure, trCloudCover, trVisibility, trConditionDesc;
+	int pTWidth, pTHeight, tC1, tSrS, wFadeTI, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure,
+			trCloudCover, trVisibility, trConditionDesc;
 
 	/* BEGIN Weather Vars */
 
@@ -84,7 +88,8 @@ private:
 	bool bV1, wOK;
 	char nthsInWord[8], dateString[32];
 	char wIcon[64];
-	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32], tScrolling[64], tScrollCycle[64], tScrollingTimer[64], tScrollSFader[64], tScrollEFader[64], dTimeEvent;
+	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32], tScrolling[64], tScrollCycle[64], tScrollingTimer[64], tScrollSFader[64],
+			tScrollEFader[64], dTimeEvent;
 	float wCelcius;
 	char wTemp[32];
 
@@ -101,12 +106,58 @@ private:
 	void parseWeather(xmlNode * a_node);
 
 	/* Board Specific Vars */
-	bool validConfig[64], bChanger[64], bHeaderVis[64][64], tHeaderVis[64], tPRunning[64];
-	int tEn[64], tPX[64], tPY[64], tSc[64], tBr[64], tW[64], tH[64], tBt[64], tA[64], tTs[64], tDuration[64][64], tSType[64][64], tSSpeed[64][64], tBC[64],
-			tBR[64], tOR[64], pFade[64], aDuration[64], aSType[64], aSSpeed[64], aActive[64], tScrollV[64], tSComp[64], tSHeaderSize[64], tBHeaderSize[64][64];
-	char tFldr[64][1024], tUID[64][128], tType[64][64][128], tSrc[64][64][128], aType[64][128], aSrc[64][128], bSection[64][32], tAudEnable[64][64][16],
-			sHeader[256], tSHeaderTxt[64][256], sWLoc[64], sWCountry[64], sWAPI[64], tHeaderTxt[64][64][256], bPluginCmd[64][1024], sVersionString[32];
-	FILE *pPluginCMD[64];
+	struct
+	{
+		char UID[128];
+		char UIDS[128];
+		int UIDI;
+		char Folder[1024];
+		int curBoard;
+		int reqBoard;
+		int oldBoard;
+		int X;
+		int Y;
+		int Scale;
+		int Border;
+		int Width;
+		int Height;
+		int Scroll;
+		int ScrollComplete;
+		int pFade;
+		int nBoards;
+		int Alert;
+		int AlertActive;
+		char Header[128];
+		int HeaderSize;
+		bool HeaderVis;
+		char sPluginCMD[1024];
+		FILE *fPluginCMD;
+		bool rPluginCMD;
+		int TimeStampCFG;
+		int TimeStampCheck;
+		bool ConfigValid;
+		bool isDestroying;
+		int CreatedID;
+
+		/* Define Child Board Variables */
+		struct
+		{
+			char Section[128];
+			int Duration;
+			char Type[128];
+			char Src[128];
+			int Quality;
+			int ScrollSpeed;
+			char Header[128];
+			int HeaderSize;
+			bool HeaderVis;
+			char AudioOut[16];
+			bool isAlert;
+		} cBoard[64];
+	} mBoard[64];
+	Texture mBoardTex[64];
+
+	char sHeader[256], sWLoc[64], sWCountry[64], sWAPI[64], sVersionString[32];
 };
 
 #endif /* SIGNAGE_H_ */
