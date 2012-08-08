@@ -1342,7 +1342,7 @@ void Signage::Draw()
 	{
 		if (iBoxes[n].isCreated())
 		{
-			if ((n == 1))
+			if ((n == 101))
 			{
 				/* Weather Box */
 				if (!iBoxes[n].doDraw(wFadeV[1]))
