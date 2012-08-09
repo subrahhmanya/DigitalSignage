@@ -1048,6 +1048,9 @@ void Signage::Update()
 								/* Destroy iPlayer/Media Reference */
 								printf("Destroying ID %i\n", iBoxes[mBoard[cB].CreatedID].stype());
 								iBoxes[mBoard[cB].CreatedID].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+								/* Make Board Dirty so it is properly destroyed. */
+								mBoard[cB].TimeStampCFG = 0;
+								mBoard[cB].TimeStampCheck = 0;
 							}
 							else
 							{
