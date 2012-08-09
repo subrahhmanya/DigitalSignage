@@ -47,6 +47,6 @@ cp -a ${srcroot}textures ${scrroot} > /dev/null 2>&1
 # Load Application
 logOut "Launching InfoDisplay..."
 cd ${scrroot}
-env DISPLAY=:0 ${scrroot}infodisplay &
+env DISPLAY=:0 ${scrroot}infodisplay & > /dev/null 2>&1
 
 logOut "Update Complete!"
