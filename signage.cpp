@@ -805,9 +805,6 @@ void Signage::Update()
 													tcBoardCount++;
 												}
 											}
-
-											/* Reset nBoards variable to coincide with number of actual boards configured */
-											//mBoard[cB].nBoards = tcBoardCount - 1;
 											printf("\nBoard '%s':\n\tUIDS:\t'%s'\n\tUID:\t'%s'\n\tUIDI:\t%i\n\tBoards:\t%i\n", dList[dS].c_str(),
 													mBoard[cB].UIDS, mBoard[cB].UID, mBoard[cB].UIDI, mBoard[cB].nBoards);
 											for (int brdO = 0; brdO < mBoard[cB].nBoards; brdO++)
@@ -1045,9 +1042,10 @@ void Signage::Update()
 							/* Destroy broken Streaming Events */
 							if ((iBoxes[mBoard[cB].CreatedID].stype() != 1) && (iBoxes[mBoard[cB].CreatedID].stype() == 2))
 							{
-								/* Destroy iPlayer/Media Reference */
+								/* Problem with Media Streaming - Send a Kill Flag */
 								printf("Destroying ID %i\n", iBoxes[mBoard[cB].CreatedID].stype());
-								iBoxes[mBoard[cB].CreatedID].Destroy(); /* Problem with Media Streaming - Send a Kill Flag */
+								/* Destroy iPlayer/Media Reference */
+								iBoxes[mBoard[cB].CreatedID].Destroy();
 								/* Make Board Dirty so it is properly destroyed. */
 								mBoard[cB].TimeStampCFG = 0;
 								mBoard[cB].TimeStampCheck = 0;
