@@ -9,6 +9,6 @@ if [ ! $(pidof infodisplay) ] ; then
 	killall -9 rtmpdump > /dev/null 2>&1
 	killall -9 get_iplayer > /dev/null 2>&1
 	cd ${scrroot}
-	env DISPLAY=:0 ${scrroot}infodisplay > /dev/null 2>&1
+	env DISPLAY=:0 ${scrroot}infodisplay & > /dev/null 2>&1
 fi
 
