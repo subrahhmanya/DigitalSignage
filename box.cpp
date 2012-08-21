@@ -67,51 +67,56 @@ bool Box::doDraw(int aOverride)
 		if ((sType >= 4) && (ipVis))
 		{
 			/* Check for getiPlayer Instance, restart if required. */
-			char pgc[1024];
-			sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
-			FILE *fp = popen(pgc, "r");
-			char buff[1024];
-			if (!fgets(buff, sizeof buff, fp) != NULL)
+			ipCC++;
+			if (ipCC > 100)
 			{
-				/* get_iplayer isn't running - Close current window and set ipVis to false
-				 * iPlayer Window will automatically re-launch when closed.
-				 * Also, worth cycling through Quality settings, just in case it's an issue
-				 * with the stream, as experienced around May 20th 2012. */
-				SDL_SysWMinfo sdl_info;
-
-				sdl_info = get_sdl_wm_info();
-				sdl_info.info.x11.lock_func();
-
-				destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
-
-				/* Try '2' for Quality */
-				if (ipLFail == 0)
-					ipLFail = 1;
-				else
+				ipCC = 0;
+				char pgc[1024];
+				sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
+				FILE *fp = popen(pgc, "r");
+				char buff[1024];
+				if (!fgets(buff, sizeof buff, fp) != NULL)
 				{
-					ipLFail = 0;
-					ipLooper++;
-				}
+					/* get_iplayer isn't running - Close current window and set ipVis to false
+					 * iPlayer Window will automatically re-launch when closed.
+					 * Also, worth cycling through Quality settings, just in case it's an issue
+					 * with the stream, as experienced around May 20th 2012. */
+					SDL_SysWMinfo sdl_info;
 
-				if (ipLooper == 2)
-				{
-					sType = 4;
-				}
-				else if (ipLooper >= 3)
-				{
-					sType++;
-				}
+					sdl_info = get_sdl_wm_info();
+					sdl_info.info.x11.lock_func();
 
-				if ((sType - 3) > 4)
-				{
-					/* Set iPlayer to type 2 (Broken) */
-					sType = 2;
-				}
+					destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
 
-				sdl_info.info.x11.unlock_func();
-				ipVis = false;
+					/* Try '2' for Quality */
+					if (ipLFail == 0)
+						ipLFail = 1;
+					else
+					{
+						ipLFail = 0;
+						ipLooper++;
+					}
+
+					if (ipLooper == 2)
+					{
+						sType = 4;
+					}
+					else if (ipLooper >= 3)
+					{
+						sType++;
+					}
+
+					if ((sType - 3) > 4)
+					{
+						/* Set iPlayer to type 2 (Broken) */
+						sType = 2;
+					}
+
+					sdl_info.info.x11.unlock_func();
+					ipVis = false;
+				}
+				pclose(fp);
 			}
-			pclose(fp);
 		}
 	}
 	else if ((tAlpha == 0) && (sType == -1))
@@ -199,6 +204,7 @@ void Box::Destroy()
 			system("killall -9 mplayer");
 			system("killall -9 rtmpdump");
 			system("killall -9 get_iplayer");
+			pclose(mplayer_fp);
 			char pgc[1024];
 			sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
 			FILE *fp = popen(pgc, "r");
@@ -604,7 +610,7 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\" > /dev/null 2>&1",
 			quality, streamid, audEnable, cache, win);
 	printf("%s\n", cmdline);
-	*mplayer_fp = popen(cmdline, "w");
+	*mplayer_fp = popen(cmdline, "r");
 }
 
 void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int scale)

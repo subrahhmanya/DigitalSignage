@@ -125,6 +125,8 @@ Signage::Signage()
 	wOK = false;
 	pTWidth = 0;
 	wCelcius = 0.0;
+
+	dTimeEvent = 0;
 }
 
 void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc, const char* weathercountry,
@@ -865,8 +867,13 @@ void Signage::Update()
 								/* Run Plugin (Initial) */
 								if (strlen(mBoard[cB].sPluginCMD) != 0)
 								{
-									mBoard[cB].fPluginCMD = NULL;
-									mBoard[cB].fPluginCMD = popen(mBoard[cB].sPluginCMD, "w");
+									/* Clean up Any-and-All Open Plugins */
+									if (mBoard[cB].fPluginCMD != NULL)
+									{
+										pclose(mBoard[cB].fPluginCMD);
+										mBoard[cB].fPluginCMD = NULL;
+									}
+									mBoard[cB].fPluginCMD = popen(mBoard[cB].sPluginCMD, "r");
 								}
 
 								/* Create Board (Initial) */
@@ -950,6 +957,12 @@ void Signage::Update()
 					sprintf(mBoard[cB].Header, "");
 					mBoard[cB].HeaderSize = 0;
 					mBoard[cB].HeaderVis = false;
+					/* Clean up Any-and-All Open Plugins */
+					if (mBoard[cB].fPluginCMD != NULL)
+					{
+						pclose(mBoard[cB].fPluginCMD);
+						mBoard[cB].fPluginCMD = NULL;
+					}
 					sprintf(mBoard[cB].sPluginCMD, "");
 					mBoard[cB].fPluginCMD = NULL;
 					mBoard[cB].rPluginCMD = false;
@@ -995,8 +1008,13 @@ void Signage::Update()
 							iBoxes[mBoard[cB].CreatedID].stype(), mBoard[cB].pFade, mBoard[cB].Scroll);
 					printf("\tCommand:\t%s\n", mBoard[cB].sPluginCMD);
 					mBoard[cB].rPluginCMD = true;
-					mBoard[cB].fPluginCMD = NULL;
-					mBoard[cB].fPluginCMD = popen(mBoard[cB].sPluginCMD, "w");
+					/* Clean up Any-and-All Open Plugins */
+					if (mBoard[cB].fPluginCMD != NULL)
+					{
+						pclose(mBoard[cB].fPluginCMD);
+						mBoard[cB].fPluginCMD = NULL;
+					}
+					mBoard[cB].fPluginCMD = popen(mBoard[cB].sPluginCMD, "r");
 				}
 
 				if ((cTime > (iBoxes[mBoard[cB].CreatedID].getClicks() + mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration)))
@@ -1074,7 +1092,7 @@ void Signage::Update()
 								{
 									/* No Alerts Showing - Run as Normal */
 									mBoard[cB].reqBoard++;
-									if (mBoard[cB].reqBoard > mBoard[cB].nBoards - 1)
+									if (mBoard[cB].reqBoard > (mBoard[cB].nBoards - 1))
 										mBoard[cB].reqBoard = 0;
 								}
 							}
