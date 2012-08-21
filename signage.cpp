@@ -1096,12 +1096,19 @@ void Signage::Update()
 						char bdID[128];
 						if ((mBoard[cB].AlertActive == 1) && (mBoard[cB].Alert == 1))
 						{
-							sprintf(bdID, "/screen/boards/%s/alert/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
+							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
+								sprintf(bdID, "/screen/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
+							else
+								sprintf(bdID, "/screen/boards/%s/alert/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
 						}
 						else
 						{
-							sprintf(bdID, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
+								sprintf(bdID, "/screen/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+							else
+								sprintf(bdID, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
 						}
+
 						iBoxes[mBoard[cB].CreatedID].setScreen(mBoard[cB].curBoard);
 						printf("Attempting to load Texture '%s'...", bdID);
 						if (FileExists(bdID) == false)
@@ -1122,8 +1129,7 @@ void Signage::Update()
 					}
 
 					/* Fade In Event */
-					if ((mBoard[cB].reqBoard == mBoard[cB].curBoard) && (iBoxes[mBoard[cB].CreatedID].stype() != -1)
-							&& (iBoxes[mBoard[cB].CreatedID].stype() < 3))
+					if ((mBoard[cB].reqBoard == mBoard[cB].curBoard) && (iBoxes[mBoard[cB].CreatedID].stype() != -1))
 					{
 						mBoard[cB].pFade = mBoard[cB].pFade + 5;
 						if (mBoard[cB].pFade > 255)

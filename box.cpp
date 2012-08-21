@@ -61,7 +61,7 @@ bool Box::doDraw(int aOverride)
 
 	if ((tAlpha == 255) && (sType > 0))
 	{
-		if ((sType >= 4) && (!ipVis))
+		if ((sType >= 4) && (!ipVis) && (aOverride == 255))
 			createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
 
 		if ((sType >= 4) && (ipVis))
@@ -104,20 +104,8 @@ bool Box::doDraw(int aOverride)
 
 				if ((sType - 3) > 4)
 				{
-					/* Remove iPlayer feed, set as Static Image with "Unavailable" feed. */
+					/* Set iPlayer to type 2 (Broken) */
 					sType = 2;
-					char bgID[128];
-					sprintf(bgID, "/screen/textures/iplayer/%s.png", bMSRC);
-					if (FileExists(bgID) == false)
-						sprintf(bgID, "/screen/textures/iplayer/generic_fail.png");
-					ipBG.Load(bgID);
-					sWidth = ipBG.width();
-					sHeight = ipBG.height();
-					glTex = ipBG.gltex();
-				}
-				else
-				{
-					glTex = 0;
 				}
 
 				sdl_info.info.x11.unlock_func();
@@ -246,11 +234,8 @@ void Box::SwapTex(GLuint TextureID, int w, int h)
 	glTex = 0;
 	glGenTextures(1, &glTex);
 	glTex = TextureID;
-	if (sType == 1)
-	{
-		sWidth = w;
-		sHeight = h;
-	}
+	sWidth = w;
+	sHeight = h;
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
@@ -515,7 +500,6 @@ void Box::drawInfoBox(GLuint TextureID, bool bVis, int px, int py, int minx, int
 			/* Draw a Header Image */
 			if (sHeaderEnab == true)
 				glColor4f(br, bg, bb, (float) balpha / 255.0);
-			//sprintf(bHeaderTxt, "*");
 			glBindTexture(GL_TEXTURE_2D, layout[4].gltex());
 			glBegin(GL_QUADS);
 			glTexCoord2f(0.0f, 1.0f);
@@ -556,7 +540,7 @@ Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int 
 
 	winbgcol = WhitePixel(dpy, DefaultScreen(dpy));
 
-	win = XCreateSimpleWindow(dpy, parent, x, y, width, height, 0, winbgcol, winbgcol);
+	win = XCreateWindow(dpy, parent, x, y, width, height, 0, CopyFromParent, CopyFromParent, CopyFromParent, 0, 0);
 
 	if (!win)
 		return 0;
@@ -635,11 +619,11 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	int mplayer_t_width = 688;
 	int mplayer_t_height = 384;
 	y = (720 - y) - ((height / 255.0) * scale);
-	int mplayer_pos_y = (y / 720.0) * sHeight;
-	int mplayer_pos_x = (x / 1280.0) * sWidth;
-	int mplayer_width = (((mplayer_t_width / 1280.0) * sWidth) / 255.0) * scale;
-	int mplayer_height = (((mplayer_t_height / 720.0) * sHeight) / 255.0) * scale;
-	printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_y, mplayer_pos_y, mplayer_width, mplayer_height);
+	int mplayer_pos_y = y;
+	int mplayer_pos_x = x;
+	int mplayer_width = (width / 255.0) * scale;
+	int mplayer_height = (height / 255.0) * scale;
+	printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win)
 	{
