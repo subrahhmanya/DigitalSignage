@@ -533,12 +533,9 @@ void Box::destroy_x11_subwindow(Display *dpy, Window parent)
 Window Box::create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height)
 {
 	Window win;
-	int winbgcol;
 
 	if (!dpy)
 		return 0;
-
-	winbgcol = WhitePixel(dpy, DefaultScreen(dpy));
 
 	win = XCreateWindow(dpy, parent, x, y, width, height, 0, CopyFromParent, CopyFromParent, CopyFromParent, 0, 0);
 
@@ -618,11 +615,17 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 
 	int mplayer_t_width = 688;
 	int mplayer_t_height = 384;
+
+	const SDL_VideoInfo* info = SDL_GetVideoInfo();
+	int tWidth = info->current_w;
+	int tHeight = info->current_h;
+
 	y = (720 - y) - ((height / 255.0) * scale);
-	int mplayer_pos_y = y;
-	int mplayer_pos_x = x;
-	int mplayer_width = (width / 255.0) * scale;
-	int mplayer_height = (height / 255.0) * scale;
+	int mplayer_pos_y = (y / 720.0) * tHeight;
+	int mplayer_pos_x = (x / 1280.0) * tWidth;
+	int mplayer_width = (((mplayer_t_width / 1280.0) * tWidth) / 255.0) * scale;
+	int mplayer_height = (((mplayer_t_height / 720.0) * tHeight) / 255.0) * scale;
+
 	printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win)
