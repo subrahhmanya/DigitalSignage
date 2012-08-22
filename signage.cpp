@@ -137,6 +137,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	m_bQuitting = false;
 	m_bOKKill = false;
 	wCurDisp = 99;
+	debugLevel = dLevel;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -184,15 +185,16 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 
 	//print video card memory
 	const SDL_VideoInfo* info = SDL_GetVideoInfo();
-	if (info->video_mem == 0)
+	if (debugLevel > 0)
 	{
-		if (debugLevel > 0)
+		if (info->video_mem == 0)
+		{
 			printf("**Unable to detect how much Video Memory is available**\n");
-	}
-	else
-	{
-		if (debugLevel > 0)
+		}
+		else
+		{
 			printf("Video Memory (in MB): %d\n", info->video_mem);
+		}
 	}
 
 	if (screen == NULL)
@@ -230,9 +232,7 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	weather[3].Load("/screen/textures/weather/cold.png", debugLevel);
 
 	/* Load Fonts */
-	int n;
-
-	for (n = 0; n < 49; n++)
+	for (int n = 0; n < 49; n++)
 	{
 		if (debugLevel > 1)
 			printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, n);
@@ -347,15 +347,16 @@ void Signage::Update()
 				/* Update last check interval */
 				wLastCheckM = ltm->tm_min;
 
-				if (ltm->tm_min < 10)
+				if (debugLevel > 1)
 				{
-					if (debugLevel > 1)
+					if (ltm->tm_min < 10)
+					{
 						printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
-				}
-				else
-				{
-					if (debugLevel > 1)
+					}
+					else
+					{
 						printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+					}
 				}
 				/* Hour is odd, we call check */
 				tIcon = 0;
@@ -827,20 +828,20 @@ void Signage::Update()
 												}
 											}
 											if (debugLevel > 1)
+											{
 												printf("\nBoard '%s':\n\tUIDS:\t'%s'\n\tUID:\t'%s'\n\tUIDI:\t%i\n\tBoards:\t%i\n", dList[dS].c_str(),
 														mBoard[cB].UIDS, mBoard[cB].UID, mBoard[cB].UIDI, mBoard[cB].nBoards);
-											for (int brdO = 0; brdO < mBoard[cB].nBoards; brdO++)
-											{
-												if (debugLevel > 1)
+												for (int brdO = 0; brdO < mBoard[cB].nBoards; brdO++)
+												{
 													printf("\t\tChild Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, cB,
 															brdO, mBoard[cB].cBoard[brdO].Type, mBoard[cB].cBoard[brdO].Src, mBoard[cB].cBoard[brdO].Duration);
-											}
-											if (mBoard[cB].cBoard[mBoard[cB].nBoards].isAlert == true)
-											{
-												if (debugLevel > 1)
+												}
+												if (mBoard[cB].cBoard[mBoard[cB].nBoards].isAlert == true)
+												{
 													printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n",
 															mBoard[cB].nBoards, cB, mBoard[cB].nBoards, mBoard[cB].cBoard[mBoard[cB].nBoards].Type,
 															mBoard[cB].cBoard[mBoard[cB].nBoards].Src, mBoard[cB].cBoard[mBoard[cB].nBoards].Duration);
+												}
 											}
 											break;
 										}

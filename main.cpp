@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	srand(time(NULL)); /* Randomise Time Seed */
 	Signage signage;
 
-	printf("Loading Configuration....");
+	printf("Loading Configuration....\n");
 	/* Check for valid Configuration Files and Contents */
 	char tFName[128];
 	sprintf(tFName, "/screen/config.ini");
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 					}
 				}
 			} else {
-				printf("\n\nUnable to Launch.\nPlease ensure that /screen/config.ini exists, and that the 'Enabled' option is set to '1'.");
+				printf("\n\nUnable to Launch.\nPlease ensure that /screen/config.ini exists, and that the 'Enabled' option is set to '1'.\n");
 			}
 		}
 	}
