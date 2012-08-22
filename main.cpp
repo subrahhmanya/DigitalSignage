@@ -77,7 +77,9 @@ int main(int argc, char* argv[])
 						signage.Draw();
 					}
 				}
-			} else {
+			}
+			else
+			{
 				printf("\n\nUnable to Launch.\nPlease ensure that /screen/config.ini exists, and that the 'Enabled' option is set to '1'.\n");
 			}
 		}

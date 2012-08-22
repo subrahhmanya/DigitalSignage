@@ -990,7 +990,6 @@ void Signage::Update()
 						mBoard[cB].fPluginCMD = NULL;
 					}
 					sprintf(mBoard[cB].sPluginCMD, "");
-					mBoard[cB].fPluginCMD = NULL;
 					mBoard[cB].rPluginCMD = false;
 					mBoard[cB].TimeStampCFG = 0;
 					mBoard[cB].TimeStampCheck = 0;
