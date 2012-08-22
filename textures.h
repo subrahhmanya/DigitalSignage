@@ -18,7 +18,7 @@ class Texture
 {
 public:
 	Texture(void);
-	void Load(const char* fname);
+	void Load(const char* fname, int dbgLVL);
 	void Destroy();
 	GLuint gltex()
 	{
@@ -37,6 +37,7 @@ private:
 	int widthi;
 	int heighti;
 	int mode;
+	int debugLevel;
 	char tName[1024];
 	GLuint checkError(const char *context);
 };

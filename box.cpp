@@ -26,6 +26,7 @@ Box::Box()
 	bTStamp = 0;
 	ipLFail = 0;
 	ipLooper = 0;
+	debugLevel = 0;
 	tAlpha = 0;
 	tSTimer = 0;
 	tCScreen = -1;
@@ -122,7 +123,9 @@ bool Box::doDraw(int aOverride)
 	else if ((tAlpha == 0) && (sType == -1))
 	{
 		/* Delete Board */
-		printf("    BOX \"%s\" Destroy Event Complete\n", bUID);
+		if (debugLevel > 1)
+			printf("    BOX \"%s\" Destroy Event Complete\n", bUID);
+		debugLevel = 0;
 		glTex = 0;
 		m_bRunning = false;
 		bType = false;
@@ -151,32 +154,38 @@ bool Box::doDraw(int aOverride)
 		sprintf(bMSRC, "*");
 		if (ipBG.width() != 0)
 		{
-			printf(" - ipBG");
+			if (debugLevel > 1)
+				printf(" - ipBG");
 			ipBG.Destroy();
 		}
 		if (layout[0].width() != 0)
 		{
-			printf(" - BoxTex1 ");
+			if (debugLevel > 1)
+				printf(" - BoxTex1 ");
 			layout[0].Destroy();
 		}
 		if (layout[1].width() != 0)
 		{
-			printf(" - BoxTex2 ");
+			if (debugLevel > 1)
+				printf(" - BoxTex2 ");
 			layout[1].Destroy();
 		}
 		if (layout[2].width() != 0)
 		{
-			printf(" - BoxTex3 ");
+			if (debugLevel > 1)
+				printf(" - BoxTex3 ");
 			layout[2].Destroy();
 		}
 		if (layout[3].width() != 0)
 		{
-			printf(" - BoxTex4 ");
+			if (debugLevel > 1)
+				printf(" - BoxTex4 ");
 			layout[3].Destroy();
 		}
 		if (layout[4].width() != 0)
 		{
-			printf(" - BoxTex5 ");
+			if (debugLevel > 1)
+				printf(" - BoxTex5 ");
 			layout[4].Destroy();
 		}
 	}
@@ -195,12 +204,14 @@ void Box::doUpdate()
 
 void Box::Destroy()
 {
-	printf("    BOX \"%s\" Destroy Event Called\n", bUID);
+	if (debugLevel > 1)
+		printf("    BOX \"%s\" Destroy Event Called\n", bUID);
 	if (m_bRunning)
 	{
 		if ((sType >= 4) && (ipVis))
 		{
-			printf(" - Destroying iplayer/mplayer reference...\n");
+			if (debugLevel > 1)
+				printf(" - Destroying iplayer/mplayer reference...\n");
 			system("killall -9 mplayer");
 			system("killall -9 rtmpdump");
 			system("killall -9 get_iplayer");
@@ -245,34 +256,35 @@ void Box::SwapTex(GLuint TextureID, int w, int h)
 }
 
 void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
-		int sourceType, int dScreen, char dAudio[16], bool hasHeader, bool hasSHeader, char txtHeader[256], char txtSHeader[256])
+		int sourceType, int dScreen, char dAudio[16], bool hasHeader, bool hasSHeader, char txtHeader[256], char txtSHeader[256], int dbgLVL)
 {
 	bType = false;
 	if (bcol == 1)
 	{
 		bType = true;
-		layout[0].Load("/screen/textures/orb_bl.png");
-		layout[1].Load("/screen/textures/orb_bt.png");
-		layout[2].Load("/screen/textures/orb_bcrnr.png");
-		layout[3].Load("/screen/textures/orb_boxb.png");
-		layout[4].Load("/screen/textures/orb_bh.png");
+		layout[0].Load("/screen/textures/orb_bl.png", debugLevel);
+		layout[1].Load("/screen/textures/orb_bt.png", debugLevel);
+		layout[2].Load("/screen/textures/orb_bcrnr.png", debugLevel);
+		layout[3].Load("/screen/textures/orb_boxb.png", debugLevel);
+		layout[4].Load("/screen/textures/orb_bh.png", debugLevel);
 	}
 	else if (bcol == 2)
 	{
 		bType = true;
-		layout[0].Load("/screen/textures/orb_wl.png");
-		layout[1].Load("/screen/textures/orb_wt.png");
-		layout[2].Load("/screen/textures/orb_wcrnr.png");
-		layout[3].Load("/screen/textures/orb_boxw.png");
-		layout[4].Load("/screen/textures/orb_wh.png");
+		layout[0].Load("/screen/textures/orb_wl.png", debugLevel);
+		layout[1].Load("/screen/textures/orb_wt.png", debugLevel);
+		layout[2].Load("/screen/textures/orb_wcrnr.png", debugLevel);
+		layout[3].Load("/screen/textures/orb_boxw.png", debugLevel);
+		layout[4].Load("/screen/textures/orb_wh.png", debugLevel);
 	}
 	else if (bcol == 3)
 	{
 		bType = true;
-		layout[0].Load("/screen/textures/orb_tl.png");
-		layout[1].Load("/screen/textures/orb_tt.png");
-		layout[2].Load("/screen/textures/orb_tcrnr.png");
+		layout[0].Load("/screen/textures/orb_tl.png", debugLevel);
+		layout[1].Load("/screen/textures/orb_tt.png", debugLevel);
+		layout[2].Load("/screen/textures/orb_tcrnr.png", debugLevel);
 	}
+	debugLevel = dbgLVL;
 	sType = sourceType;
 	bCol = bcol;
 	bX = px;
@@ -609,7 +621,8 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 	sprintf(cmdline,
 			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\" > /dev/null 2>&1",
 			quality, streamid, audEnable, cache, win);
-	printf("%s\n", cmdline);
+	if (debugLevel > 1)
+		printf("%s\n", cmdline);
 	*mplayer_fp = popen(cmdline, "r");
 }
 
@@ -632,7 +645,8 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	int mplayer_width = (((mplayer_t_width / 1280.0) * tWidth) / 255.0) * scale;
 	int mplayer_height = (((mplayer_t_height / 720.0) * tHeight) / 255.0) * scale;
 
-	printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
+	if (debugLevel > 1)
+		printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	if (!play_win)
 	{

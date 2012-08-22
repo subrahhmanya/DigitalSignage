@@ -40,7 +40,7 @@ class Signage
 public:
 	Signage();
 	void Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc, const char* weathercountry,
-			const char* weatherapi, const char* versionstr);
+			const char* weatherapi, const char* versionstr, int dLevel);
 	void HandleEvents(Signage* signage);
 	void Update();
 	void Draw();
@@ -89,7 +89,7 @@ private:
 	char nthsInWord[8], dateString[32];
 	char wIcon[64];
 	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32], tScrolling[64], tScrollCycle[64], tScrollingTimer[64], tScrollSFader[64],
-			tScrollEFader[64], dTimeEvent;
+			tScrollEFader[64], dTimeEvent, debugLevel;
 	float wCelcius;
 	char wTemp[32];
 

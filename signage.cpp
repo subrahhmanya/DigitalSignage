@@ -130,7 +130,7 @@ Signage::Signage()
 }
 
 void Signage::Init(const char* title, int width, int height, int bpp, bool fullscreen, const char* header, const char* weatherloc, const char* weathercountry,
-		const char* weatherapi, const char* versionstr)
+		const char* weatherapi, const char* versionstr, int dLevel)
 {
 	/* Default to True, as we will falsify later if fail. */
 	m_bRunning = true;
@@ -178,18 +178,21 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blue);
 	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alpha);
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &doublebuf);
-	printf("Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", red, green, blue, alpha,
-			(doublebuf == 1 ? "Yes" : "No"));
+	if (debugLevel > 0)
+		printf("Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", red, green, blue, alpha,
+				(doublebuf == 1 ? "Yes" : "No"));
 
 	//print video card memory
 	const SDL_VideoInfo* info = SDL_GetVideoInfo();
 	if (info->video_mem == 0)
 	{
-		printf("**Unable to detect how much Video Memory is available**\n");
+		if (debugLevel > 0)
+			printf("**Unable to detect how much Video Memory is available**\n");
 	}
 	else
 	{
-		printf("Video Memory (in MB): %d\n", info->video_mem);
+		if (debugLevel > 0)
+			printf("Video Memory (in MB): %d\n", info->video_mem);
 	}
 
 	if (screen == NULL)
@@ -219,19 +222,20 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	SDL_WM_SetCaption(title, NULL);
 
 	/* Load Default Texture Items */
-	pLogo.Load("/screen/textures/orblogo.png");
-	tScrollTex[0].Load("/screen/textures/fader_blft.png");
-	tScrollTex[1].Load("/screen/textures/fader_brght.png");
-	weather[1].Load("/screen/textures/weather/gales.png");
-	weather[2].Load("/screen/textures/weather/hot.png");
-	weather[3].Load("/screen/textures/weather/cold.png");
+	pLogo.Load("/screen/textures/orblogo.png", debugLevel);
+	tScrollTex[0].Load("/screen/textures/fader_blft.png", debugLevel);
+	tScrollTex[1].Load("/screen/textures/fader_brght.png", debugLevel);
+	weather[1].Load("/screen/textures/weather/gales.png", debugLevel);
+	weather[2].Load("/screen/textures/weather/hot.png", debugLevel);
+	weather[3].Load("/screen/textures/weather/cold.png", debugLevel);
 
 	/* Load Fonts */
 	int n;
 
 	for (n = 0; n < 49; n++)
 	{
-		printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, n);
+		if (debugLevel > 1)
+			printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, n);
 		fntCGothic[n] = TTF_OpenFont("/screen/fonts/cgothic.ttf", n);
 		if (fntCGothic[n] == NULL)
 		{
@@ -239,7 +243,8 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 		}
 		else
 		{
-			printf("OK\n");
+			if (debugLevel > 1)
+				printf("OK\n");
 		}
 	}
 
@@ -256,8 +261,11 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	counter.cap_on();
 
 	/* Reset Debug Timer */
-	cTime = time(0);
-	dTimeEvent = cTime;
+	if (debugLevel > 1)
+	{
+		cTime = time(0);
+		dTimeEvent = cTime;
+	}
 }
 
 void Signage::HandleEvents(Signage* signage)
@@ -326,7 +334,7 @@ void Signage::Update()
 
 		if (!iBoxes[100].isCreated() && iBoxes[100].stype() != -1)
 			iBoxes[100].Create("Orbital Logo", "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, "null", false, false, "", "");
+					pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, "null", false, false, "", "", debugLevel);
 		else
 			iBoxes[100].doUpdate();
 
@@ -341,11 +349,13 @@ void Signage::Update()
 
 				if (ltm->tm_min < 10)
 				{
-					printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
+					if (debugLevel > 1)
+						printf("Weather Update - %i:0%i\n", ltm->tm_hour, ltm->tm_min);
 				}
 				else
 				{
-					printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
+					if (debugLevel > 1)
+						printf("Weather Update - %i:%i\n", ltm->tm_hour, ltm->tm_min);
 				}
 				/* Hour is odd, we call check */
 				tIcon = 0;
@@ -376,7 +386,8 @@ void Signage::Update()
 				replace(tsWLoc.begin(), tsWLoc.end(), ' ', '+');
 
 				sprintf(tWString, "http://free.worldweatheronline.com/feed/weather.ashx?q=%s,%s&format=xml&key=%s", tsWLoc.c_str(), tsWCountry.c_str(), sWAPI);
-				printf("Checking URL - %s\n", tWString);
+				if (debugLevel > 1)
+					printf("Checking URL - %s\n", tWString);
 				doc = xmlReadFile(tWString, NULL, 0);
 				if (doc)
 				{
@@ -394,7 +405,8 @@ void Signage::Update()
 				else
 				{
 					/* Update last check interval (we want to check in another minute) */
-					printf("NO DATA/NET CONNECTION\n");
+					if (debugLevel > 1)
+						printf("NO DATA/NET CONNECTION\n");
 					wLastCheckH = -5;
 					wOK = false;
 				}
@@ -419,10 +431,12 @@ void Signage::Update()
 					{
 						if (wCelcius <= 3.0)
 							iBoxes[105].Create("Weather Temp Cold Alert Cycle", "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2,
-									weather[3].height() / 2, weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, "null", false, false, "", "");
+									weather[3].height() / 2, weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, "null", false, false, "", "",
+									debugLevel);
 						else
 							iBoxes[105].Create("Weather Temp Hot Alert Cycle", "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2,
-									weather[2].height() / 2, weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, "null", false, false, "", "");
+									weather[2].height() / 2, weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, "null", false, false, "", "",
+									debugLevel);
 
 					}
 					else if (iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
@@ -576,9 +590,9 @@ void Signage::Update()
 					wFadeV[1] = 0;
 					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 
-					weather[0].Load(tBuff);
+					weather[0].Load(tBuff, debugLevel);
 					iBoxes[101].Create("Weather Condition", "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2, weather[0].height() / 2,
-							weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, "null", false, false, "", "");
+							weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, "null", false, false, "", "", debugLevel);
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -632,7 +646,8 @@ void Signage::Update()
 			/* Start Board Checking Loop */
 
 			/* Check Board Configurations */
-			printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+			if (debugLevel > 1)
+				printf("Board Check - %i:%i:%i\n", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
 			wUpdateTimer[2] = cTime;
 
 			DIR *d;
@@ -652,7 +667,8 @@ void Signage::Update()
 
 				closedir(d);
 				sort(dList.begin(), dList.end()); /* Sort Array */
-				printf("Found %i Folders to check...\n", dList.size());
+				if (debugLevel > 1)
+					printf("Found %i Folders to check...\n", dList.size());
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
 					char tFName[128];
@@ -684,16 +700,19 @@ void Signage::Update()
 										 * We now need to check TimeStamp, see if we are matching or not, so we can decide if
 										 * board information is changing. */
 										tBFound = true;
-										printf("\n\tFound Existing board at ID '%i'. Checking to see if it's changed...\n", cB);
+										if (debugLevel > 1)
+											printf("\n\tFound Existing board at ID '%i'. Checking to see if it's changed...\n", cB);
 										if (mBoard[cB].TimeStampCFG != atoi(ini.GetKeyValue("BoardSettings", "TimeStamp").c_str()))
 										{
-											printf("\t\tNew TimeStamp Detected - Marking as Dirty...\n");
+											if (debugLevel > 1)
+												printf("\t\tNew TimeStamp Detected - Marking as Dirty...\n");
 											mBoard[cB].TimeStampCheck = 0;
 											mBoard[cB].isDestroying = true;
 										}
 										else
 										{
-											printf("\t\tConfiguration is unchanged.\n\t\tBoard ID - %i\n", mBoard[cB].CreatedID);
+											if (debugLevel > 1)
+												printf("\t\tConfiguration is unchanged.\n\t\tBoard ID - %i\n", mBoard[cB].CreatedID);
 											/* Reset TimeStampCheck */
 											mBoard[cB].TimeStampCheck = cTime;
 										}
@@ -807,18 +826,21 @@ void Signage::Update()
 													tcBoardCount++;
 												}
 											}
-											printf("\nBoard '%s':\n\tUIDS:\t'%s'\n\tUID:\t'%s'\n\tUIDI:\t%i\n\tBoards:\t%i\n", dList[dS].c_str(),
-													mBoard[cB].UIDS, mBoard[cB].UID, mBoard[cB].UIDI, mBoard[cB].nBoards);
+											if (debugLevel > 1)
+												printf("\nBoard '%s':\n\tUIDS:\t'%s'\n\tUID:\t'%s'\n\tUIDI:\t%i\n\tBoards:\t%i\n", dList[dS].c_str(),
+														mBoard[cB].UIDS, mBoard[cB].UID, mBoard[cB].UIDI, mBoard[cB].nBoards);
 											for (int brdO = 0; brdO < mBoard[cB].nBoards; brdO++)
 											{
-												printf("\t\tChild Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, cB,
-														brdO, mBoard[cB].cBoard[brdO].Type, mBoard[cB].cBoard[brdO].Src, mBoard[cB].cBoard[brdO].Duration);
+												if (debugLevel > 1)
+													printf("\t\tChild Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n", brdO + 1, cB,
+															brdO, mBoard[cB].cBoard[brdO].Type, mBoard[cB].cBoard[brdO].Src, mBoard[cB].cBoard[brdO].Duration);
 											}
 											if (mBoard[cB].cBoard[mBoard[cB].nBoards].isAlert == true)
 											{
-												printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n",
-														mBoard[cB].nBoards, cB, mBoard[cB].nBoards, mBoard[cB].cBoard[mBoard[cB].nBoards].Type,
-														mBoard[cB].cBoard[mBoard[cB].nBoards].Src, mBoard[cB].cBoard[mBoard[cB].nBoards].Duration);
+												if (debugLevel > 1)
+													printf("\t\tAlert Board %i (%i,%i)\n\t\t\tType\t\t%s\n\t\t\tSrc\t\t%s\n\t\t\tDuration\t%i\n",
+															mBoard[cB].nBoards, cB, mBoard[cB].nBoards, mBoard[cB].cBoard[mBoard[cB].nBoards].Type,
+															mBoard[cB].cBoard[mBoard[cB].nBoards].Src, mBoard[cB].cBoard[mBoard[cB].nBoards].Duration);
 											}
 											break;
 										}
@@ -831,7 +853,8 @@ void Signage::Update()
 			}
 			else
 			{
-				printf("**Error Parsing Boards - Does the folder exist?\n");
+				if (debugLevel > 1)
+					printf("**Error Parsing Boards - Does the folder exist?\n");
 			}
 			/* End Board Checking Loop */
 		}
@@ -893,11 +916,12 @@ void Signage::Update()
 									tBoardType = mBoard[cB].cBoard[mBoard[cB].curBoard].Quality;
 								}
 
-								printf("Creating Board '%s' with BoardID (%i,%i) - Type %i...\n", mBoard[cB].UIDS, cBC, cB, tBoardType);
+								if (debugLevel > 1)
+									printf("Creating Board '%s' with BoardID (%i,%i) - Type %i...\n", mBoard[cB].UIDS, cBC, cB, tBoardType);
 								iBoxes[cBC].Create(mBoard[cB].UID, mBoard[cB].cBoard[mBoard[cB].curBoard].Src, mBoard[cB].TimeStampCFG, 0, mBoard[cB].Border,
 										mBoard[cB].X, mBoard[cB].Y, mBoard[cB].Width, mBoard[cB].Height, sWidth, sHeight, mBoard[cB].Scale, tBoardType,
 										mBoard[cB].curBoard, mBoard[cB].cBoard[mBoard[cB].curBoard].AudioOut, mBoard[cB].cBoard[mBoard[cB].curBoard].HeaderVis,
-										mBoard[cB].HeaderVis, mBoard[cB].cBoard[mBoard[cB].curBoard].Header, mBoard[cB].Header);
+										mBoard[cB].HeaderVis, mBoard[cB].cBoard[mBoard[cB].curBoard].Header, mBoard[cB].Header, debugLevel);
 								mBoard[cB].CreatedID = cBC;
 								if (mBoardMod == true)
 									mBoard[cB].curBoard = -1;
@@ -933,7 +957,8 @@ void Signage::Update()
 				}
 				if (bWipeNeed)
 				{
-					printf("\tWiping Board ID '%i' (%s)...", cB, mBoard[cB].UIDS);
+					if (debugLevel > 1)
+						printf("\tWiping Board ID '%i' (%s)...", cB, mBoard[cB].UIDS);
 					/* Clear Variables */
 					sprintf(mBoard[cB].UID, "");
 					sprintf(mBoard[cB].UIDS, "");
@@ -984,7 +1009,8 @@ void Signage::Update()
 						sprintf(mBoard[cB].cBoard[bClean].AudioOut, "");
 						mBoard[cB].cBoard[bClean].isAlert = false;
 					}
-					printf(" [OK]\n");
+					if (debugLevel > 1)
+						printf(" [OK]\n");
 				}
 			}
 		}
@@ -1003,10 +1029,13 @@ void Signage::Update()
 						&& ((strlen(mBoard[cB].sPluginCMD) != 0) && (mBoard[cB].rPluginCMD == false)))
 				{
 					/* Run Plugin Command */
-					printf("Plugin Timer Event Check (%i) - Board %i, Screen %i of %i (%i seconds) - FLAG #%ix%ix%i\n", cTime, cB,
-							iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards, mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration,
-							iBoxes[mBoard[cB].CreatedID].stype(), mBoard[cB].pFade, mBoard[cB].Scroll);
-					printf("\tCommand:\t%s\n", mBoard[cB].sPluginCMD);
+					if (debugLevel > 1)
+						printf("Plugin Timer Event Check (%i) - Board %i, Screen %i of %i (%i seconds) - FLAG #%ix%ix%i\n", cTime, cB,
+								iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards,
+								mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration, iBoxes[mBoard[cB].CreatedID].stype(), mBoard[cB].pFade,
+								mBoard[cB].Scroll);
+					if (debugLevel > 1)
+						printf("\tCommand:\t%s\n", mBoard[cB].sPluginCMD);
 					mBoard[cB].rPluginCMD = true;
 					/* Clean up Any-and-All Open Plugins */
 					if (mBoard[cB].fPluginCMD != NULL)
@@ -1025,10 +1054,11 @@ void Signage::Update()
 								|| ((mBoard[cB].Scroll / mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].ScrollSpeed)
 										== (mBoard[cB].Scale * (mBoardTex[iBoxes[mBoard[cB].CreatedID].getScreen()].height() / 255))
 												- (mBoard[cB].Scale * (mBoard[cB].Height / 255))))
-							printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, cB,
-									iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards,
-									mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration, iBoxes[mBoard[cB].CreatedID].stype(),
-									mBoard[cB].pFade, mBoard[cB].Scroll);
+							if (debugLevel > 1)
+								printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", cTime, cB,
+										iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards,
+										mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration, iBoxes[mBoard[cB].CreatedID].stype(),
+										mBoard[cB].pFade, mBoard[cB].Scroll);
 
 						/* Scrolling Event */
 						if ((mBoardTex[cB].height() > mBoard[cB].Height) && (mBoard[cB].pFade == 255.0))
@@ -1061,7 +1091,8 @@ void Signage::Update()
 							if ((iBoxes[mBoard[cB].CreatedID].stype() != 1) && (iBoxes[mBoard[cB].CreatedID].stype() == 2))
 							{
 								/* Problem with Media Streaming - Send a Kill Flag */
-								printf("Destroying ID %i\n", iBoxes[mBoard[cB].CreatedID].stype());
+								if (debugLevel > 1)
+									printf("Destroying ID %i\n", iBoxes[mBoard[cB].CreatedID].stype());
 								/* Destroy iPlayer/Media Reference */
 								iBoxes[mBoard[cB].CreatedID].Destroy();
 								/* Make Board Dirty so it is properly destroyed. */
@@ -1128,11 +1159,12 @@ void Signage::Update()
 						}
 
 						iBoxes[mBoard[cB].CreatedID].setScreen(mBoard[cB].curBoard);
-						printf("Attempting to load Texture '%s'...", bdID);
+						if (debugLevel > 1)
+							printf("Attempting to load Texture '%s'...", bdID);
 						if (FileExists(bdID) == false)
 							sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
 						mBoardTex[cB].Destroy();
-						mBoardTex[cB].Load(bdID);
+						mBoardTex[cB].Load(bdID, debugLevel);
 						/* Scale Texture to Box unless we scroll */
 						int texH = 0;
 						if (mBoardTex[cB].height() < mBoard[cB].Height)
@@ -1175,7 +1207,8 @@ void Signage::Update()
 
 	if (cTime >= wUpdateTimer[4] + 29)
 	{
-		printf("Generating Screendump...");
+		if (debugLevel > 1)
+			printf("Generating Screendump...");
 		wUpdateTimer[4] = cTime;
 		SDL_Surface * scrimage = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
 
@@ -1198,7 +1231,8 @@ void Signage::Update()
 
 		SDL_SaveBMP(scrimage, "/screen/SCRDUMP.bmp");
 		SDL_FreeSurface(scrimage);
-		printf("[OK] (%is)\n", cTime - wUpdateTimer[4]);
+		if (debugLevel > 1)
+			printf("[OK] (%is)\n", cTime - wUpdateTimer[4]);
 	}
 }
 
@@ -1294,7 +1328,7 @@ void Signage::Draw()
 			if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 			{
 				iBoxes[102].Create("Weather Condition Fader - Right", "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), pTHeight,
-						tScrollTex[0].width(), pTHeight, 255, 1, 1, "null", false, false, "", "");
+						tScrollTex[0].width(), pTHeight, 255, 1, 1, "null", false, false, "", "", debugLevel);
 			}
 
 			tScrollSFader[0] = 0;
@@ -1307,7 +1341,7 @@ void Signage::Draw()
 					if (!iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 					{
 						iBoxes[103].Create("Weather Condition Fader - Left", "", 0, tScrollTex[1].gltex(), 4, tPXX, 8, tScrollTex[1].width(), 64,
-								tScrollTex[1].width(), 64, 255, 1, 1, "null", false, false, "", "");
+								tScrollTex[1].width(), 64, 255, 1, 1, "null", false, false, "", "", debugLevel);
 					}
 					else
 					{
@@ -1342,7 +1376,7 @@ void Signage::Draw()
 			if (!iBoxes[104].isCreated() && iBoxes[104].stype() != -1)
 			{
 				iBoxes[104].Create("Weather Wind Alert", "", 0, weather[1].gltex(), 4, 0, 0, weather[1].width() / 2, weather[1].height() / 2,
-						weather[1].width() / 2, weather[1].height() / 2, 255, 1, 1, "null", false, false, "", "");
+						weather[1].width() / 2, weather[1].height() / 2, 255, 1, 1, "null", false, false, "", "", debugLevel);
 			}
 		}
 		else
@@ -1417,7 +1451,7 @@ void Signage::Draw()
 	{
 		if (!iBoxes[106].isCreated() && iBoxes[106].stype() != -1)
 		{
-			iBoxes[106].Create("Debug Info Pane", "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, "null", false, false, "", "");
+			iBoxes[106].Create("Debug Info Pane", "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, "null", false, false, "", "", debugLevel);
 		}
 	}
 	else
@@ -1457,7 +1491,8 @@ void Signage::Clean()
 		{
 			if (iBoxes[n].stype() != -1)
 			{
-				printf("Destroying Box iBoxes[%i]...\n", n);
+				if (debugLevel > 1)
+					printf("Destroying Box iBoxes[%i]...\n", n);
 				iBoxes[n].Destroy();
 			}
 		}
@@ -1478,10 +1513,12 @@ void Signage::Clean()
 	if (m_bRunning == false)
 	{
 		/* Delete Any and All Testures */
-		printf("Destroying Texture pLogo... ");
+		if (debugLevel > 1)
+			printf("Destroying Texture pLogo... ");
 		pLogo.Destroy();
 
-		printf("Destroying Texture weather... ");
+		if (debugLevel > 1)
+			printf("Destroying Texture weather... ");
 		weather[0].Destroy();
 		weather[1].Destroy();
 		weather[2].Destroy();
@@ -1489,12 +1526,15 @@ void Signage::Clean()
 		int n;
 		for (n = 0; n < 49; n++)
 		{
-			printf("Destroying Font fntCGothic[%i]... ", n);
+			if (debugLevel > 1)
+				printf("Destroying Font fntCGothic[%i]... ", n);
 			TTF_CloseFont(fntCGothic[n]);
-			printf("OK\n");
+			if (debugLevel > 1)
+				printf("OK\n");
 		}
 
-		printf("Destroying Texture Faders... ");
+		if (debugLevel > 1)
+			printf("Destroying Texture Faders... ");
 		tScrollTex[0].Destroy();
 		tScrollTex[1].Destroy();
 
@@ -1818,7 +1858,8 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				sprintf(tObservationTime, "%s", xmlNodeGetContent(cur_node));
 				trObservationTime = 1;
-				printf("\tItem: %s \tData: %s\n", cur_node->name, tObservationTime);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %s\n", cur_node->name, tObservationTime);
 			}
 
 			// Weather Temperature (Farenheight) //
@@ -1833,7 +1874,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trTemp == 1)
 					tTemp = atoi(tTempI);
-				printf("\tItem: %s \t\tData: %i\n", cur_node->name, tTemp);
+				if (debugLevel > 1)
+					printf("\tItem: %s \t\tData: %i\n", cur_node->name, tTemp);
 			}
 
 			// Weather Condition Code (for description and Icon check) //
@@ -1848,7 +1890,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trWeatherCode == 1)
 					tWeatherCode = atoi(tTempI);
-				printf("\tItem: %s \tData: %i\n", cur_node->name, tWeatherCode);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %i\n", cur_node->name, tWeatherCode);
 			}
 
 			// Wind Speed //
@@ -1863,7 +1906,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trWindSpeedMPH == 1)
 					tWindSpeedMPH = atoi(tTempI);
-				printf("\tItem: %s \tData: %i\n", cur_node->name, tWindSpeedMPH);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %i\n", cur_node->name, tWindSpeedMPH);
 			}
 
 			// Wind Direction //
@@ -1871,7 +1915,8 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				sprintf(tWindDir, "%s", xmlNodeGetContent(cur_node));
 				trWindDir = 1;
-				printf("\tItem: %s \tData: %s\n", cur_node->name, tWindDir);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %s\n", cur_node->name, tWindDir);
 			}
 
 			// Humidity //
@@ -1886,7 +1931,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trHumidity == 1)
 					tHumidity = atoi(tTempI);
-				printf("\tItem: %s \t\tData: %i\n", cur_node->name, tHumidity);
+				if (debugLevel > 1)
+					printf("\tItem: %s \t\tData: %i\n", cur_node->name, tHumidity);
 			}
 
 			// Air Pressure //
@@ -1901,7 +1947,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trPressure == 1)
 					tPressure = atoi(tTempI);
-				printf("\tItem: %s \t\tData: %i\n", cur_node->name, tPressure);
+				if (debugLevel > 1)
+					printf("\tItem: %s \t\tData: %i\n", cur_node->name, tPressure);
 			}
 
 			// Cloud Cover //
@@ -1916,7 +1963,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trCloudCover == 1)
 					tCloudCover = atoi(tTempI);
-				printf("\tItem: %s \tData: %i\n", cur_node->name, tCloudCover);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %i\n", cur_node->name, tCloudCover);
 			}
 
 			// Visibility //
@@ -1931,7 +1979,8 @@ void Signage::parseWeather(xmlNode * a_node)
 				}
 				if (trVisibility == 1)
 					tVisibility = atoi(tTempI);
-				printf("\tItem: %s \tData: %i\n", cur_node->name, tVisibility);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %i\n", cur_node->name, tVisibility);
 			}
 
 			// Weather Description //
@@ -1939,7 +1988,8 @@ void Signage::parseWeather(xmlNode * a_node)
 			{
 				sprintf(tConditionDesc, "%s", xmlNodeGetContent(cur_node));
 				trConditionDesc = 1;
-				printf("\tItem: %s \tData: %s\n", cur_node->name, tConditionDesc);
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %s\n", cur_node->name, tConditionDesc);
 			}
 		}
 

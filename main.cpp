@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 			{
 				/* Enabled - Get Configs! */
 				bool tFS = false;
+				int dbgLvl;
 				int tWX, tWH, tBPP;
 				char tMID[256];
 				char tHeader[256];
@@ -40,6 +41,7 @@ int main(int argc, char* argv[])
 				tWX = atoi(ini.GetKeyValue("GeneralSettings", "SWidth").c_str());
 				tWH = atoi(ini.GetKeyValue("GeneralSettings", "SHeight").c_str());
 				tBPP = atoi(ini.GetKeyValue("GeneralSettings", "BPP").c_str());
+				dbgLvl = atoi(ini.GetKeyValue("GeneralSettings", "DebugLevel").c_str());
 				sprintf(tMID, "%s", ini.GetKeyValue("GeneralSettings", "MID").c_str());
 				sprintf(tHeader, "%s", ini.GetKeyValue("GeneralSettings", "Header").c_str());
 				sprintf(tWLoc, "%s", ini.GetKeyValue("GeneralSettings", "WeatherLoc").c_str());
@@ -53,7 +55,7 @@ int main(int argc, char* argv[])
 				getline(vFile, line);
 				sprintf(tVS, "Client Version %s", line.c_str());
 
-				signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc, tWCountry, tWAPI, tVS);
+				signage.Init(tMID, tWX, tWH, tBPP, tFS, tHeader, tWLoc, tWCountry, tWAPI, tVS, dbgLvl);
 
 				while (signage.Running())
 				{
