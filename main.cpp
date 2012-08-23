@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 				sprintf(tWAPI, "%s", ini.GetKeyValue("GeneralSettings", "WeatherAPI").c_str());
 
 				/* Load Version String */
-				char tVS[32];
+				char tVS[64];
 				ifstream vFile("/screen/src/orbital_infodisplay/version");
 				string line;
 				getline(vFile, line);
