@@ -35,6 +35,12 @@ Box::Box()
 	sprintf(audEnable, "*");
 	sprintf(bUID, "*");
 	sprintf(bMSRC, "*");
+	glTex = 0;
+	mplayer_fp = NULL;
+	sHeaderEnab = NULL;
+	play_win = 0;
+	ipVis = NULL;
+	ipCC = 0;
 }
 
 bool Box::doDraw(int aOverride)
@@ -76,7 +82,7 @@ bool Box::doDraw(int aOverride)
 				sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
 				FILE *fp = popen(pgc, "r");
 				char buff[1024];
-				if (!fgets(buff, sizeof buff, fp) != NULL)
+				if (!fgets(buff, sizeof buff, fp) != 0)
 				{
 					/* get_iplayer isn't running - Close current window and set ipVis to false
 					 * iPlayer Window will automatically re-launch when closed.
@@ -220,7 +226,7 @@ void Box::Destroy()
 			sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
 			FILE *fp = popen(pgc, "r");
 			char buff[1024];
-			if (!fgets(buff, sizeof buff, fp) != NULL)
+			if (!fgets(buff, sizeof buff, fp) != 0)
 			{
 				/* get_iplayer isn't running - Close current window and set ipVis to false
 				 * iPlayer Window will automatically re-launch when closed. */

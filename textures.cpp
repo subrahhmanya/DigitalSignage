@@ -13,6 +13,8 @@ Texture::Texture(void)
 	widthi = 0;
 	heighti = 0;
 	mode = 0;
+	debugLevel = 0;
+	gltexi = 0;
 }
 
 void Texture::Destroy()
@@ -60,7 +62,7 @@ GLuint Texture::checkError(const char *context)
 	if (err > 0)
 	{
 		if (debugLevel > 1)
-			printf("ERROR LOADING TEXTURE%s\n", glGetError());
+			printf("ERROR LOADING TEXTURE%i\n", glGetError());
 	}
 	return err;
 }

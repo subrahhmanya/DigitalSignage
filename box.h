@@ -116,7 +116,7 @@ private:
 	Texture ipBG;
 	GLuint glTex;
 	bool m_bRunning, bType, bHeaderEnab, sHeaderEnab;
-	int bCol, bX, bY, bW, bH, tH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail, ipLooper, tAlpha, tSTimer, tCScreen, scrollv, iFade, ipCC, debugLevel;
+	int bCol, bX, bY, bW, bH, bScale, sType, sWidth, sHeight, bTStamp, ipLFail, ipLooper, tAlpha, tSTimer, tCScreen, scrollv, ipCC, debugLevel;
 	char bUID[128];
 	char bMSRC[1024];
 	char audEnable[16];
