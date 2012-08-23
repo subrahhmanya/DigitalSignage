@@ -356,8 +356,9 @@ void Signage::Update()
 		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
 
 		if (!iBoxes[100].isCreated() && iBoxes[100].stype() != -1)
-			iBoxes[100].Create((char *)"Orbital Logo", (char *)"", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10, pLogo.width(),
-					pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, (char *)"null", false, false, (char *)"", (char *)"", debugLevel);
+			iBoxes[100].Create((char *) "Orbital Logo", (char *) "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10,
+					pLogo.width(), pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, (char *) "null", false, false, (char *) "", (char *) "",
+					debugLevel);
 		else
 			iBoxes[100].doUpdate();
 
@@ -453,13 +454,13 @@ void Signage::Update()
 					if (!iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
 					{
 						if (wCelcius <= 3.0)
-							iBoxes[105].Create((char *)"Weather Temp Cold Alert Cycle", (char *)"", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2,
-									weather[3].height() / 2, weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, (char *)"null", false, false, (char *)"", (char *)"",
-									debugLevel);
+							iBoxes[105].Create((char *) "Weather Temp Cold Alert Cycle", (char *) "", 0, weather[3].gltex(), 4, 0, 0, weather[3].width() / 2,
+									weather[3].height() / 2, weather[3].width() / 2, weather[3].height() / 2, 255, 1, 1, (char *) "null", false, false,
+									(char *) "", (char *) "", debugLevel);
 						else
-							iBoxes[105].Create((char *)"Weather Temp Hot Alert Cycle", (char *)"", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2,
-									weather[2].height() / 2, weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, (char *)"null", false, false, (char *)"", (char *)"",
-									debugLevel);
+							iBoxes[105].Create((char *) "Weather Temp Hot Alert Cycle", (char *) "", 0, weather[2].gltex(), 4, 0, 0, weather[2].width() / 2,
+									weather[2].height() / 2, weather[2].width() / 2, weather[2].height() / 2, 255, 1, 1, (char *) "null", false, false,
+									(char *) "", (char *) "", debugLevel);
 
 					}
 					else if (iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
@@ -614,8 +615,9 @@ void Signage::Update()
 					sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
 
 					weather[0].Load(tBuff, debugLevel);
-					iBoxes[101].Create((char *)"Weather Condition", (char *)"", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2, weather[0].height() / 2,
-							weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, (char *)"null", false, false, (char *)"", (char *)"", debugLevel);
+					iBoxes[101].Create((char *) "Weather Condition", (char *) "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2,
+							weather[0].height() / 2, weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, (char *) "null", false, false, (char *) "",
+							(char *) "", debugLevel);
 				}
 				if (wFadeV[1] > 255)
 				{
@@ -691,7 +693,7 @@ void Signage::Update()
 				closedir(d);
 				sort(dList.begin(), dList.end()); /* Sort Array */
 				if (debugLevel > 1)
-					printf("Found %d Folders to check...\n", (int)dList.size());
+					printf("Found %d Folders to check...\n", (int) dList.size());
 				for (int dS = 0; dS < dList.size(); dS++)
 				{
 					char tFName[128];
@@ -767,6 +769,9 @@ void Signage::Update()
 											mBoard[cB].Y = atoi(ini.GetKeyValue("BoardSettings", "PosY").c_str());
 											mBoard[cB].Scale = atoi(ini.GetKeyValue("BoardSettings", "Scale").c_str());
 											mBoard[cB].Border = atoi(ini.GetKeyValue("BoardSettings", "Border").c_str());
+											mBoard[cB].valR = atoi(ini.GetKeyValue("BoardSettings", "RedHue").c_str());
+											mBoard[cB].valG = atoi(ini.GetKeyValue("BoardSettings", "GreenHue").c_str());
+											mBoard[cB].valB = atoi(ini.GetKeyValue("BoardSettings", "BlueHue").c_str());
 											mBoard[cB].Width = atoi(ini.GetKeyValue("BoardSettings", "Width").c_str());
 											mBoard[cB].Height = atoi(ini.GetKeyValue("BoardSettings", "Height").c_str());
 											mBoard[cB].nBoards = atoi(ini.GetKeyValue("BoardSettings", "Boards").c_str());
@@ -1052,7 +1057,7 @@ void Signage::Update()
 				{
 					/* Run Plugin Command */
 					if (debugLevel > 1)
-						printf("Plugin Timer Event Check (%i) - Board %i, Screen %i of %i (%i seconds) - FLAG #%ix%ix%i\n", (int)cTime, cB,
+						printf("Plugin Timer Event Check (%i) - Board %i, Screen %i of %i (%i seconds) - FLAG #%ix%ix%i\n", (int) cTime, cB,
 								iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards,
 								mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration, iBoxes[mBoard[cB].CreatedID].stype(), mBoard[cB].pFade,
 								mBoard[cB].Scroll);
@@ -1077,7 +1082,7 @@ void Signage::Update()
 										== (mBoard[cB].Scale * (mBoardTex[iBoxes[mBoard[cB].CreatedID].getScreen()].height() / 255))
 												- (mBoard[cB].Scale * (mBoard[cB].Height / 255))))
 							if (debugLevel > 1)
-								printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", (int)cTime, cB,
+								printf("Board Timer Event Check (%i - Board %i) - Screen %i of %i (%i Seconds) - FLAG #%ix%ix%i\n", (int) cTime, cB,
 										iBoxes[mBoard[cB].CreatedID].getScreen(), mBoard[cB].nBoards,
 										mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration, iBoxes[mBoard[cB].CreatedID].stype(),
 										mBoard[cB].pFade, mBoard[cB].Scroll);
@@ -1249,7 +1254,8 @@ void Signage::Update()
 		uint8_t *imagepixels = reinterpret_cast<uint8_t*>(scrimage->pixels);
 
 		// Copy the "reversed_image" memory to the "image" memory
-		for (int y = (screen->h - 1); y >= 0; --y) {
+		for (int y = (screen->h - 1); y >= 0; --y)
+		{
 			uint8_t *row_begin = pixels + y * screen->w * 3;
 			uint8_t *row_end = row_begin + screen->w * 3;
 
@@ -1260,12 +1266,12 @@ void Signage::Update()
 		}
 
 		/* Free pixels */
-		free (pixels);
+		free(pixels);
 
 		SDL_SaveBMP(scrimage, "/screen/SCRDUMP.bmp");
 		SDL_FreeSurface(scrimage);
 		if (debugLevel > 1)
-			printf("[OK] (%is)\n", (int)cTime - wUpdateTimer[4]);
+			printf("[OK] (%is)\n", (int) cTime - wUpdateTimer[4]);
 	}
 }
 
@@ -1360,8 +1366,8 @@ void Signage::Draw()
 
 			if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 			{
-				iBoxes[102].Create((char *)"Weather Condition Fader - Right", (char *)"", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(), pTHeight,
-						tScrollTex[0].width(), pTHeight, 255, 1, 1, (char *)"null", false, false, (char *)"", (char *)"", debugLevel);
+				iBoxes[102].Create((char *) "Weather Condition Fader - Right", (char *) "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8, tScrollTex[0].width(),
+						pTHeight, tScrollTex[0].width(), pTHeight, 255, 1, 1, (char *) "null", false, false, (char *) "", (char *) "", debugLevel);
 			}
 
 			tScrollSFader[0] = 0;
@@ -1373,8 +1379,8 @@ void Signage::Draw()
 				{
 					if (!iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 					{
-						iBoxes[103].Create((char *)"Weather Condition Fader - Left", (char *)"", 0, tScrollTex[1].gltex(), 4, tPXX, 8, tScrollTex[1].width(), 64,
-								tScrollTex[1].width(), 64, 255, 1, 1, (char *)"null", false, false, (char *)"", (char *)"", debugLevel);
+						iBoxes[103].Create((char *) "Weather Condition Fader - Left", (char *) "", 0, tScrollTex[1].gltex(), 4, tPXX, 8, tScrollTex[1].width(),
+								64, tScrollTex[1].width(), 64, 255, 1, 1, (char *) "null", false, false, (char *) "", (char *) "", debugLevel);
 					}
 					else
 					{
@@ -1408,8 +1414,8 @@ void Signage::Draw()
 		{
 			if (!iBoxes[104].isCreated() && iBoxes[104].stype() != -1)
 			{
-				iBoxes[104].Create((char *)"Weather Wind Alert", (char *)"", 0, weather[1].gltex(), 4, 0, 0, weather[1].width() / 2, weather[1].height() / 2,
-						weather[1].width() / 2, weather[1].height() / 2, 255, 1, 1, (char *)"null", false, false, (char *)"", (char *)"", debugLevel);
+				iBoxes[104].Create((char *) "Weather Wind Alert", (char *) "", 0, weather[1].gltex(), 4, 0, 0, weather[1].width() / 2, weather[1].height() / 2,
+						weather[1].width() / 2, weather[1].height() / 2, 255, 1, 1, (char *) "null", false, false, (char *) "", (char *) "", debugLevel);
 			}
 		}
 		else
@@ -1433,7 +1439,16 @@ void Signage::Draw()
 			if ((n == 101))
 			{
 				/* Weather Box */
-				if (!iBoxes[n].doDraw(wFadeV[1]))
+				if (!iBoxes[n].doDraw(1, wFadeV[1]))
+				{
+					m_bQuitting = true;
+					m_bRunning = false;
+				}
+			}
+			else if ((n == 106))
+			{
+				/* Weather Box */
+				if (!iBoxes[n].doDraw(4, -1, 255, 172, 172))
 				{
 					m_bQuitting = true;
 					m_bRunning = false;
@@ -1441,7 +1456,7 @@ void Signage::Draw()
 			}
 			else
 			{
-				if (!iBoxes[n].doDraw(-1))
+				if (!iBoxes[n].doDraw(1, -1))
 				{
 					m_bQuitting = true;
 					m_bRunning = false;
@@ -1452,7 +1467,7 @@ void Signage::Draw()
 
 	for (int cB = 0; cB < 64; cB++)
 	{
-		if (!iBoxes[mBoard[cB].CreatedID].doDraw(mBoard[cB].pFade))
+		if (!iBoxes[mBoard[cB].CreatedID].doDraw(4, mBoard[cB].pFade, mBoard[cB].valR, mBoard[cB].valG, mBoard[cB].valB))
 		{
 			m_bRunning = false;
 			m_bQuitting = true;
@@ -1484,7 +1499,8 @@ void Signage::Draw()
 	{
 		if (!iBoxes[106].isCreated() && iBoxes[106].stype() != -1)
 		{
-			iBoxes[106].Create((char *)"Debug Info Pane", (char *)"", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, (char *)"null", false, false, (char *)"", (char *)"", debugLevel);
+			iBoxes[106].Create((char *) "Debug Info Pane", (char *) "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, (char *) "null", false, false,
+					(char *) "", (char *) "", debugLevel);
 		}
 	}
 	else

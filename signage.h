@@ -124,6 +124,9 @@ private:
 		int Scroll;
 		int ScrollComplete;
 		int pFade;
+		int valR;
+		int valG;
+		int valB;
 		int nBoards;
 		int Alert;
 		int AlertActive;

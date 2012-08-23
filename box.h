@@ -25,7 +25,7 @@ public:
 	void Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureID, int bcol, int px, int py, int w, int h, int aw, int ah, int scale,
 			int sourceType, int dScreen, char dAudio[16], bool hasHeader, bool hasSHeader, char txtHeader[256], char txtSHeader[256], int dbgLVL);
 	void SwapTex(GLuint TextureID, int w, int h);
-	bool doDraw(int aOverride);
+	bool doDraw(int  aOverride, ... );
 	char * GetUID()
 	{
 		return bUID;

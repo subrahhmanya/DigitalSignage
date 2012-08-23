@@ -43,7 +43,7 @@ Box::Box()
 	ipCC = 0;
 }
 
-bool Box::doDraw(int aOverride)
+bool Box::doDraw(int aOverride, ...)
 {
 	/* mplayer/iPlayer check
 	 * Streaming Issue will have sType of 2
@@ -52,6 +52,38 @@ bool Box::doDraw(int aOverride)
 
 	/* tAlpha is the initial Alpha value when creating a new Box.
 	 * All boxes need to fade in, and fade out, thus being clean. */
+
+	int tAlphaO = -1;
+	int tbR = 255;
+	int tbB = 255;
+	int tbG = 255;
+	int cRGB = 0;
+
+	va_list Arguments;
+	va_start(Arguments, aOverride);
+
+	for (int i = 0; i < aOverride; ++i)
+	{
+		switch (cRGB)
+		{
+		case 0:
+			tAlphaO = va_arg(Arguments, int);
+			break;
+		case 1:
+			tbR = va_arg(Arguments, int);
+			break;
+		case 2:
+			tbB = va_arg(Arguments, int);
+			break;
+		case 3:
+			tbG = va_arg(Arguments, int);
+			break;
+		}
+		cRGB++;
+	}
+
+	va_end(Arguments);
+
 	if (sType > 0)
 		tAlpha = tAlpha + 15;
 	else
@@ -68,7 +100,7 @@ bool Box::doDraw(int aOverride)
 
 	if ((tAlpha == 255) && (sType > 0))
 	{
-		if ((sType >= 4) && (!ipVis) && (aOverride == 255))
+		if ((sType >= 4) && (!ipVis) && (tAlphaO == 255))
 			createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
 
 		if ((sType >= 4) && (ipVis))
@@ -196,10 +228,11 @@ bool Box::doDraw(int aOverride)
 		}
 	}
 
-	if (aOverride != -1)
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, sHeight, 1.0f, 1.0f, 1.0f, bScale, tAlpha, aOverride);
-	else
-		drawInfoBox(glTex, bType, bX, bY, bW, bH, sHeight, 1.0f, 1.0f, 1.0f, bScale, tAlpha, 255);
+	if (tAlphaO == -1)
+		tAlphaO = 255;
+
+	drawInfoBox(glTex, bType, bX, bY, bW, bH, sHeight, (1.0 / 255.0) * tbR, (1.0 / 255.0) * tbB, (1.0 / 255.0) * tbG, bScale, tAlpha, tAlphaO);
+
 	return true;
 }
 
