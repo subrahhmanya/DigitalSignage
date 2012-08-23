@@ -1259,8 +1259,7 @@ void Signage::Update()
 			imagepixels += scrimage->pitch;
 		}
 
-		/* Free variables */
-		free(imagepixels);
+		/* Free pixels */
 		free (pixels);
 
 		SDL_SaveBMP(scrimage, "/screen/SCRDUMP.bmp");
