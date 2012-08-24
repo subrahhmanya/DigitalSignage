@@ -110,6 +110,11 @@ Signage::Signage()
 	wUpdateTimer[4] = 0;
 	wCurDisp = 99;
 
+	tSBoot = 0;
+	tSBSec = 0;
+	tSBMin = 0;
+	tSBHrs = 0;
+
 	tIcon = 0;
 	tOIcon = 0;
 	trObservationTime = 0;
@@ -329,6 +334,22 @@ void Signage::Update()
 
 	cTime = time(0);
 	ltm = localtime(&cTime);
+
+	if (tSBoot != cTime)
+	{
+		tSBoot = cTime;
+		tSBSec++;
+		if (tSBSec == 60)
+		{
+			tSBSec = 0;
+			tSBMin++;
+		}
+		if (tSBMin == 60)
+		{
+			tSBMin = 0;
+			tSBHrs++;
+		}
+	}
 
 	/* Only perform Update if Running */
 	if (m_bQuitting == false)
@@ -1431,6 +1452,35 @@ void Signage::Draw()
 			iBoxes[101].Destroy();
 	}
 
+	for (int cB = 0; cB < 64; cB++)
+	{
+		if (!iBoxes[mBoard[cB].CreatedID].doDraw(4, mBoard[cB].pFade, mBoard[cB].valR, mBoard[cB].valG, mBoard[cB].valB))
+		{
+			m_bRunning = false;
+			m_bQuitting = true;
+		}
+		else
+		{
+			if (iBoxes[mBoard[cB].CreatedID].hasSHeader() == true)
+			{
+				drawText(iBoxes[mBoard[cB].CreatedID].txtSHeader(), fntCGothic[mBoard[cB].HeaderSize], 3, 0, 0, 0, iBoxes[cB].GetTAlpha(),
+						mBoard[cB].X + ((mBoard[cB].Width / 255.0) * iBoxes[mBoard[cB].CreatedID].scale()), mBoard[cB].X,
+						((mBoard[cB].Height / 255.0) * iBoxes[mBoard[cB].CreatedID].scale()) + mBoard[cB].Y - mBoard[cB].HeaderSize, 0, 0);
+			}
+		}
+	}
+
+	/* Draw *Weather As of: */
+	if (wOK)
+	{
+		char tWOB[64];
+		sprintf(tWOB, "Weather Observed at %s", tObservationTime);
+		drawText(tWOB, fntCGothic[16], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
+	}
+
+	/* Limit FPS */
+	counter.tick();
+
 	/* Draw Standard Boxes */
 	for (int n = 100; n < 128; n++)
 	{
@@ -1456,7 +1506,7 @@ void Signage::Draw()
 			}
 			else
 			{
-				if (!iBoxes[n].doDraw(1, -1))
+				if (!iBoxes[n].doDraw(0))
 				{
 					m_bQuitting = true;
 					m_bRunning = false;
@@ -1465,41 +1515,12 @@ void Signage::Draw()
 		}
 	}
 
-	for (int cB = 0; cB < 64; cB++)
-	{
-		if (!iBoxes[mBoard[cB].CreatedID].doDraw(4, mBoard[cB].pFade, mBoard[cB].valR, mBoard[cB].valG, mBoard[cB].valB))
-		{
-			m_bRunning = false;
-			m_bQuitting = true;
-		}
-		else
-		{
-			if (iBoxes[mBoard[cB].CreatedID].hasSHeader() == true)
-			{
-				drawText(iBoxes[mBoard[cB].CreatedID].txtSHeader(), fntCGothic[mBoard[cB].HeaderSize], 3, 0, 0, 0, 255,
-						mBoard[cB].X + ((mBoard[cB].Width / 255.0) * iBoxes[mBoard[cB].CreatedID].scale()), mBoard[cB].X,
-						((mBoard[cB].Height / 255.0) * iBoxes[mBoard[cB].CreatedID].scale()) + mBoard[cB].Y - mBoard[cB].HeaderSize, 0, 0);
-			}
-		}
-	}
-
-	/* Draw *Weather As of: */
-	if (wOK)
-	{
-		char tWOB[64];
-		sprintf(tWOB, "Weather Observed at %s", tObservationTime);
-		drawText(tWOB, fntCGothic[16], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
-	}
-
-	/* Limit FPS */
-	counter.tick();
-
 	/* Draw FPS and Version Debug Info for 10 seconds only. */
 	if (cTime <= (dTimeEvent + 10) && m_bQuitting == false)
 	{
 		if (!iBoxes[106].isCreated() && iBoxes[106].stype() != -1)
 		{
-			iBoxes[106].Create((char *) "Debug Info Pane", (char *) "", 0, 0, 2, 1068, 688, 260, 30, 260, 30, 200, 1, 1, (char *) "null", false, false,
+			iBoxes[106].Create((char *) "Debug Info Pane", (char *) "", 0, 0, 2, 1068, 670, 260, 52, 260, 30, 200, 1, 1, (char *) "null", false, false,
 					(char *) "", (char *) "", debugLevel);
 		}
 	}
@@ -1517,14 +1538,20 @@ void Signage::Draw()
 		sprintf(FPSC, "FPS - %i", currentFPS);
 		char FPSL[32] = "";
 		sprintf(FPSL, "(FPS Limit - %i)", FPSLimit);
-		drawText("Debug Information", fntCGothic[14], 1, 0, 0, 0, 255, 0, 1108, 702, 0, 0);
+		char tUTime[32] = "";
+		sprintf(tUTime, "Uptime: %i hours %i mins %i secs", tSBHrs, tSBMin, tSBSec);
+
+		drawText("Debug Information", fntCGothic[14], 1, 0, 0, 0, iBoxes[106].GetTAlpha(), 0, 1108, 702, 0, 0);
 
 		/* Draw Debug Variables */
-		drawText(FPSC, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1088, 692, 0, 0);
-		drawText(FPSL, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1168, 692, 0, 0);
+		drawText(FPSC, fntCGothic[12], 1, 0, 0, 0, iBoxes[106].GetTAlpha(), 0, 1088, 690, 0, 0);
+		drawText(FPSL, fntCGothic[12], 1, 0, 0, 0, iBoxes[106].GetTAlpha(), 0, 1168, 690, 0, 0);
 
 		/* Draw Version String */
-		drawText(sVersionString, fntCGothic[12], 1, 0, 0, 0, 255, 0, 1068, 682, 0, 0);
+		drawText(sVersionString, fntCGothic[12], 1, 0, 0, 0, iBoxes[106].GetTAlpha(), 0, 1068, 678, 0, 0);
+
+		/* Draw Uptime String */
+		drawText(tUTime, fntCGothic[12], 1, 0, 0, 0, iBoxes[106].GetTAlpha(), 0, 1068, 666, 0, 0);
 	}
 
 	/* Swap Buffers */

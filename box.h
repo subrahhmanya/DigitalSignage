@@ -30,6 +30,10 @@ public:
 	{
 		return bUID;
 	}
+	int GetTAlpha()
+	{
+		return tAlpha;
+	}
 	int GetTStamp()
 	{
 		return bTStamp;

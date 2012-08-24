@@ -80,6 +80,7 @@ private:
 	int tPressure;
 	int tCloudCover;
 	int tVisibility;
+	int tSBoot, tSBSec, tSBMin, tSBHrs;
 	char tConditionDesc[64];
 
 	/* END Weather Vars */
