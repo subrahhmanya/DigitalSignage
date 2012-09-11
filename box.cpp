@@ -111,15 +111,20 @@ bool Box::doDraw(int aOverride, ...)
 			{
 				ipCC = 0;
 				char pgc[1024];
-				sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
+				sprintf(pgc, "echo $(ps aux | grep '0x%lx' | grep -vn grep | awk '{print $2}')", play_win);
 				FILE *fp = popen(pgc, "r");
 				char buff[1024];
-				if (!fgets(buff, sizeof buff, fp) != 0)
+				fgets(buff, sizeof buff, fp);
+				pclose(fp);
+				if (strcmp(buff, "\n") == 0)
 				{
 					/* get_iplayer isn't running - Close current window and set ipVis to false
 					 * iPlayer Window will automatically re-launch when closed.
 					 * Also, worth cycling through Quality settings, just in case it's an issue
 					 * with the stream, as experienced around May 20th 2012. */
+					if (debugLevel > 1)
+						printf("\nKilling Window Reference - 0x%lx\n", play_win);
+
 					SDL_SysWMinfo sdl_info;
 
 					sdl_info = get_sdl_wm_info();
@@ -154,7 +159,6 @@ bool Box::doDraw(int aOverride, ...)
 					sdl_info.info.x11.unlock_func();
 					ipVis = false;
 				}
-				pclose(fp);
 			}
 		}
 	}
@@ -251,18 +255,44 @@ void Box::Destroy()
 		{
 			if (debugLevel > 1)
 				printf(" - Destroying iplayer/mplayer reference...\n");
-			system("killall -9 mplayer");
-			system("killall -9 rtmpdump");
-			system("killall -9 get_iplayer");
-			pclose(mplayer_fp);
+			/* Get Current PID matching WID */
+			char tipc[1024];
+			sprintf(tipc, "echo $(ps aux | grep '0x%lx' | grep -vn grep | awk '{print $2}')", play_win);
+			FILE *tIPC = popen(tipc, "r");
+			char tIPCbuff[1024];
+			fgets(tIPCbuff, sizeof tIPCbuff, tIPC);
+			pclose(tIPC);
+			if (strcmp(tIPCbuff, "\n") != 0)
+			{
+				char * tIPCLst;
+				tIPCLst = strtok(tIPCbuff, " ,.-");
+				while (tIPCLst != NULL)
+				{
+					if (debugLevel > 1)
+						printf("Killing PID - %s...", tIPCLst);
+					char tcb[1024];
+					sprintf(tcb, "kill -9 %s", tIPCLst);
+					system(tcb);
+					tIPCLst = strtok(NULL, "\n ,.-");
+					if (debugLevel > 1)
+						printf(" [OK]\n");
+				}
+				pclose(mplayer_fp);
+			}
+
 			char pgc[1024];
-			sprintf(pgc, "ps aux | grep get_iplayer | grep %s | grep -vn grep", bMSRC);
+			sprintf(pgc, "echo $(ps aux | grep '0x%lx' | grep -vn grep | awk '{print $2}')", play_win);
 			FILE *fp = popen(pgc, "r");
 			char buff[1024];
-			if (!fgets(buff, sizeof buff, fp) != 0)
+			fgets(buff, sizeof buff, fp);
+			pclose(fp);
+			if (strcmp(buff, "\n") == 0)
 			{
 				/* get_iplayer isn't running - Close current window and set ipVis to false
 				 * iPlayer Window will automatically re-launch when closed. */
+				if (debugLevel > 1)
+					printf("\nDestroying Window Reference - 0x%lx\n", play_win);
+
 				SDL_SysWMinfo sdl_info;
 
 				sdl_info = get_sdl_wm_info();
@@ -273,7 +303,6 @@ void Box::Destroy()
 				sdl_info.info.x11.unlock_func();
 				ipVis = false;
 			}
-			pclose(fp);
 		}
 		if (ipVis == false)
 		{
@@ -683,10 +712,10 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 	int mplayer_pos_x = (x / 1280.0) * tWidth;
 	int mplayer_width = (((mplayer_t_width / 1280.0) * tWidth) / 255.0) * scale;
 	int mplayer_height = (((mplayer_t_height / 720.0) * tHeight) / 255.0) * scale;
-
 	if (debugLevel > 1)
 		printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
 	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
+
 	if (!play_win)
 	{
 		fprintf(stderr, "Cannot create X11 window\n");
