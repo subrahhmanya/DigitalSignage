@@ -1218,7 +1218,10 @@ void Signage::Update()
 						if (debugLevel > 1)
 							printf("Attempting to load Texture '%s'...", bdID);
 						if (FileExists(bdID) == false)
-							sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
+							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
+								sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
+							else
+								sprintf(bdID, "/screen/textures/orb_boxt.png");
 						mBoardTex[cB].Destroy();
 						mBoardTex[cB].Load(bdID, debugLevel);
 						/* Scale Texture to Box unless we scroll */

@@ -265,7 +265,7 @@ void Box::Destroy()
 			if (strcmp(tIPCbuff, "\n") != 0)
 			{
 				char * tIPCLst;
-				tIPCLst = strtok(tIPCbuff, " ,.-");
+				tIPCLst = strtok(tIPCbuff, "\n ,.-");
 				while (tIPCLst != NULL)
 				{
 					if (debugLevel > 1)
