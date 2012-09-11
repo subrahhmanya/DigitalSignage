@@ -374,7 +374,15 @@ void Signage::Update()
 
 			tC1 = ltm->tm_sec;
 		}
-		sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+
+		if (bV1)
+		{
+			sprintf(dateString, "%i %s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+		}
+		else
+		{
+			sprintf(dateString, "%i:%s - %s, %s %i  %i", ltm->tm_hour, mins, daysInWord, monthsInWord, ltm->tm_mday, (1900 + ltm->tm_year));
+		}
 
 		if (!iBoxes[100].isCreated() && iBoxes[100].stype() != -1)
 			iBoxes[100].Create((char *) "Orbital Logo", (char *) "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10,
@@ -1309,15 +1317,6 @@ void Signage::Draw()
 
 	/* Draw Time */
 	drawText(dateString, fntCGothic[32], 2, 255, 255, 255, 255, 0, 1262, 8, 0, 0);
-
-	if (bV1)
-	{
-		if (ltm->tm_hour > 9)
-			drawText(":", fntCGothic[32], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 44, 11, 0, 0);
-		else
-			drawText(":", fntCGothic[32], 2, 255, 255, 255, 255, 0, 1262 - pTWidth + 26, 11, 0, 0);
-	}
-
 	drawText(nthsInWord, fntCGothic[12], 1, 255, 255, 255, 255, 0, 1172, 32, 0, 0);
 
 	/* Draw Weather */
