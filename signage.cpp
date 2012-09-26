@@ -1226,7 +1226,7 @@ void Signage::Update()
 						if (FileExists(bdID) == false)
 							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "mplayer") == 0)
 							{
-								sprintf(bdID, "/opt/digitalsignage/textures/orb_boxt.png");
+								sprintf(bdID, "/opt/digitalsignage/textures/boxt.png");
 								iBoxes[mBoard[cB].CreatedID].audioOut(mBoard[cB].cBoard[mBoard[cB].curBoard].AudioOut);
 								iBoxes[mBoard[cB].CreatedID].setType(3);
 								iBoxes[mBoard[cB].CreatedID].setSrc(mpSC);
@@ -1240,7 +1240,7 @@ void Signage::Update()
 							}
 							else
 							{
-								sprintf(bdID, "/opt/digitalsignage/textures/orb_boxt.png");
+								sprintf(bdID, "/opt/digitalsignage/textures/boxt.png");
 								iBoxes[mBoard[cB].CreatedID].setType(1);
 								iBoxes[mBoard[cB].CreatedID].setSrc(mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
 							}

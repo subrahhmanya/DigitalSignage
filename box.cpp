@@ -340,27 +340,27 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	if (bcol == 1)
 	{
 		bType = true;
-		layout[0].Load("/opt/digitalsignage/textures/orb_bl.png", debugLevel);
-		layout[1].Load("/opt/digitalsignage/textures/orb_bt.png", debugLevel);
-		layout[2].Load("/opt/digitalsignage/textures/orb_bcrnr.png", debugLevel);
-		layout[3].Load("/opt/digitalsignage/textures/orb_boxb.png", debugLevel);
-		layout[4].Load("/opt/digitalsignage/textures/orb_bh.png", debugLevel);
+		layout[0].Load("/opt/digitalsignage/textures/bl.png", debugLevel);
+		layout[1].Load("/opt/digitalsignage/textures/bt.png", debugLevel);
+		layout[2].Load("/opt/digitalsignage/textures/bcrnr.png", debugLevel);
+		layout[3].Load("/opt/digitalsignage/textures/boxb.png", debugLevel);
+		layout[4].Load("/opt/digitalsignage/textures/bh.png", debugLevel);
 	}
 	else if (bcol == 2)
 	{
 		bType = true;
-		layout[0].Load("/opt/digitalsignage/textures/orb_wl.png", debugLevel);
-		layout[1].Load("/opt/digitalsignage/textures/orb_wt.png", debugLevel);
-		layout[2].Load("/opt/digitalsignage/textures/orb_wcrnr.png", debugLevel);
-		layout[3].Load("/opt/digitalsignage/textures/orb_boxw.png", debugLevel);
-		layout[4].Load("/opt/digitalsignage/textures/orb_wh.png", debugLevel);
+		layout[0].Load("/opt/digitalsignage/textures/wl.png", debugLevel);
+		layout[1].Load("/opt/digitalsignage/textures/wt.png", debugLevel);
+		layout[2].Load("/opt/digitalsignage/textures/wcrnr.png", debugLevel);
+		layout[3].Load("/opt/digitalsignage/textures/boxw.png", debugLevel);
+		layout[4].Load("/opt/digitalsignage/textures/wh.png", debugLevel);
 	}
 	else if (bcol == 3)
 	{
 		bType = true;
-		layout[0].Load("/opt/digitalsignage/textures/orb_tl.png", debugLevel);
-		layout[1].Load("/opt/digitalsignage/textures/orb_tt.png", debugLevel);
-		layout[2].Load("/opt/digitalsignage/textures/orb_tcrnr.png", debugLevel);
+		layout[0].Load("/opt/digitalsignage/textures/tl.png", debugLevel);
+		layout[1].Load("/opt/digitalsignage/textures/tt.png", debugLevel);
+		layout[2].Load("/opt/digitalsignage/textures/tcrnr.png", debugLevel);
 	}
 	debugLevel = dbgLVL;
 	sType = sourceType;
