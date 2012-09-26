@@ -13,7 +13,7 @@ else
   cp -aR Release/DigitalSignage DigitalSignage-DPKG/opt/digitalsignage/
   cp -aR runcheck.sh DigitalSignage-DPKG/opt/digitalsignage/
   cp -aR res/* DigitalSignage-DPKG/opt/digitalsignage/
-  cp -aR ../orbital_get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
+  cp -aR ../get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
   rm -rf DigitalSignage-DPKG/opt/digitalsignage/deps/ip/.git
   echo Files Copied
   echo Please ensure all binaries and configs are updated/reset accordingly before
