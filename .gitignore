@@ -31,3 +31,4 @@ Release/textures.d
 Release/textures.o
 DigitalSignage-DPKG/opt
 res/defaults/vstr
+DPKG-Out/*

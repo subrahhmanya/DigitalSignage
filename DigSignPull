@@ -16,6 +16,18 @@ else
   cp -aR ../get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
   rm -rf DigitalSignage-DPKG/opt/digitalsignage/deps/ip/.git
   echo Files Copied
-  echo Please ensure all binaries and configs are updated/reset accordingly before
-  echo the application is re-packaged!
+  echo Building .deb
+  echo "Package: digitalsignage" > DigitalSignage-DPKG/DEBIAN/control
+  echo "Version: $newversion" >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Section: base" >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Priority: optional" >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Architecture: amd64" >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Maintainer: paulw@hardmilk.com" >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> DigitalSignage-DPKG/DEBIAN/control
+  dpkg --build DigitalSignage-DPKG ./
+  mkdir -p DPKG-Out
+  echo Moving to DPKG-Out...
+  mv digitalsignage_${newversion}_amd64.deb DPKG-Out/
+  echo Done!
 fi
