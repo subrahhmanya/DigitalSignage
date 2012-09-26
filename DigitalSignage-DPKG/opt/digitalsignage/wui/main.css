@@ -1,0 +1,1231 @@
+	body {
+		width: 920px;
+		font-size: 12px;
+		font-family:"Century Gothic";
+		color: #000000;
+		margin: 0px;
+	}
+	a {
+		color: #003399;
+	}
+	a:hover {
+		color:#000000;
+	}
+
+	a div {
+		cursor:pointer;
+	}
+
+	.youAreHere {
+		color:#000000;
+	}
+
+	#flagGB {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -2px -2px no-repeat;}
+	#flagFR {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -22px -2px no-repeat;}
+	#flagGR {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -43px -2px no-repeat;}
+	#flagSP {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -62px -2px no-repeat;}
+	#flagBR {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -81px -2px no-repeat;}
+	#flagIN {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -2px -15px no-repeat;}
+
+
+	#rssIcon {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -2px -15px no-repeat;}
+
+	.aroRight {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -23px -17px no-repeat;}
+	.aroLeft {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -64px -17px no-repeat;}
+	.icoQMark {background: transparent url(../images/Icongraphy/spriteFlagsIcons.gif) -44px -17px no-repeat; margin-bottom:-3px;}
+
+
+	h1 {
+		color:#003399;
+		font-size: 20px;
+		padding: 10px 0px 11px 0px;
+		margin:0px;
+	}
+
+	h2 {
+		color:#003399;
+		margin:0px;
+		font-size:14px;
+	}
+	
+	p {
+		margin:.8em 0 .8em 0;
+	}
+
+	.ltBtnGry {
+		float:left;
+		width:5px;
+		height:18px;
+		background:transparent url(../images/Icongraphy/spriteBtns.gif) 0 0 no-repeat;
+	}
+	.txtBtnGry {
+		float:left;
+		height:17px;
+		background:url(../images/Icongraphy/spriteBtns.gif) 0 -19px repeat-x;
+		color:#ffffff;
+		font-weight:bold;
+		text-transform:uppercase;
+		padding:2px 1px 0 1px;
+	}
+	.rtBtnGry {
+		float:left;
+		width:5px;
+		height:18px;
+		background:url(../images/Icongraphy/spriteBtns.gif) -6px 0 no-repeat;
+	}
+	.ltBtnWht {
+		float:left;
+		width:5px;
+		height:18px;
+		background:transparent url(../images/Icongraphy/spriteBtns.gif) 0 -38px no-repeat;
+	}
+	.txtBtnWht {
+		float:left;
+		height:17px;
+		background:url(../images/Icongraphy/spriteBtns.gif) 0 -57px repeat-x;
+		color:#ffffff;
+		font-weight:bold;
+		text-transform:uppercase;
+		padding:2px 1px 0 1px;
+	}
+	.rtBtnWht {
+		float:left;
+		width:5px;
+		height:18px;
+		background:url(../images/Icongraphy/spriteBtns.gif) -6px -38px no-repeat;
+	}
+
+
+	.content_subhead {
+		font-size:14px;
+		font-weight: bold;
+	}
+	
+	#header_top {
+		text-align:center;
+	}
+	#header_top_title {
+		font-size:14px;
+	}
+	#header {
+		background:url(../../images/Header/bg_header.jpg) no-repeat;
+		width: 920px;
+		height: 155px;
+	}
+	#headerSpon {
+		float: right;
+		color: #ffffff;
+		width: 150px;
+		padding: 0px 0px 0px 45px;
+		margin: 0px 0px 0px 0px;
+		font-size: 10px;
+		line-height: 15px;
+	}
+	#header_links_right_noUtilityBar {
+		float: right;
+		padding: 0px 0px 0px 101px;
+		width: 100px;
+		font-size: 14px;
+		text-align:right;
+		height: 27px;
+	}
+	#header_links_right_std {
+		float: right;
+		padding: 0px;
+		font-size: 14px;
+		text-align:right;
+		height: 27px;
+	}
+	
+	.header_links_right_bar{
+	    padding-top:4px;
+	    margin-top:3px;
+	    height:10px;
+	}
+	#header_links_right_noSearch {
+		float: right;
+		padding: 43px 0px 0px 101px;
+		width: 100px;
+		font-size: 14px;
+	}
+	#header_dlx_links_right {
+		float: right;
+		padding: 0px 0px 0px 0px;
+		| padding: 0px 0px 0px 0px;
+		height: 27px;
+		text-align:right;
+	}
+	#header_dlx_printerF {
+		float: right;
+		padding: 28px 0px 0px 0px;
+		| padding: 28px 0px 4px 0px;
+		width: 180px;
+		font-size: 14px;
+		text-align:right;
+	}
+	#header_links_right_basic {
+		padding: 0px 0px 2px 0px;
+		font-size: 14px;
+		text-align:right;
+		font-style:normal;
+	}	
+	#header_links_right_basic a{
+		color:#fff;
+		}
+	
+	#header_links_right_right_basic{
+		margin-top:5px; padding-right:10px;
+	}
+	
+	#header_dlx_links_right_noSearch {
+		float: right;
+		padding: 44px 0px 0px 0px;
+		width: 191px;
+		font-size: 14px;
+		text-align:right;
+	}
+	
+	 #header_links_right_left {
+	 margin-left:13px;padding-top:2px;
+	}
+	
+	#header_links_right_left_std {
+		float: right;
+		margin: 5px 8px 0px 5px;
+		| margin: 5px 8px 0px 3px;
+	}
+	
+	#header_links_right_right_std {
+		float: right;
+		margin: 0px 0px 0px 12px;
+	}
+	
+	#header_links_right_left_dlx {
+		float: right;
+		margin-left:12px;
+	}
+	#header_links_right_middle_dlx {
+		float: right;
+		margin: 5px 8px 3px 8px;
+	}
+	#header_links_right_right_dlx {
+		float: right;
+		margin: 0px 0px 0px 12px;		
+	}
+	
+	#header_links_right_divider {
+		float: left;
+		margin: 6px 0px -4px 0px;
+	}
+	.header_links_right_divider {
+		display:none;
+		float: left;
+		margin: 6px 0px -4px 0px;
+	}
+	#header_nav {
+		float: left;
+		clear:both;
+		width: 920px;
+		background:url(../images/bg_nav.gif) repeat-x;
+		margin: 0px 0px 0px 0px;
+		border-top: 1px #ffffff solid;
+		padding:0px;
+	}
+
+	#header_nav a {
+		font-weight: bold;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	#header_nav a:hover {
+		text-decoration:none;
+		color:#FEBD25
+	}
+
+	#header_nav_local {
+		float: left;
+		height: 24px;
+		border-right: 1px #ffffff solid;
+		padding: 10px 18px 0px 18px;
+		text-align: center;
+	}
+	#header_nav_national {
+		float: left;
+		width: 99px;
+		height: 24px;
+		border-right: 1px #ffffff solid;
+		padding: 10px 0px 0px 0px;
+		text-align: center;
+	}
+	#header_nav_regional {
+		float: left;
+		width: 98px;
+		height: 24px;
+		border-right: 1px #ffffff solid;
+		padding: 10px 0px 0px 0px;
+		text-align: center;
+	}
+	#header_nav_global {
+		float: left;
+		width: 88px;
+		height: 24px;
+		border-right: 1px #ffffff solid;
+		padding: 10px 0px 0px 0px;
+		text-align: center;
+	}
+	#header_nav_climate {
+		float: left;
+		width: 92px;
+		height: 24px;
+		border-right: 1px #ffffff solid;
+		padding: 10px 0px 0px 0px;
+		text-align: center;
+	}
+	#header_nav_maps {
+		float: left;
+		width: 77px;
+		height: 24px;
+		border-right: 1px #ffffff solid;
+		padding: 10px 0px 0px 0px;
+		text-align: center;
+	}
+	#header_nav_search {
+		float: right;
+		padding: 0px 10px 0px 0;
+	}
+	#header_nav_search_box {
+		float: left;
+		margin: 8px 0px 0px 0px;
+	}
+	#header_nav_search_radio {
+		float: left;
+		width: 80px;
+		font-size: 9px;
+		color: #ffffff;
+		margin: 2px 0px 0px 7px;
+		padding: 0px 0px 0px 0px;
+		line-height: 14px;
+		|margin: 0px 4px 0px 3px;
+		|line-height: 8px;
+	}
+	.rdo_header {
+		margin: 0px 0px -3px 0px;
+		padding: 0px 0px 3px 0px;
+		|margin: -1px 0px -3px 0px;
+		|padding: 0px 0px 0px 0px;
+	}
+	
+	#home_nav_search_radio {
+		float: left;
+		font-size: 9px;
+		color: #000000;
+		margin: 0px 0px 2px 2px;
+		padding: 0px 0px 0px 0px;
+	}
+	.rdo_home {
+		margin: 0px 0px -3px 0px;
+		padding: 0px 0px 3px 0px;
+		|margin: -1px 0px -3px 0px;
+		|padding: 0px 0px 0px 0px;
+	}
+	#home_search_logo{
+	float: right;
+	color: #666666;
+	font-size: 10px;
+	padding-right: 2px;
+	}
+	#header_nav_search_button {
+		float: left;
+		margin: 8px 0px 0px 0px;
+	}
+	#header_left {
+		float: left;
+		width: 220px;
+		padding: 3px 0px 0px 20px;
+	}
+	#header_flags {
+		float: left;
+	}
+	#header_flags img {
+		padding: 0px 4px 0px 0px;
+	}
+	#header_logos {
+		float: left;
+		padding: 23px 0px 26px 0px;
+		width: 300px;
+		font-size: 1%;
+	}
+	#header_logos_icon {
+		float: left;
+	}
+	#header_logos_text {
+		float: left;
+		padding: 22px 0px 0px 7px;
+	}
+	#header_links_left {
+		float: left;
+		font-weight: bold;
+	}
+	#header_right {
+		float: right;
+		padding: 6px 0px 0px 0px;
+		width: 490px;
+		height: 107px;
+	}
+	#header_recentsearches {
+		float: left;
+		text-align: left;
+		width: 310px;
+	}
+	#header_spon {
+		float: right;
+		width: 170px;
+		padding-top: 16px;
+	}
+	#outlook_container {
+		margin-top:4px;
+	}
+	#recentsearches_header {
+		color: #FFFFFF;
+		font-weight: bold;
+		padding: 0px 0px 2px 0px;
+	}
+	#recentsearches_1 {
+		float: left;
+		background:url(../../images/bg_recent_1.gif) no-repeat;
+		width: 97px;
+		height: 59px;
+	}
+	#recentsearches_2 {
+		float: left;
+		background:url(../../images/bg_recent_2.gif) no-repeat;
+		width: 97px;
+		height: 59px;
+	}
+	#recentsearches_3 {
+		float: left;
+		background:url(../../images/bg_recent_3.gif) no-repeat;
+		width: 97px;
+		height: 59px;
+	}
+	
+	#recentsearches_ski_1 {
+		float: left;
+		background:url(../../images/bg_recent_ski_1.jpg) no-repeat;
+		width: 97px;
+		height: 59px;
+	}
+	#recentsearches_ski_2 {
+		float: left;
+		background:url(../../images/bg_recent_ski_2.jpg) no-repeat;
+		width: 97px;
+		height: 59px;
+	}
+	#recentsearches_ski_3 {
+		float: left;
+		background:url(../../images/bg_recent_ski_3.jpg) no-repeat;
+		width: 97px;
+		height: 59px;
+	}
+	.recentsearches_icon {
+		float: left;
+		padding: 3px 0px 0px 12px;
+	}
+	.recentsearches_temp {
+		float: left;
+		font-size: 20px;
+		font-weight: bold;
+		color: #000000;
+		padding: 7px 0px 0px 6px;
+		height: 32px;
+	}
+	.recentsearches_link {
+		float: left;
+		font-weight: bold;
+		text-align:center;
+		width: 90px;
+		overflow:hidden;
+	}
+	.recentsearches_link{ color: #003399;
+	}
+	.recentsearches_link1 {
+		float: left;
+		font-weight: bold;
+		text-align:center;
+		width: 90px;
+		overflow:hidden;
+	}
+	.recentsearches_link1{ color: #FFFFFF;
+	}
+	#content {
+		float: left;
+		margin: 0px;
+	}
+	
+/*	*+html #content {margin-top:35px;}*/
+	
+	#content_breadcrumbs {
+		float: left;
+		width: 920px;
+		color: #000000;
+		margin: 8px 0px 6px 0px;
+		height: 31px;
+	}
+	#content_breadcrumbs_left {
+		float: left;
+		width: 413px;
+	}
+	#content_breadcrumbs_sponsor_label {
+		float: left;
+	  	color:#868686;
+		font-size:10px;/* unique font  */
+		font-weight:normal;
+		width:104px;
+		text-align:right;
+		padding:8px 3px 0px 0px;
+		height:24px;
+	}
+	#content_breadcrumbs_sponsor {
+		float: left;
+		width: 88px;
+	}
+	#content_breadcrumbs_right {
+		float: right;
+		padding-left: 4px;
+
+	}
+	#content_left {
+		float: left;
+		width: 604px;
+		margin: 8px 0px 0px 0px;
+	}
+	#content_title {
+		float: left;
+		width: 585px;
+		font-size: 20px;
+		font-weight: bold;
+		padding: 0px 0px 10px 0px;
+	}
+	.link_arrow {
+		float: left;
+		margin: 2px 3px 0px 0px;
+	}
+	.link_text {
+		float: left;
+	}
+	.outlook_thumb_title {
+		font-weight: bold;
+		padding: 0px 0px 2px 0px;
+	}
+	.outlook_thumb_divider {
+		float:left;
+		background-color:#003399;
+		height:103px;
+		width:1px;
+		font-size:1%;
+	}
+	#local {
+		float: left;
+		padding: 0px 0px 16px 19px;
+	}
+	#local_container {
+		float: left;
+		width: 200px;
+		height: 98px;
+		border: 2px solid #003399;
+		background: url(../images/bg_local.gif) repeat-x;
+		padding: 8px 0px 8px 7px;
+	}
+	#local_textbox {
+		width: 132px;
+		float: left;
+	}
+	.txtbox {
+		width: 121px;
+		height: 14px;
+		font-size: 10px;
+	}
+	.txtboxGoogle{
+		width: 121px;
+		height: 14px;
+		font-size: 10px;
+		background-image: url('../images/Logos/google-watermark.png');
+		background-repeat: no-repeat;
+	}
+	.txtboxmedium {
+		width: 150px;
+		height: 13px;
+		font-size: 10px;
+	}
+	.txtboxlong {
+		width: 234px;
+		height: 13px;
+		font-size: 10px;
+	}
+	#content_right_ad_bottom {
+		float: left;
+		font-size: 11px;
+		margin: 15px 0px 5px 11px;
+		| margin: 15px 0px 5px 5px;
+	}
+	#right_ad_bottom_box {
+		float: left;
+		background: #ffffff;
+		border: 1px #003399 solid;
+		width: 263px;
+		height: 169px;
+		padding: 10px 8px 0px 10px;
+		margin: 5px 0px 0px 0px;
+	}
+	.right_ad_bottom_item {
+		float: left;
+		width: 259px;
+		margin: 0px 0px 12px 0px;
+	}
+	.right_ad_bottom_title {
+		font-size: 12px;
+	}
+	.right_ad_bottom_text {
+		font-size: 12px;
+		color: #000000;
+	}
+	.right_ad_bottom_link a {
+		font-size: 10px;
+		text-decoration: none;
+	}
+	#timeframe_nevigation_links {
+		float: left;
+		width: 585px;
+		color: #000000;
+		word-spacing: 4px;
+		margin: -5px 0px 14px 0px;
+	}
+	#almanac_navigation_links {
+		float: left;
+		width: 604px;
+		color: #000000;
+		word-spacing: 2px;
+		margin: -5px 0px 14px 0px;
+	}
+	#chart_link {
+		float: left;
+	}
+	#chart_content_almanac {
+		float: left;
+		background: #FFFFFF;
+		border: 2px #003399 solid;
+		width: 580px;
+		height: 146px;
+		margin: 0px 0px 18px 0px;
+	}
+	#chart_content_hourbyhour {
+		float: left;
+		background: #FFFFFF;
+		border: 2px #003399 solid;
+		width: 583px;
+		height: 146px;
+		margin: 0px 0px 18px 0px;
+	}
+	#national_maps {
+		float: left;
+		margin: 5px 0px 0px 0px;
+	}
+	#national_maps_topnav {
+		float: left;
+		border: 2px #003399 solid;
+		width: 437px;
+		font-weight: bold;
+	}
+	.national_maps_topnav_item {
+		float: left;
+		height: 20px;
+		width: 145px;
+		border-right: 1px #003399 solid;
+		text-align: center;
+		padding: 4px 0px 0px 0px;
+	}
+	.national_maps_topnav_item_on {
+		float: left;
+		background:url(../images/bg_today_outlook.gif) repeat-x;
+		height: 20px;
+		width: 145px;
+		border-right: 1px #003399 solid;
+		text-align: center;
+		padding: 4px 0px 0px 0px;
+	}
+
+	.national_maps_topnav_item_on a, .national_maps_topnav_item_on a:hover  {
+		color:#000000;
+		text-decoration:none;
+		cursor:default;
+	}
+
+	#national_maps_link {
+		float: right;
+		margin: 6px 0px 0px 48px;
+		padding-right: 20px;
+	}
+	#national_maps_map {
+		float: left;
+		border-left: 2px #003399 solid;
+		border-bottom: 2px #003399 solid;
+	}
+	#national_maps_image {
+		width: 438px;
+		height: 293px;
+		border-right: 1px #003399 solid;
+		border-bottom: 1px #003399 solid;
+	}
+	#national_maps_footer {
+		background: #ededed;
+		width: 438px;
+		height: 18px;
+		border-right: 1px #003399 solid;
+		text-align: center;
+		padding: 6px 0px 0px 0px;
+	}
+	#national_maps_footer_image {
+		float: left;
+		margin: 2px 5px 0px 160px;
+	}
+	* html #national_maps_footer_image {
+		margin: 2px 5px 0px 80px;
+	}
+	#national_maps_footer_text {
+		float: left;
+	}
+	#national_maps_sidenav {
+		float: left;
+		width: 142px;
+		height: 318px;
+		border-top:  2px #003399 solid;
+		border-right:  2px #003399 solid;
+		border-bottom:  2px #003399 solid;
+		margin: -2px 0px 0px 0px;
+	}
+	#national_maps_sidenav_header {
+		float: left;
+		width: 133px;
+		height: 19px;
+		background: #999999;
+		color: #ffffff;
+		font-weight: bold;
+		border-bottom:  1px #003399 solid;
+		padding: 5px 0px 0px 9px;
+	}
+	#national_maps_sidenav_links {
+		float: left;
+		width: 132px;
+		font-weight: bold;
+		color: #333333;
+		margin: 4px 4px 0px 11px;
+		line-height: 20px;
+	}
+	
+	#national_high {
+		padding-right: 5px;
+	}
+	#national_low {
+		padding-right: 5px;
+	}
+	#national_interest {
+		padding-right: 5px;
+	}
+	* html #national_maps_sidenav_links {
+		margin: 4px 0px 0px 5px;
+	}
+
+	#national_maps_sidenav_links p {
+		margin: .6em 0px .6em 0px;
+		line-height:1.2em;
+	}
+	#national_ad {
+		float: left;
+		width: 586px;
+		height: 98px;
+		background: #ece9d1;
+		margin: 17px 0px 0px 0px;
+		padding: 7px 0px 0px 0px;
+	}
+	#national_search {
+		float: left;
+		font-weight: bold;
+		margin: 19px 0px 0px 0px;
+	}
+	#national_search_content {
+		float: left;
+		border: 2px #003399 solid;
+		background: url(../images/bg_national_search.gif) repeat-x;
+		height: 47px;
+		width: 199px;
+		color: #333333;
+		margin: 4px 0px 0px 0px;
+		padding: 10px 0px 0px 12px;
+	}
+	#national_search_label {
+		
+	}
+	#national_search_box {
+		float: left;
+		margin: 2px 4px 0px 0px;
+	}
+	#national_search_button {
+		float: left;
+		margin: 2px 0px 0px 0px;
+	}
+
+	#useWeather {
+		float: left;
+		font-weight: bold;
+		margin: 19px 0px 0px 20px;
+	}
+	#useWeatherContent {
+		float: left;
+		border: 2px #003399 solid;
+		background:#f9dc97 url(../images/bg_national_search.gif) repeat-x center;
+		width: 322px;
+		color: #333333;
+		margin: 4px 0px 0px 0px;
+		padding: 7px 0px 0px 6px;
+	}
+
+	#useWeatherContent .block {
+		float:left;
+		width:90px;
+		padding:0 10px 3px 10px;
+	}
+
+	.txtNational {
+		height: 12px;
+		width: 150px;
+	}
+	.cities_table_header {
+		font-weight: bold;
+		margin: 0px 0px 0px 6px;
+	}
+	.cities_table_link {
+		font-weight: bold;
+		margin: 0px 0px 0px 8px;
+		padding:0 3px 0 0;
+	}	
+	.cities_table_temp {
+		font-size: 14px;
+		font-weight: bold;
+		color: #000000;
+	}
+	.cities_table_forecast {
+		color: #000000;
+	}
+	#global_destinations {
+		float: left;
+	}
+	#global_destinations_divider {
+		float: left;
+		font-size: 1%;
+		margin: 3px 0px 5px 0px;
+	}
+	#global_destinations_links {
+		float: left;
+		font-size: 10px;
+		width: 391px;
+		line-height: 12px;
+	}
+	
+	
+	/* Footer */
+	
+	#footer {
+		float: left;
+		padding-top: 30px;
+	}
+
+    #footer_maproom #footer {
+        margin-top: 40px;
+    }
+
+	#footer_ad {
+		float: left;
+		background: #ece9d1;
+		width: 835px;
+		height: 96px;
+		margin: 6px 0px 0px 0px;
+		padding: 9px 0px 0px 85px;
+	}	
+	#footer_search {
+		float: left;
+		width: 920px;
+		padding: 24px 0px 0px 0px;
+	}
+	#google_search_txtbox_mid {
+		float: left;
+		width: 680px;
+		padding: 0px 0px 15px 0px;
+	}
+	#footer_search_text {
+		float: left;
+		color: #000000;
+		font-weight: bold;
+		padding: 2px 6px 0px 250px;
+		| padding: 3px 6px 0px 250px;
+	}
+	#footer_search_box {
+		float: left;
+	}
+	#footer_search_button {
+		float: left;
+		padding: 0px 0px 0px 4px;
+	}
+	#footer_search_logo {
+		float : left;
+		text-align: center;
+		font-size: 10px;
+		color: #666666;
+		padding: 0px 0px 3px 5px;
+	}
+	#footer_links {
+		width: 920px;
+		float: left;
+		text-align: center;
+		color: #000000;
+		line-height:25px;
+		padding: 15px 0px 0px 0px;
+	}
+
+	.item {
+		float: left;
+		width: 562px;
+		margin: 0px 0px 17px 0px;
+	}
+	.divider {
+		float: left;
+		font-size: 1%;
+		margin: 4px 0px 7px 0px;
+	}
+	.content {
+		float: left;
+		color: #000000;
+		margin: 0px 0px 5px 0px;
+	}
+#vidContainer {
+	width:596px;
+	border:2px solid #003399;
+}
+
+	#content_right {
+		float: right;
+		background: #ece9d1;
+		padding:5px;
+		margin:0;
+		font-size: 1%;
+	}
+
+#content_right_header {
+  font-size:11px;
+	text-align:center;
+	width:300px;
+}	
+
+#content_right_ad_bottom{
+  width:280px;
+}
+
+#printer_friendly{
+}
+
+.partnerSearchLabelSmall {
+	font-size: 10px;
+	font-weight: bold;
+	height: 10px;
+}
+ 
+.bigger_HighTemp{
+	font-size: 17px;
+}
+.smaller_LowTemp{
+	font-size: 14px;
+}
+
+/* Language Dropdown */
+			#header_dropdown
+			{
+				margin:3px 0;
+			}
+
+    	#header_dropdown select{
+				color:#039;
+				font-family:Arial,Helvetica,sans-serif;
+				font-size:11px;
+			}	
+			#header_dropdown option{
+				color:#039;
+				font-family:Arial,Helvetica,sans-serif;
+				font-size:11px;
+			}
+    	#header_dropdown option:hover{
+				background-color:#c8ceda;
+				color:#039;
+			}			
+			span.select {
+			  position: absolute;
+			  width: 127px; /* With the padding included, the width is 190 pixels: the actual width of the image. */
+			  height: 19px;
+			  padding: 0 17px 0 4px;
+			  color: #039;
+			  font: 11px/21px arial,sans-serif;
+			  background: url('../images/styledDropdown.gif') no-repeat;
+			  overflow: hidden;
+			}	
+		#styledropdwn {
+		background: url('../images/styledDropdown.gif') no-repeat;
+		}	
+/* Language Dropdown */
+
+	#content_left_wider {
+		float: left;
+		width: 920px;
+		margin: 8px 0px 0px 0px;
+	}
+
+/** Style settings for UK severe weather alert banner **/
+.ukSevereWeatherBanner
+{
+	height: 28px;
+	| height: 28px;
+	margin: -2px 0 3px;
+	padding: 4px 0 4px;
+	background: transparent url(../images/Icongraphy/weatherWarningBannerBG.gif) left 10px repeat-x;
+	text-align: center;
+	color: #fff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	cursor: pointer;
+}
+.ukSevereWeatherBanner div
+{
+	width: 200px;
+	margin: 0 auto;
+	position: relative;
+}
+.ukSevereWeatherBanner img
+{
+	float: left;
+}			
+.ukSevereWeatherBanner p
+{
+	margin-top: 8px;
+	float: left;
+}
+#printerFriendlyIcon
+{
+	float:left;
+	margin: 0px 6px 0px 0px;
+}
+#printerFriendlyText
+{
+	float:left;
+	margin: 0px 0px 0px 0px;
+	padding-top:1px;
+	font-size:11px;
+	font-weight:normal !important;
+}
+
+#RssIcon
+{
+	float:left;
+	margin: 0px 6px 0px 0px;
+}
+#RssText
+{
+	float:left;
+	margin: 0px 0px 0px 0px;
+	padding-top:1px;
+	font-size:11px;
+	font-weight:normal !important;
+}
+/* Begin Local Linker (Content Right) Styles */
+
+#content_right{
+  width:310px;
+  padding:0;
+  background-color:transparent;
+}
+.shaded{
+  width:300px;
+  background-color:#ECE9D1;
+  padding:5px;
+}
+
+#Ad_Block{
+ /* height:264px; */
+  margin-bottom:0;
+}
+
+#Google_Block{
+  height:209px;
+	float: left;
+	font-size: 11px;
+	width:294px;
+	| width:294px;
+  padding: 15px 0px 5px 16px;
+	margin-top:0;
+}
+
+#sponsListingsHeader {
+	width:283px;
+	| width:283px;
+	cursor:pointer;
+}
+	
+#right_ad_bottom_box{
+	overflow:hidden;
+	height:170px;
+	margin-bottom:6px;
+}
+
+#Local_Block{
+  clear:both;
+  margin-top:0;
+	width:300px;
+}
+
+.local_links{
+  margin-top:6px;
+	border:2px solid #003399;
+	padding:0;
+	height:118px;
+}
+
+#Local_Block h2{
+  padding-top:12px;
+}
+#Local_Block h3{
+  margin:0;
+	font-size:11px;
+	font-weight:bold;
+	background:transparent url(../images/bg_today_maps.gif) repeat-x scroll 0 0;
+  border-bottom:1px solid #003399;
+	color:#003399;
+	font-weight:bold;
+	height:18px;
+	padding:5px 0 0 10px;
+}
+#Local_Block ul{
+	margin:9px 0 6px 0;
+	padding-left:12px;
+}
+#Local_Block li{
+  list-style-type:square;
+  font-size:11px;
+	margin:0 0 8px 12px;
+	padding:0 6px 0 0;
+}
+
+.twc_ad{
+  margin-top:7px;
+}
+/*
+#content_right_header strong{
+	 font-weight:normal;
+}  BUG IN FF */
+
+/* end Local Linker (Content Right) styles */
+	#content_right_about {
+		background:none;
+		float: right;
+		padding: 7px 6px 5px 7px;
+		margin: 55px 20px 0px 0;
+		font-size: 1%;
+		text-align:center;
+	}
+
+	#content_right_about img {
+		border:1px solid #003399;
+		margin-bottom:25px;
+	}
+.disclaimer{
+	font-size:10px;
+	line-height:12px;
+	color:#003365;
+	background-color:inherit;
+	margin:6px 0 0 0;
+	float:left;
+	clear:both;
+}
+
+#header_ski {
+		background:url(../../images/Header/bg_ski_header.jpg) no-repeat;
+		width: 920px;
+		height: 155px;
+	}
+	
+.offsiteicon2 {
+	background:transparent url('../images/Travel/ski/icon_viewLarger.gif') left 2px no-repeat;
+	display:block;
+	margin-top:9px;  
+	padding-left:18px;
+}
+
+/*Rajneesh: new CSS starts from here */
+.floatR {
+	float:right
+}
+.floatL {
+	float:left
+}
+.clear {
+	clear:both;
+	font-size:0;
+	line-height:0;
+}
+
+/*Rajneesh: Header Temprature Starts  */
+.TempUnitConverter {
+	float:right;
+	width:58px;
+	height:26px;
+	margin-left:8px;
+	padding-top:1px;
+}
+.FtoC, .CtoF {
+	background:url(../images/bg_FC_select.gif) no-repeat 0 0px;
+	width:58px;
+	height:26px;
+	overflow:hidden;
+}
+.TempUnitConverter a {
+	display:block;
+	width:27px;
+	height:22px;
+	text-indent:-99px;
+	overflow:hidden;
+}
+.CtoF a {
+	background:url(../images/bg_FC_select.gif) no-repeat -2px -29px;
+	margin:2px 0 0 2px;
+}
+.CtoF a:hover {
+	background-position:-2px -2px;
+}
+.FtoC a {
+	background:url(../images/bg_FC_select.gif) no-repeat -29px -29px;
+	margin:2px 0 0 29px;
+}
+.FtoC a:hover {
+	background-position:-29px -2px;
+}
+/*Rajneesh: Header Temprature Ends  */
+
+/*Rajneesh: Leaderboard ad position Starts*/
+#horizontal_ad2 {
+	clear: both;
+	width: 920px;
+	height: 104px;
+	padding: 7px 0;
+	background-color:#ece9d1;
+	text-align: center;
+	margin: 20px 0;
+}
+/*Rajneesh: Leaderboard ad position Ends*/
+

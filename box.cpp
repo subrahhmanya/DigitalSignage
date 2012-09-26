@@ -100,10 +100,13 @@ bool Box::doDraw(int aOverride, ...)
 
 	if ((tAlpha == 255) && (sType > 0))
 	{
+		if ((sType == 3) && (!ipVis) && (tAlphaO == 255))
+			createmPlayer(bW, bH, bX, bY, bScale);
+
 		if ((sType >= 4) && (!ipVis) && (tAlphaO == 255))
 			createiPlayer(sType - 3, bW, bH, bX, bY, bScale);
 
-		if ((sType >= 4) && (ipVis))
+		if ((sType >= 3) && (ipVis))
 		{
 			/* Check for getiPlayer Instance, restart if required. */
 			ipCC++;
@@ -132,30 +135,37 @@ bool Box::doDraw(int aOverride, ...)
 
 					destroy_x11_subwindow(sdl_info.info.x11.display, play_win);
 
-					/* Try '2' for Quality */
-					if (ipLFail == 0)
-						ipLFail = 1;
+					if (sType >= 4)
+					{
+						/* Try '2' for Quality */
+						if (ipLFail == 0)
+							ipLFail = 1;
+						else
+						{
+							ipLFail = 0;
+							ipLooper++;
+						}
+
+						if (ipLooper == 2)
+						{
+							sType = 4;
+						}
+						else if (ipLooper >= 3)
+						{
+							sType++;
+						}
+
+						if ((sType - 3) > 4)
+						{
+							/* Set iPlayer to type 2 (Broken) */
+							sType = 2;
+						}
+					}
 					else
 					{
-						ipLFail = 0;
-						ipLooper++;
+						/* Set Player to type 2 (Broken/Finished) */
+						sType = 1;
 					}
-
-					if (ipLooper == 2)
-					{
-						sType = 4;
-					}
-					else if (ipLooper >= 3)
-					{
-						sType++;
-					}
-
-					if ((sType - 3) > 4)
-					{
-						/* Set iPlayer to type 2 (Broken) */
-						sType = 2;
-					}
-
 					sdl_info.info.x11.unlock_func();
 					ipVis = false;
 				}
@@ -251,7 +261,7 @@ void Box::Destroy()
 		printf("    BOX \"%s\" Destroy Event Called\n", bUID);
 	if (m_bRunning)
 	{
-		if ((sType >= 4) && (ipVis))
+		if ((sType >= 3) && (ipVis))
 		{
 			if (debugLevel > 1)
 				printf(" - Destroying iplayer/mplayer reference...\n");
@@ -269,7 +279,7 @@ void Box::Destroy()
 				while (tIPCLst != NULL)
 				{
 					if (debugLevel > 1)
-						printf("Killing PID - %s...", tIPCLst);
+						printf("\tKilling PID - %s...", tIPCLst);
 					char tcb[1024];
 					sprintf(tcb, "kill -9 %s", tIPCLst);
 					system(tcb);
@@ -330,27 +340,27 @@ void Box::Create(char btUID[128], char btMSRC[1024], int tStamp, GLuint TextureI
 	if (bcol == 1)
 	{
 		bType = true;
-		layout[0].Load("/screen/textures/orb_bl.png", debugLevel);
-		layout[1].Load("/screen/textures/orb_bt.png", debugLevel);
-		layout[2].Load("/screen/textures/orb_bcrnr.png", debugLevel);
-		layout[3].Load("/screen/textures/orb_boxb.png", debugLevel);
-		layout[4].Load("/screen/textures/orb_bh.png", debugLevel);
+		layout[0].Load("/opt/digitalsignage/textures/orb_bl.png", debugLevel);
+		layout[1].Load("/opt/digitalsignage/textures/orb_bt.png", debugLevel);
+		layout[2].Load("/opt/digitalsignage/textures/orb_bcrnr.png", debugLevel);
+		layout[3].Load("/opt/digitalsignage/textures/orb_boxb.png", debugLevel);
+		layout[4].Load("/opt/digitalsignage/textures/orb_bh.png", debugLevel);
 	}
 	else if (bcol == 2)
 	{
 		bType = true;
-		layout[0].Load("/screen/textures/orb_wl.png", debugLevel);
-		layout[1].Load("/screen/textures/orb_wt.png", debugLevel);
-		layout[2].Load("/screen/textures/orb_wcrnr.png", debugLevel);
-		layout[3].Load("/screen/textures/orb_boxw.png", debugLevel);
-		layout[4].Load("/screen/textures/orb_wh.png", debugLevel);
+		layout[0].Load("/opt/digitalsignage/textures/orb_wl.png", debugLevel);
+		layout[1].Load("/opt/digitalsignage/textures/orb_wt.png", debugLevel);
+		layout[2].Load("/opt/digitalsignage/textures/orb_wcrnr.png", debugLevel);
+		layout[3].Load("/opt/digitalsignage/textures/orb_boxw.png", debugLevel);
+		layout[4].Load("/opt/digitalsignage/textures/orb_wh.png", debugLevel);
 	}
 	else if (bcol == 3)
 	{
 		bType = true;
-		layout[0].Load("/screen/textures/orb_tl.png", debugLevel);
-		layout[1].Load("/screen/textures/orb_tt.png", debugLevel);
-		layout[2].Load("/screen/textures/orb_tcrnr.png", debugLevel);
+		layout[0].Load("/opt/digitalsignage/textures/orb_tl.png", debugLevel);
+		layout[1].Load("/opt/digitalsignage/textures/orb_tt.png", debugLevel);
+		layout[2].Load("/opt/digitalsignage/textures/orb_tcrnr.png", debugLevel);
 	}
 	debugLevel = dbgLVL;
 	sType = sourceType;
@@ -687,8 +697,19 @@ void Box::create_iplayer(const char *streamid, const char *quality, int cache, W
 {
 	char cmdline[1024];
 	sprintf(cmdline,
-			"/screen/src/orbital_get_iplayer/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\" > /dev/null 2>&1",
+			"/opt/digitalsignage/deps/ip/get_iplayer --stream --modes=%s --type=livetv %s --player=\"mplayer -really-quiet -vo xv -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -cache %i -wid 0x%lx -\" > /dev/null 2>&1",
 			quality, streamid, audEnable, cache, win);
+	if (debugLevel > 1)
+		printf("%s\n", cmdline);
+	*mplayer_fp = popen(cmdline, "r");
+}
+
+void Box::create_mplayer(const char *streamid, Window win, FILE **mplayer_fp)
+{
+	char cmdline[1024];
+	sprintf(cmdline,
+			"/usr/bin/mplayer %s -really-quiet -vo xv -ao %s -mc 1 -autosync 30 -noconsolecontrols -nokeepaspect -hardframedrop -wid 0x%lx > /dev/null 2>&1",
+			streamid, audEnable, win);
 	if (debugLevel > 1)
 		printf("%s\n", cmdline);
 	*mplayer_fp = popen(cmdline, "r");
@@ -757,6 +778,39 @@ void Box::createiPlayer(int maxqual, int width, int height, int x, int y, int sc
 			else
 				create_iplayer(bMSRC, "flashvhigh2", 4096, play_win, &mplayer_fp);
 		}
+	}
+}
+
+void Box::createmPlayer(int width, int height, int x, int y, int scale)
+{
+	/* MPLAYER Testing */
+	ipVis = true;
+
+	int mplayer_t_width = width;
+	int mplayer_t_height = height;
+
+	const SDL_VideoInfo* info = SDL_GetVideoInfo();
+	int tWidth = info->current_w;
+	int tHeight = info->current_h;
+
+	y = (720 - y) - ((height / 255.0) * scale);
+	int mplayer_pos_y = (y / 720.0) * tHeight;
+	int mplayer_pos_x = (x / 1280.0) * tWidth;
+	int mplayer_width = (((mplayer_t_width / 1280.0) * tWidth) / 255.0) * scale;
+	int mplayer_height = (((mplayer_t_height / 720.0) * tHeight) / 255.0) * scale;
+	if (debugLevel > 1)
+		printf("Creating X11 Child at %ix%i (%ix%i)\n", mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
+	play_win = create_sdl_x11_subwindow(mplayer_pos_x, mplayer_pos_y, mplayer_width, mplayer_height);
+
+	if (!play_win)
+	{
+		fprintf(stderr, "Cannot create X11 window\n");
+		ipVis = false;
+	}
+	else
+	{
+		mplayer_fp = NULL;
+		create_mplayer(bMSRC, play_win, &mplayer_fp);
 	}
 }
 

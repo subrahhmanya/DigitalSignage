@@ -252,19 +252,19 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	SDL_WM_SetCaption(title, NULL);
 
 	/* Load Default Texture Items */
-	pLogo.Load("/screen/textures/orblogo.png", debugLevel);
-	tScrollTex[0].Load("/screen/textures/fader_blft.png", debugLevel);
-	tScrollTex[1].Load("/screen/textures/fader_brght.png", debugLevel);
-	weather[1].Load("/screen/textures/weather/gales.png", debugLevel);
-	weather[2].Load("/screen/textures/weather/hot.png", debugLevel);
-	weather[3].Load("/screen/textures/weather/cold.png", debugLevel);
+	pLogo.Load("/opt/digitalsignage/textures/clogo.png", debugLevel);
+	tScrollTex[0].Load("/opt/digitalsignage/textures/fader_blft.png", debugLevel);
+	tScrollTex[1].Load("/opt/digitalsignage/textures/fader_brght.png", debugLevel);
+	weather[1].Load("/opt/digitalsignage/textures/weather/gales.png", debugLevel);
+	weather[2].Load("/opt/digitalsignage/textures/weather/hot.png", debugLevel);
+	weather[3].Load("/opt/digitalsignage/textures/weather/cold.png", debugLevel);
 
 	/* Load Fonts */
 	for (int n = 0; n < 49; n++)
 	{
 		if (debugLevel > 1)
-			printf("Loading Font fntCGothic[%i] - " "/screen/fonts/cgothic.ttf" " size %i... ", n, n);
-		fntCGothic[n] = TTF_OpenFont("/screen/fonts/cgothic.ttf", n);
+			printf("Loading Font fntCGothic[%i] - " "/opt/digitalsignage/fonts/cgothic.ttf" " size %i... ", n, n);
+		fntCGothic[n] = TTF_OpenFont("/opt/digitalsignage/fonts/cgothic.ttf", n);
 		if (fntCGothic[n] == NULL)
 		{
 			fprintf(stderr, "FAILED -  %s\n", SDL_GetError());
@@ -385,7 +385,7 @@ void Signage::Update()
 		}
 
 		if (!iBoxes[100].isCreated() && iBoxes[100].stype() != -1)
-			iBoxes[100].Create((char *) "Orbital Logo", (char *) "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10,
+			iBoxes[100].Create((char *) "Company Logo", (char *) "", 0, pLogo.gltex(), 2, (1280 / 2) - ((((pLogo.width() / 255.0) * 225.0) + 8) / 2), 10,
 					pLogo.width(), pLogo.height(), pLogo.width(), pLogo.height(), 225, 1, 1, (char *) "null", false, false, (char *) "", (char *) "",
 					debugLevel);
 		else
@@ -614,9 +614,9 @@ void Signage::Update()
 			}
 
 			if (tSrS == 2)
-				sprintf(tBuff, "/screen/textures/weather/night");
+				sprintf(tBuff, "/opt/digitalsignage/textures/weather/night");
 			else
-				sprintf(tBuff, "/screen/textures/weather/day");
+				sprintf(tBuff, "/opt/digitalsignage/textures/weather/day");
 
 			/* Weather Icon Fading Transition */
 			if ((tIcon != tOIcon) && (wFadeA[1] == 0))
@@ -1104,7 +1104,7 @@ void Signage::Update()
 
 				if ((cTime > (iBoxes[mBoard[cB].CreatedID].getClicks() + mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].Duration)))
 				{
-					if ((mBoard[cB].reqBoard == mBoard[cB].curBoard) && (mBoard[cB].pFade == 255))
+					if ((mBoard[cB].reqBoard == mBoard[cB].curBoard) && (mBoard[cB].pFade == 255) && iBoxes[mBoard[cB].CreatedID].stype() <= 2)
 					{
 						if ((mBoard[cB].Scroll == 0)
 								|| ((mBoard[cB].Scroll / mBoard[cB].cBoard[iBoxes[mBoard[cB].CreatedID].getScreen()].ScrollSpeed)
@@ -1198,30 +1198,53 @@ void Signage::Update()
 					if (((mBoard[cB].reqBoard != mBoard[cB].curBoard) && (mBoard[cB].pFade == 0)) && (iBoxes[mBoard[cB].CreatedID].stype() != -1))
 					{
 						mBoard[cB].curBoard = mBoard[cB].reqBoard;
-						char bdID[128];
+						char bdID[1024];
+						char mpSC[1024];
 						if ((mBoard[cB].AlertActive == 1) && (mBoard[cB].Alert == 1))
 						{
 							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
-								sprintf(bdID, "/screen/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
+								sprintf(bdID, "/opt/digitalsignage/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
 							else
 								sprintf(bdID, "/screen/boards/%s/alert/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].nBoards].Src);
 						}
 						else
 						{
 							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
-								sprintf(bdID, "/screen/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+								sprintf(bdID, "/opt/digitalsignage/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+							else if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "mplayer") == 0)
+							{
+								sprintf(bdID, "/opt/digitalsignage/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+								sprintf(mpSC, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+							}
 							else
 								sprintf(bdID, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
 						}
 
-						iBoxes[mBoard[cB].CreatedID].setScreen(mBoard[cB].curBoard);
 						if (debugLevel > 1)
 							printf("Attempting to load Texture '%s'...", bdID);
+						iBoxes[mBoard[cB].CreatedID].setScreen(mBoard[cB].curBoard);
+						iBoxes[mBoard[cB].CreatedID].setType(1);
 						if (FileExists(bdID) == false)
-							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
-								sprintf(bdID, "/screen/textures/iplayer/generic_fail.png");
+							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "mplayer") == 0)
+							{
+								sprintf(bdID, "/opt/digitalsignage/textures/orb_boxt.png");
+								iBoxes[mBoard[cB].CreatedID].audioOut(mBoard[cB].cBoard[mBoard[cB].curBoard].AudioOut);
+								iBoxes[mBoard[cB].CreatedID].setType(3);
+								iBoxes[mBoard[cB].CreatedID].setSrc(mpSC);
+							}
+							else if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "iplayer") == 0)
+							{
+								sprintf(bdID, "/opt/digitalsignage/textures/iplayer/generic_fail.png");
+								iBoxes[mBoard[cB].CreatedID].audioOut(mBoard[cB].cBoard[mBoard[cB].curBoard].AudioOut);
+								iBoxes[mBoard[cB].CreatedID].setType(mBoard[cB].cBoard[mBoard[cB].curBoard].Quality);
+								iBoxes[mBoard[cB].CreatedID].setSrc(mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+							}
 							else
-								sprintf(bdID, "/screen/textures/orb_boxt.png");
+							{
+								sprintf(bdID, "/opt/digitalsignage/textures/orb_boxt.png");
+								iBoxes[mBoard[cB].CreatedID].setType(1);
+								iBoxes[mBoard[cB].CreatedID].setSrc(mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+							}
 						mBoardTex[cB].Destroy();
 						mBoardTex[cB].Load(bdID, debugLevel);
 						/* Scale Texture to Box unless we scroll */

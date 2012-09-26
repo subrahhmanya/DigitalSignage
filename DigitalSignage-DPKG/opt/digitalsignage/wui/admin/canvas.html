@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Digital Signage Screen Editor</title>
+    
+    <!-- A border on the canvas helps us see the edges -->
+    <style type="text/css">
+      #CContainer { position: relative; }
+      #SCanvas { border: 2px solid #999; background: #000; width: 800px; height: 450px }
+    </style> 
+    <script type="text/javascript" src="includes/right.js"></script>
+    <script type="text/javascript" src="includes/shapes.js"></script>
+    <script type="text/javascript" src="includes/cpicker.js"></script>
+<script type="text/javascript">
+function addBox (form) {
+   var tX = parseInt(form.xcoord.value);
+   var tY = parseInt(form.ycoord.value);
+   var tW = parseInt(form.width.value);
+   var tH = parseInt(form.height.value);
+   var tS = parseInt(form.scale.value);
+   var bFill = form.boxcol.value;
+   var bID = parseInt(form.boxid.value);
+   if ( isNaN(tX) || isNaN(tY) || isNaN(tW) || isNaN(tH) || isNaN(tS))
+   {
+      alert("Please ensure you fill in the Size Details Correctly");
+   } else {
+      if (isNaN(bID))
+      {
+        // Adding New Box
+        addRect(tX, (720 - tY - tH), tW, tH, '#FFFFFF', tS);
+      } else {
+        modRect(bID, tX, (720 - tY - tH), tW, tH, bFill, tS);
+      }
+   }
+}
+
+function delBox (form) {
+   var bID = parseInt(form.boxid.value);
+   if (!isNaN(bID))
+   {
+     delRect(bID);
+   }
+}
+</script>
+  </head>
+  <body onLoad="init2()">
+    
+    <div id="CContainer">
+    <canvas id="SCanvas" width="1280" height="720">
+      <!-- Fallback Content -->
+      <p>Sorry, but your browser does not support HTML5 Canvas objects.</p>
+    </canvas>
+    </div>
+    <div style="font-family: Verdana; font-size: 12px;">
+    <p>Click to select. Click on selection handles to resize. Double click to create a new node.</p>
+    <form name="iBoxDetails">
+MouseX-<input type="text" name="mousex" readonly="readonly" />:MouseY-<input type="text" name="mousey" readonly="readonly" />
+      <table>
+        <tr>
+          <td>Selected Box ID</td>
+          <td>:</td>
+          <td><input type="text" name="boxid" readonly="readonly" /></td>
+          <td>Colour</td>
+          <td>:</td>
+          <td><input type="text" name="boxcol" readonly="readonly" id='direct-assignment-test' type='text' />
+          <script type='text/javascript'>
+          // <![CDATA[
+            new Colorpicker({
+              update: 'direct-assignment-test'
+            });
+          // ]]>
+          </script></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>X-Coord</td>
+          <td>:</td>
+          <td><input type="text" name="xcoord" /></td>
+          <td>Y-Coord</td>
+          <td>:</td>
+          <td><input type="text" name="ycoord" /></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Width</td>
+          <td>:</td>
+          <td><input type="text" name="width" /></td>
+          <td>Height</td>
+          <td>:</td>
+          <td><input type="text" name="height" /></td>
+          <td>Scale</td>
+          <td>:</td>
+          <td><input type="text" name="scale" /></td>
+        </tr>
+      </table>
+      <input onclick="addBox(this.form)" type="button" value="Create/Update"></input>
+      <input onclick="delBox(this.form)" type="button" value="Delete Box"></input>
+      <input onclick="selNextRect()" type="button" value="Select Next Box"></input>
+    </form>
+    </div>
+  </body>
+</html>

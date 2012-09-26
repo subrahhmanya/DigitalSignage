@@ -1,0 +1,60 @@
+	#today_current {
+		float: left;
+		width: 354px;
+		height: 205px;
+		margin: 0px 0px 0px 0px;
+		padding:0px 0px 0px 0px;
+	}
+	#current_left {
+		float: left;
+		width: 230px;
+	}
+	#current_box {
+		float: left;
+		width: 204px;
+		border: 1px solid #003399;
+		background: #ffffff;
+		margin: 11px 0px 0px 11px;
+		| margin: 11px 0px 0px 5px;
+		padding:0 0 5px 0;
+	}
+	#current_box_icon {
+		float: left;
+		margin: 3px 0px -5px 7px;
+	}
+	#current_box_temp {
+		float: left;
+		color: #333333;
+		font-size: 33px;
+		font-weight: bold;
+		margin: 20px 0px 0px 9px;
+	}
+	#current_box_cond {
+		float: left;
+		| float: none;
+		width:90px;
+		color: #333333;
+		margin: 0px 0px 0px 4px;
+	}
+	#current_updated {
+		float: left;
+		font-size: 12px;
+		color: #000000;
+		width: 204px;
+		padding: 6px 0px 0px 11px;
+	}
+	#current_right {
+		float: left;
+		color: #000000;
+		line-height: 12px;
+		padding: 12px 0px 0px 1px;
+		width: 115px;
+		text-wrap: normal;
+	}
+	#current_bottom {
+		float: left;
+		width: 354px;
+		text-align: center;
+		font-weight: bold;
+		padding: 12px 0px 0px 0px;
+	}

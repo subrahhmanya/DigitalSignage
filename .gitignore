@@ -3,7 +3,7 @@
 infodisplay.cpp~
 Makefile~
 updater/puTasks.sh~
-Debug/OrbitalDigitalSignage
+Debug/DigitalSignage
 Debug/box.d
 Debug/box.o
 Debug/fps_counter.d
@@ -16,7 +16,7 @@ Debug/signage.d
 Debug/signage.o
 Debug/textures.d
 Debug/textures.o
-Release/OrbitalDigitalSignage
+Release/DigitalSignage
 Release/box.d
 Release/box.o
 Release/fps_counter.d

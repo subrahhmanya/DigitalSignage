@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	printf("Loading Configuration....\n");
 	/* Check for valid Configuration Files and Contents */
 	char tFName[128];
-	sprintf(tFName, "/screen/config.ini");
+	sprintf(tFName, "/etc/digitalsignage/config.ini");
 	if (FileExists(tFName))
 	{
 		/* Found a config gile, parse it... */
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
 				/* Load Version String */
 				char tVS[64];
-				ifstream vFile("/screen/src/orbital_infodisplay/version");
+				ifstream vFile("/opt/digitalsignage/defaults/vstr");
 				string line;
 				getline(vFile, line);
 				sprintf(tVS, "Client Version %s", line.c_str());
@@ -80,11 +80,16 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				printf("\n\nUnable to Launch.\nPlease ensure that /screen/config.ini exists, and that the 'Enabled' option is set to '1'.\n");
+				printf("\n\nUnable to Launch.\nPlease ensure you have configured the Signage System first by visiting http://localhost\n");
 			}
 		}
 	}
-	printf("\n\nOrbitalDigitalSignage has cleanly exited.\n");
+	else
+	{
+		printf("\n\nUnable to Launch.\nPlease ensure you have configured the Signage System first by visiting http://localhost\n");
+	}
+
+	printf("\n\nDigitalSignageSystem has cleanly exited.\n");
 	return 0;
 }
 

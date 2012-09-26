@@ -37,19 +37,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: OrbitalDigitalSignage
+all: DigitalSignage
 
 # Tool invocations
-OrbitalDigitalSignage: $(OBJS) $(USER_OBJS)
+DigitalSignage: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/usr/lib -o "OrbitalDigitalSignage" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/usr/lib -o "DigitalSignage" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) OrbitalDigitalSignage
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) DigitalSignage
 	-@echo ' '
 
 .PHONY: all clean dependents

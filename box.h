@@ -86,6 +86,18 @@ public:
 	{
 		return sType;
 	}
+	void setType(int nt)
+	{
+		sType = nt;
+	}
+	int setSrc(char btMSrc[1024])
+	{
+		sprintf(bMSRC, "%s", btMSrc);
+	}
+	int audioOut(char btAO[16])
+	{
+		sprintf(audEnable, "%s", btAO);
+	}
 	int getScrollV()
 	{
 		return scrollv;
@@ -133,11 +145,13 @@ private:
 	/* iPlayer Specific */
 	bool ipVis;
 	void createiPlayer(int maxqual, int width, int height, int x, int y, int scale);
+	void createmPlayer(int width, int height, int x, int y, int scale);
 	void destroy_x11_subwindow(Display *dpy, Window parent);
 	Window create_x11_subwindow(Display *dpy, Window parent, int x, int y, int width, int height);
 	Window create_sdl_x11_subwindow(int x, int y, int width, int height);
 	SDL_SysWMinfo get_sdl_wm_info(void);
 	void create_iplayer(const char *streamid, const char *quality, int cache, Window win, FILE **mplayer_fp);
+	void create_mplayer(const char *streamid, Window win, FILE **mplayer_fp);
 
 	/* MPlayer Integration */
 	Window play_win;
