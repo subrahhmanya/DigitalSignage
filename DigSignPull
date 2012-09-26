@@ -1,16 +1,20 @@
 #!/bin/bash
-newversion="0.2.$(date +%s)"
-echo Cleaning Old Files...
-rm -rf DigitalSignage-DPKG/opt
-echo Updating Version to $newversion
-echo $newversion > res/defaults/vstr
-echo "Populating Package Container from compiled source (RELEASE)..."
-mkdir -p DigitalSignage-DPKG/opt/digitalsignage/deps
-cp -aR Release/DigitalSignage DigitalSignage-DPKG/opt/digitalsignage/
-cp -aR res/* DigitalSignage-DPKG/opt/digitalsignage/
-cp -aR ../orbital_wui/www DigitalSignage-DPKG/opt/digitalsignage/wui
-cp -aR ../orbital_get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
-rm -rf DigitalSignage-DPKG/opt/digitalsignage/deps/ip/.git
-echo Files Copied
-echo Please ensure all binaries and configs are updated/reset accordingly before
-echo the application is re-packaged!
+if [ ! -f Release/DigitalSignage ]; then
+  echo "Please ensure you have built a \"Release\" build!"
+else
+  newversion="0.2.$(date +%s)"
+  echo Cleaning Old Files...
+  rm -rf DigitalSignage-DPKG/opt
+  echo Updating Version to $newversion
+  echo $newversion > res/defaults/vstr
+  echo "Populating Package Container from compiled source (RELEASE)..."
+  mkdir -p DigitalSignage-DPKG/opt/digitalsignage/deps
+  cp -aR Release/DigitalSignage DigitalSignage-DPKG/opt/digitalsignage/
+  cp -aR res/* DigitalSignage-DPKG/opt/digitalsignage/
+  cp -aR ../orbital_wui/www DigitalSignage-DPKG/opt/digitalsignage/wui
+  cp -aR ../orbital_get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
+  rm -rf DigitalSignage-DPKG/opt/digitalsignage/deps/ip/.git
+  echo Files Copied
+  echo Please ensure all binaries and configs are updated/reset accordingly before
+  echo the application is re-packaged!
+fi
