@@ -252,7 +252,14 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	SDL_WM_SetCaption(title, NULL);
 
 	/* Load Default Texture Items */
-	pLogo.Load("/opt/digitalsignage/textures/clogo.png", debugLevel);
+	if (FileExists ("/screen/clogo.png"))
+	{
+		pLogo.Load("/screen/clogo.png", debugLevel);
+	}
+	else
+	{
+		pLogo.Load("/opt/digitalsignage/textures/clogo.png", debugLevel);
+	}
 	tScrollTex[0].Load("/opt/digitalsignage/textures/fader_blft.png", debugLevel);
 	tScrollTex[1].Load("/opt/digitalsignage/textures/fader_brght.png", debugLevel);
 	weather[1].Load("/opt/digitalsignage/textures/weather/gales.png", debugLevel);
