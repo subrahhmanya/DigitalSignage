@@ -1223,7 +1223,6 @@ void Signage::Update()
 						if (debugLevel > 1)
 							printf("Attempting to load Texture '%s'...", bdID);
 						iBoxes[mBoard[cB].CreatedID].setScreen(mBoard[cB].curBoard);
-						iBoxes[mBoard[cB].CreatedID].setType(1);
 						if (FileExists(bdID) == false)
 							if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "mplayer") == 0)
 							{
