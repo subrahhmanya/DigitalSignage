@@ -1,0 +1,8 @@
+Package: digitalsignage
+Version: 0.2.1348664865
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev
+Maintainer: paulw@hardmilk.com
+Description: Digital Signage System for Ubuntu-based Linux Distributions.
