@@ -11,6 +11,7 @@ else
   echo "Populating Package Container from compiled source (RELEASE)..."
   mkdir -p DigitalSignage-DPKG/opt/digitalsignage/deps
   cp -aR Release/DigitalSignage DigitalSignage-DPKG/opt/digitalsignage/
+  cp -aR runcheck.sh DigitalSignage-DPKG/opt/digitalsignage/
   cp -aR res/* DigitalSignage-DPKG/opt/digitalsignage/
   cp -aR ../orbital_wui/www DigitalSignage-DPKG/opt/digitalsignage/wui
   cp -aR ../orbital_get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
