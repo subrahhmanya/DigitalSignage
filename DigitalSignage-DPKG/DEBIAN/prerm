@@ -1,0 +1,19 @@
+#!/bin/bash
+# Kill any other instance of DigitalSignage (including dependencies) before install.
+echo Killing any previous instance of DigitalSignage...
+if ps ax | grep -v "grep" | grep "DigitalSignage" > /dev/null; then
+        killall -9 DigitalSignage > /dev/null 2>&1
+fi
+
+if ps ax | grep -v "grep" | grep "mplayer" > /dev/null; then
+        killall -9 mplayer > /dev/null 2>&1
+fi
+
+if ps ax | grep -v "grep" | grep "rtmpdump" > /dev/null; then
+        killall -9 rtmpdump > /dev/null 2>&1
+fi
+
+if ps ax | grep -v "grep" | grep "get_iplayer" > /dev/null; then
+        killall -9 get_iplayer > /dev/null 2>&1
+fi
+

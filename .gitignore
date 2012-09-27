@@ -32,3 +32,4 @@ Release/textures.o
 DigitalSignage-DPKG/opt
 res/defaults/vstr
 DPKG-Out/*
+DigitalSignage-DPKG/DEBIAN/control
