@@ -1,4 +1,11 @@
 #!/bin/bash
+# Remove any reference in CRONTAB
+su screen -c "crontab -l" > /tmp/cron01010205
+sed '/* * * * * \/opt\/digitalsignage\/runcheck.sh > \/dev\/null 2>&1/d' /tmp/cron01010205 > /tmp/cron01020205
+su screen -c "crontab /tmp/cron01020205"
+rm /tmp/cron01010205 > /dev/null 2>&1
+rm /tmp/cron01020205 > /dev/null 2>&1
+
 # Kill any other instance of DigitalSignage (including dependencies) before install.
 echo Killing any previous instance of DigitalSignage...
 if ps ax | grep -v "grep" | grep "DigitalSignage" > /dev/null; then

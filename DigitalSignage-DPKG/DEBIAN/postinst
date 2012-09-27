@@ -8,6 +8,18 @@ if [ ! -e /etc/digitalsignage/config.ini ]; then
 	cp /opt/digitalsignage/defaults/config.ini /etc/digitalsignage/config.ini > /dev/2>&1
 fi
 # Launch
+echo "Adding CRON Job..."
+rm /tmp/cron01010205 > /dev/null 2>&1
+su screen -c "crontab -l" > /tmp/cron01010205
+if grep -Fxq "* * * * * /opt/digitalsignage/runcheck.sh > /dev/null 2>&1" /tmp/cron01010205
+then
+	# Found, no need to add
+else
+	# Add to end of file.
+	echo "* * * * * /opt/digitalsignage/runcheck.sh > /dev/null 2>&1" >> /tmp/cron01010205
+	su screen -c "crontab /tmp/cron01010205"
+fi
+rm /tmp/cron01010205 > /dev/null 2>&1
 echo "Launching..."
 # Static Variables
 	scrroot="/opt/digitalsignage/"
