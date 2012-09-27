@@ -1,6 +1,14 @@
 #!/bin/bash
+echo "Linking apache2 /var/www to /opt/digitalsignage/wui..."
+rm -rf /var/www > /dev/null 2>&1
+ln -s /opt/digitalsignage/wui /var/www
+echo "Checking Default Configuration Exists, installing if required..."
+if [ ! -e /etc/digitalsignage/config.ini ]; then
+	mkdir -p /etc/digitalsignage > /dev/nul 2>&1
+	cp /opt/digitalsignage/defaults/config.ini /etc/digitalsignage/config.ini > /dev/2>&1
+fi
 # Launch
-echo Launching...
+echo "Launching..."
 # Static Variables
 	scrroot="/opt/digitalsignage/"
 
