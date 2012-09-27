@@ -16,7 +16,8 @@ if [ ! $(pidof DigitalSignage) ] ; then
 
 	if ps ax | grep -v "grep" | grep "get_iplayer" > /dev/null; then
 	        killall -9 get_iplayer > /dev/null 2>&1
-	fi	cd ${scrroot}
+	fi
+	cd ${scrroot}
         # Clean out getiPlayer Prefs.
         ${scrroot}deps/ip/get_iplayer --prefs-clear > /dev/null 2>&1
         ${scrroot}deps/ip/get_iplayer --refresh > /dev/null 2>&1
