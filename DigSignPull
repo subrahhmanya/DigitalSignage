@@ -3,31 +3,90 @@ if [ ! -f Release/DigitalSignage ]; then
   echo "Please ensure you have built a \"Release\" build!"
   exit 1
 else
-  newversion="0.2.$(date +%s)"
+  pathout="DigitalSignage-DPKG/"
+  majorv="0.2.$(date +%s)"
+  # oneiric
+  newversion="${majorv}.1-oneiric"
   echo Cleaning Old Files...
-  rm -rf DigitalSignage-DPKG/opt
+  rm -rf ${pathout}opt
   echo Updating Version to $newversion
   echo $newversion > res/defaults/vstr
   echo "Populating Package Container from compiled source (RELEASE)..."
-  mkdir -p DigitalSignage-DPKG/opt/digitalsignage/deps
-  cp -aR Release/DigitalSignage DigitalSignage-DPKG/opt/digitalsignage/
-  cp -aR runcheck.sh DigitalSignage-DPKG/opt/digitalsignage/
-  cp -aR res/* DigitalSignage-DPKG/opt/digitalsignage/
-  cp -aR ../get_iplayer DigitalSignage-DPKG/opt/digitalsignage/deps/ip/
-  rm -rf DigitalSignage-DPKG/opt/digitalsignage/deps/ip/.git
+  mkdir -p ${pathout}opt/digitalsignage/deps
+  cp -aR Release/DigitalSignage ${pathout}opt/digitalsignage/
+  cp -aR res/* ${pathout}opt/digitalsignage/
+  cp -aR ../get_iplayer ${pathout}opt/digitalsignage/deps/ip/
+  rm -rf ${pathout}opt/digitalsignage/deps/ip/.git
   echo Files Copied
   echo Building .deb
-  echo "Package: digitalsignage" > DigitalSignage-DPKG/DEBIAN/control
-  echo "Version: $newversion" >> DigitalSignage-DPKG/DEBIAN/control
-  echo "Section: base" >> DigitalSignage-DPKG/DEBIAN/control
-  echo "Priority: optional" >> DigitalSignage-DPKG/DEBIAN/control
-  echo "Architecture: amd64" >> DigitalSignage-DPKG/DEBIAN/control
-  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> DigitalSignage-DPKG/DEBIAN/control
-  echo "Maintainer: paulw@hardmilk.com" >> DigitalSignage-DPKG/DEBIAN/control
-  echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> DigitalSignage-DPKG/DEBIAN/control
+  echo "Package: digitalsignage" > ${pathout}DEBIAN/control
+  echo "Version: $newversion" >> ${pathout}DEBIAN/control
+  echo "Section: base" >> ${pathout}DEBIAN/control
+  echo "Priority: optional" >> ${pathout}DEBIAN/control
+  echo "Installed-Size: 5128" >> ${pathout}DEBIAN/control
+  echo "Architecture: amd64" >> ${pathout}DEBIAN/control
+  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> ${pathout}/DEBIAN/control
+  echo "Maintainer: paulw@hardmilk.com" >> ${pathout}DEBIAN/control
+  echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> ${pathout}DEBIAN/control
   dpkg --build DigitalSignage-DPKG ./
-  mkdir -p DPKG-Out
+  mkdir -p DPKG-Out/oneiric
   echo Moving to DPKG-Out...
-  mv digitalsignage_${newversion}_amd64.deb DPKG-Out/
+  mv digitalsignage_${newversion}_amd64.deb DPKG-Out/oneiric/
+
+  # precise
+  newversion="${majorv}.2-precise"
+  echo Cleaning Old Files...
+  rm -rf ${pathout}opt
+  echo Updating Version to $newversion
+  echo $newversion > res/defaults/vstr
+  echo "Populating Package Container from compiled source (RELEASE)..."
+  mkdir -p ${pathout}opt/digitalsignage/deps
+  cp -aR Release/DigitalSignage ${pathout}opt/digitalsignage/
+  cp -aR res/* ${pathout}opt/digitalsignage/
+  cp -aR ../get_iplayer ${pathout}opt/digitalsignage/deps/ip/
+  rm -rf ${pathout}opt/digitalsignage/deps/ip/.git
+  echo Files Copied
+  echo Building .deb
+  echo "Package: digitalsignage" > ${pathout}DEBIAN/control
+  echo "Version: $newversion" >> ${pathout}DEBIAN/control
+  echo "Section: base" >> ${pathout}DEBIAN/control
+  echo "Priority: optional" >> ${pathout}DEBIAN/control
+  echo "Installed-Size: 5128" >> ${pathout}DEBIAN/control
+  echo "Architecture: amd64" >> ${pathout}DEBIAN/control
+  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> ${pathout}/DEBIAN/control
+  echo "Maintainer: paulw@hardmilk.com" >> ${pathout}DEBIAN/control
+  echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> ${pathout}DEBIAN/control
+  dpkg --build DigitalSignage-DPKG ./
+  mkdir -p DPKG-Out/precise
+  echo Moving to DPKG-Out...
+  mv digitalsignage_${newversion}_amd64.deb DPKG-Out/precise/
+
+  # quantal
+  newversion="${majorv}.3-quantal"
+  echo Cleaning Old Files...
+  rm -rf ${pathout}opt
+  echo Updating Version to $newversion
+  echo $newversion > res/defaults/vstr
+  echo "Populating Package Container from compiled source (RELEASE)..."
+  mkdir -p ${pathout}opt/digitalsignage/deps
+  cp -aR Release/DigitalSignage ${pathout}opt/digitalsignage/
+  cp -aR res/* ${pathout}opt/digitalsignage/
+  cp -aR ../get_iplayer ${pathout}opt/digitalsignage/deps/ip/
+  rm -rf ${pathout}opt/digitalsignage/deps/ip/.git
+  echo Files Copied
+  echo Building .deb
+  echo "Package: digitalsignage" > ${pathout}DEBIAN/control
+  echo "Version: $newversion" >> ${pathout}DEBIAN/control
+  echo "Section: base" >> ${pathout}DEBIAN/control
+  echo "Priority: optional" >> ${pathout}DEBIAN/control
+  echo "Installed-Size: 5128" >> ${pathout}DEBIAN/control
+  echo "Architecture: amd64" >> ${pathout}DEBIAN/control
+  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> ${pathout}/DEBIAN/control
+  echo "Maintainer: paulw@hardmilk.com" >> ${pathout}DEBIAN/control
+  echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> ${pathout}DEBIAN/control
+  dpkg --build DigitalSignage-DPKG ./
+  mkdir -p DPKG-Out/quantal
+  echo Moving to DPKG-Out...
+  mv digitalsignage_${newversion}_amd64.deb DPKG-Out/quantal/
   echo Done!
 fi

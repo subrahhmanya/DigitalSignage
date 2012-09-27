@@ -1,8 +1,0 @@
-#!/bin/bash
-echo Cleaning Old Files...
-echo "Populating Package Container from PKG Files (RELEASE)"
-sudo rm -rf /opt/digitalsignage
-sudo cp -aR DigitalSignage-DPKG/opt/digitalsignage /opt/
-echo Files Copied
-echo Please ensure all binaries and configs are updated/reset accordingly before
-echo the application is re-packaged!
