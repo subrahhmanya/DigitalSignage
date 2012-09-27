@@ -2,7 +2,6 @@
 .gitignore~
 infodisplay.cpp~
 Makefile~
-updater/puTasks.sh~
 Debug/DigitalSignage
 Debug/box.d
 Debug/box.o
