@@ -14,6 +14,7 @@ su screen -c "crontab -l" > /tmp/cron01010205
 if grep -Fxq "* * * * * /opt/digitalsignage/runcheck.sh > /dev/null 2>&1" /tmp/cron01010205
 then
 	# Found, no need to add
+	echo "."
 else
 	# Add to end of file.
 	echo "* * * * * /opt/digitalsignage/runcheck.sh > /dev/null 2>&1" >> /tmp/cron01010205

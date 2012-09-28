@@ -25,7 +25,7 @@ else
   echo "Priority: optional" >> ${pathout}DEBIAN/control
   echo "Installed-Size: 5128" >> ${pathout}DEBIAN/control
   echo "Architecture: amd64" >> ${pathout}DEBIAN/control
-  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> ${pathout}/DEBIAN/control
+  echo "Depends: libsdl1.2debian, libsdl-image1.2, libsdl-ttf2.0-0, mplayer, rtmpdump, cutycapt, libwww-perl, apache2, libapache2-mod-php5" >> ${pathout}/DEBIAN/control
   echo "Maintainer: paulw@hardmilk.com" >> ${pathout}DEBIAN/control
   echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> ${pathout}DEBIAN/control
   dpkg --build DigitalSignage-DPKG ./
@@ -53,7 +53,7 @@ else
   echo "Priority: optional" >> ${pathout}DEBIAN/control
   echo "Installed-Size: 5128" >> ${pathout}DEBIAN/control
   echo "Architecture: amd64" >> ${pathout}DEBIAN/control
-  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> ${pathout}/DEBIAN/control
+  echo "Depends: libsdl1.2debian, libsdl-image1.2, libsdl-ttf2.0-0, mplayer, rtmpdump, cutycapt, libwww-perl, apache2, libapache2-mod-php5" >> ${pathout}/DEBIAN/control
   echo "Maintainer: paulw@hardmilk.com" >> ${pathout}DEBIAN/control
   echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> ${pathout}DEBIAN/control
   dpkg --build DigitalSignage-DPKG ./
@@ -81,7 +81,7 @@ else
   echo "Priority: optional" >> ${pathout}DEBIAN/control
   echo "Installed-Size: 5128" >> ${pathout}DEBIAN/control
   echo "Architecture: amd64" >> ${pathout}DEBIAN/control
-  echo "Depends: bash, libsdl-console-dev, libsdl-gfx1.2-dev, libsdl-image1.2-dev, libsdl-mixer1.2-dev, libsdl-net1.2-dev, libsdl-ocaml-dev, libsdl-pango-dev, libsdl-sge-dev, libsdl-sound1.2-dev, libsdl-ttf2.0-dev, libsdl1.2-dev, libsdl1.2debian, mplayer, rtmpdump, cutycapt, libxml2-dev, xml-core, python-libxml2, libxml++2.6-dev" >> ${pathout}/DEBIAN/control
+  echo "Depends: libsdl1.2debian, libsdl-image1.2, libsdl-ttf2.0-0, mplayer, rtmpdump, cutycapt, libwww-perl, apache2, libapache2-mod-php5" >> ${pathout}/DEBIAN/control
   echo "Maintainer: paulw@hardmilk.com" >> ${pathout}DEBIAN/control
   echo "Description: Digital Signage System for Ubuntu-based Linux Distributions." >> ${pathout}DEBIAN/control
   dpkg --build DigitalSignage-DPKG ./
