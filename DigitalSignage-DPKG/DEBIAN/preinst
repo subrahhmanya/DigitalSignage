@@ -1,13 +1,20 @@
 #!/bin/bash
 # Remove any reference in CRONTAB
+echo "Removing any old CRON entry..."
 su screen -c "crontab -l" > /tmp/cron01010205
 sed '/* * * * * \/opt\/digitalsignage\/runcheck.sh > \/dev\/null 2>&1/d' /tmp/cron01010205 > /tmp/cron01020205
 su screen -c "crontab /tmp/cron01020205"
 rm /tmp/cron01010205 > /dev/null 2>&1
 rm /tmp/cron01020205 > /dev/null 2>&1
 
+echo Stopping NODM Service...
+# Stop NODM Service
+if ps ax | grep -v "grep" | grep "nodm" > /dev/null; then
+        service nodm stop > /dev/null 2>&1
+fi
+
 # Kill any other instance of DigitalSignage (including dependencies) before install.
-echo Killing any previous instance of DigitalSignage...
+echo "Killing any previous instance of DigitalSignage if running..."
 if ps ax | grep -v "grep" | grep "DigitalSignage" > /dev/null; then
 	killall -9 DigitalSignage > /dev/null 2>&1
 fi
@@ -23,3 +30,9 @@ fi
 if ps ax | grep -v "grep" | grep "get_iplayer" > /dev/null; then
 	killall -9 get_iplayer > /dev/null 2>&1
 fi
+
+# Remove old .xsession file
+if [ -e /home/screen/.xsession ]; then
+	rm /home/screen/.xsession
+fi
+

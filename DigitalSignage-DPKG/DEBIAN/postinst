@@ -8,41 +8,12 @@ if [ ! -e /etc/digitalsignage/config.ini ]; then
 	cp /opt/digitalsignage/defaults/config.ini /etc/digitalsignage/config.ini > /dev/2>&1
 fi
 # Launch
-echo "Adding CRON Job..."
-rm /tmp/cron01010205 > /dev/null 2>&1
-su screen -c "crontab -l" > /tmp/cron01010205
-if grep -Fxq "* * * * * /opt/digitalsignage/runcheck.sh > /dev/null 2>&1" /tmp/cron01010205
-then
-	# Found, no need to add
-	echo "."
-else
-	# Add to end of file.
-	echo "* * * * * /opt/digitalsignage/runcheck.sh > /dev/null 2>&1" >> /tmp/cron01010205
-	su screen -c "crontab /tmp/cron01010205"
-fi
-rm /tmp/cron01010205 > /dev/null 2>&1
+echo "Adding XSession Configuration..."
+su screen -c "echo /opt/digitalsignage/runcheck.sh > /dev/null 2>&1 > /home/screen/.xsession"
+
 echo "Launching..."
 # Static Variables
-	scrroot="/opt/digitalsignage/"
+scrroot="/opt/digitalsignage/"
 
-if [ ! $(pidof DigitalSignage) ] ; then
-	# Kill any other instance of mplayer/rtmpdump/get_iplayer just incase already running.
-
-	if ps ax | grep -v "grep" | grep "mplayer" > /dev/null; then
-	        killall -9 mplayer > /dev/null 2>&1
-	fi
-
-	if ps ax | grep -v "grep" | grep "rtmpdump" > /dev/null; then
-	        killall -9 rtmpdump > /dev/null 2>&1
-	fi
-
-	if ps ax | grep -v "grep" | grep "get_iplayer" > /dev/null; then
-	        killall -9 get_iplayer > /dev/null 2>&1
-	fi
-
-	cd ${scrroot}
-        # Clean out getiPlayer Prefs.
-        ${scrroot}deps/ip/get_iplayer --prefs-clear > /dev/null 2>&1
-        ${scrroot}deps/ip/get_iplayer --refresh > /dev/null 2>&1
-	env DISPLAY=:0 ${scrroot}DigitalSignage & > /dev/null 2>&1
-fi
+# Start/restart NODM Service
+service nodm restart > /dev/null 2>&1

@@ -86,7 +86,7 @@ private:
 	/* END Weather Vars */
 
 	int sWidth, sHeight;
-	bool bV1, wOK;
+	bool bV1, wOK, sInitDisp;
 	char nthsInWord[8], dateString[32];
 	char wIcon[64];
 	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32], tScrolling[64], tScrollCycle[64], tScrollingTimer[64], tScrollSFader[64],

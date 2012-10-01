@@ -21,5 +21,5 @@ if [ ! $(pidof DigitalSignage) ] ; then
         # Clean out getiPlayer Prefs.
         ${scrroot}deps/ip/get_iplayer --prefs-clear > /dev/null 2>&1
         ${scrroot}deps/ip/get_iplayer --refresh > /dev/null 2>&1
-	env DISPLAY=:0 ${scrroot}DigitalSignage & > /dev/null 2>&1
+	env DISPLAY=:0 ${scrroot}DigitalSignage > /dev/null 2>&1
 fi
