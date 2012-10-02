@@ -8,10 +8,12 @@ else
   # oneiric
   newversion="${majorv}.1-oneiric"
   echo Cleaning Old Files...
-  rm -rf ${pathout}opt
+  sudo rm -rf ${pathout}opt/digitalsignage
   echo Updating Version to $newversion
   echo $newversion > res/defaults/vstr
   echo "Populating Package Container from compiled source (RELEASE)..."
+  sudo mkdir -p ${pathout}opt/digitalsignage
+  sudo chown 1000:1000 ${pathout}opt/digitalsignage
   mkdir -p ${pathout}opt/digitalsignage/deps
   cp -aR Release/DigitalSignage ${pathout}opt/digitalsignage/
   cp -aR res/* ${pathout}opt/digitalsignage/
@@ -36,10 +38,12 @@ else
   # precise
   newversion="${majorv}.2-precise"
   echo Cleaning Old Files...
-  rm -rf ${pathout}opt
+  sudo rm -rf ${pathout}opt/digitalsignage
   echo Updating Version to $newversion
   echo $newversion > res/defaults/vstr
   echo "Populating Package Container from compiled source (RELEASE)..."
+  sudo mkdir -p ${pathout}opt/digitalsignage
+  sudo chown 1000:1000 ${pathout}opt/digitalsignage
   mkdir -p ${pathout}opt/digitalsignage/deps
   cp -aR Release/DigitalSignage ${pathout}opt/digitalsignage/
   cp -aR res/* ${pathout}opt/digitalsignage/
@@ -64,10 +68,12 @@ else
   # quantal
   newversion="${majorv}.3-quantal"
   echo Cleaning Old Files...
-  rm -rf ${pathout}opt
+  sudo rm -rf ${pathout}opt/digitalsignage
   echo Updating Version to $newversion
   echo $newversion > res/defaults/vstr
   echo "Populating Package Container from compiled source (RELEASE)..."
+  sudo mkdir -p ${pathout}opt/digitalsignage
+  sudo chown 1000:1000 ${pathout}opt/digitalsignage
   mkdir -p ${pathout}opt/digitalsignage/deps
   cp -aR Release/DigitalSignage ${pathout}opt/digitalsignage/
   cp -aR res/* ${pathout}opt/digitalsignage/

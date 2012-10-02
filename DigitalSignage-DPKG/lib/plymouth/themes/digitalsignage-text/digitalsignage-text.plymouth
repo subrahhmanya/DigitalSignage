@@ -1,0 +1,11 @@
+[Plymouth Theme]
+Name=DigitalSignage Text
+Description=Text mode theme for DigitalSignage
+ModuleName=ubuntu-text
+
+[ubuntu-text]
+title=DigitalSignage
+black=0x000000
+white=0xffffff
+brown=0x000000
+blue=0xffffff

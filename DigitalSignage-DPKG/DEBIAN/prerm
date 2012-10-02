@@ -13,6 +13,9 @@ if ps ax | grep -v "grep" | grep "nodm" > /dev/null; then
         service nodm stop > /dev/null 2>&1
 fi
 
+echo "Unsetting Plymouth Theme..."
+update-alternatives --install /lib/plymouth/themes/default.plymouth default.plymouth /lib/plymouth/themes/ubuntu-text/ubuntu-text.plymouth 100
+
 # Kill any other instance of DigitalSignage (including dependencies) before install.
 echo "Killing any previous instance of DigitalSignage if running..."
 if ps ax | grep -v "grep" | grep "DigitalSignage" > /dev/null; then

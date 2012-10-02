@@ -1,0 +1,72 @@
+#!/bin/bash
+# ----------------------------------
+# Author: D0rkye
+# Homepage: http://d0rkye.zsenialis.com/
+# Most code probably by kyleabaker: http://kyleabaker.com/2010/07/11/how-to-fix-your-ubuntu-boot-screen/
+#
+# Fix for Ubuntu 11.04, for BURG, and some extra bloat by Paolo Bernardi (http://paolobernardi.wordpress.com/)
+# ----------------------------------
+
+# Usage: install_if_not_installed package_name
+function install_if_not_installed
+{
+    PACKAGE="$1"
+    INSTALLED=$(dpkg -L "$PACKAGE" > /dev/null 2>&1 && echo OK || echo KO)
+    if [ "$INSTALLED" == "KO" ]
+    then
+        sudo apt-get install "$PACKAGE" -y
+    fi
+}
+
+# Usage: contains regexp file
+function contains
+{
+    REGEXP="$1"
+    FILE="$2"
+
+    grep "$REGEXP" "$FILE" > /dev/null && echo OK || echo KO
+}
+
+install_if_not_installed v86d
+install_if_not_installed hwinfo
+
+sudo hwinfo --framebuffer
+echo "---------------------------------------------------------------"
+echo "Please enter the best resolution from the list above"
+echo "It usualy looks like this >>Mode 0x0323: 1024x768 (+4096), 24 bits<<"
+echo "And you have to enter it like this >>1024x768-24<<"
+echo "---------------------------------------------------------------"
+read resolution
+
+sed 's/GRUB\_CMDLINE\_LINUX\_DEFAULT\=\"quiet\ splash\"/GRUB\_CMDLINE\_LINUX\_DEFAULT\=\"quiet\ splash\ nomodeset\ video\=uvesafb\:mode\_option\='$resolution'\,mtrr\=3\,scroll\=ywrap\"/g' /etc/default/grub > /tmp/newgrub
+sudo cp -f /tmp/newgrub /etc/default/grub
+rm /tmp/newgrub
+
+sed 's/GRUB\_CMDLINE\_LINUX\_DEFAULT\=\"quiet\ splash\"/GRUB\_CMDLINE\_LINUX\_DEFAULT\=\"quiet\ splash\ nomodeset\ video\=uvesafb\:mode\_option\='$resolution'\,mtrr\=3\,scroll\=ywrap\"/g' /etc/default/burg > /tmp/newburg
+sudo cp -f /tmp/newburg /etc/default/burg
+rm /tmp/newburg
+
+sed 's/\#GRUB\_GFXMODE\=640x480/GRUB\_GFXMODE\='$resolution'/g' /etc/default/grub > /tmp/newgrub
+sudo cp -f /tmp/newgrub /etc/default/grub
+rm /tmp/newgrub
+
+if [ "$(contains uvesafb /etc/initramfs-tools/modules)" == 'KO' ]
+then
+    sudo echo "uvesafb mode_option=$resolution mtrr=3 scroll=ywrap" | sudo tee -a /etc/initramfs-tools/modules
+fi
+
+if [ "$(contains FRAMEBUFFER=y /etc/initramfs-tools/conf.d/splash)" == 'KO' ]
+then
+    echo FRAMEBUFFER=y | sudo tee /etc/initramfs-tools/conf.d/splash
+fi
+
+#sed 's/GRUB\_CMDLINE\_LINUX\_DEFAULT\=\"\(.*\)vt\.handoff\=7\(.*\)\"/GRUB\_CMDLINE\_LINUX\_DEFAULT\=\"\1\2\"/g' /etc/grub.d/10_linux > /tmp/new10linux
+sed 's/vt\_handoff\=\(.*\)vt\.handoff\=7\(.*\)/vt\_handoff\=\1\2/g' /etc/grub.d/10_linux > /tmp/new10linux
+sudo cp -f /tmp/new10linux /etc/grub.d/10_linux
+rm /tmp/new10linux
+sudo chmod +x /etc/grub.d/10_linux
+
+sudo update-grub2
+which update-burg > /dev/null 2>&1 && sudo update-burg
+sudo update-initramfs -u
+echo "The resolution should be fixed after a reboot"

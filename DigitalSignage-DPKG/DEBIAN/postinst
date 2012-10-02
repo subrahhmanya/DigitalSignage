@@ -11,9 +11,16 @@ fi
 echo "Adding XSession Configuration..."
 su screen -c "echo /opt/digitalsignage/runcheck.sh > /dev/null 2>&1 > /home/screen/.xsession"
 
+echo "Setting Plymouth Theme..."
+update-alternatives --install /lib/plymouth/themes/default.plymouth default.plymouth /lib/plymouth/themes/digitalsignage-text/digitalsignage-text.plymouth 100
+
 echo "Launching..."
 # Static Variables
 scrroot="/opt/digitalsignage/"
 
 # Start/restart NODM Service
 service nodm restart > /dev/null 2>&1
+
+# Display TroubleShooting
+echo "If you have issues with sound, run \"pulseaudiofix\" from the console."
+echo "If you have issues with Plymouth, run \"fixplymouth\" from the console."
