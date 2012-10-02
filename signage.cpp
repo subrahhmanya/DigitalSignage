@@ -1426,7 +1426,7 @@ void Signage::Draw()
 			}
 
 			int oPX = ((iBoxes[101].width() / 255.0) * iBoxes[101].scale()) + pTWidth + 32;
-			int plPX = (1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2);
+			int plPX = ((1280 / 2) - ((((pLogo.width() / 255.0) * 200.0) + 8) / 2) - 10);
 
 			tPXX = ((iBoxes[101].width() / 255.0) * iBoxes[101].scale()) + pTWidth + 16;
 			int tPXM = plPX - oPX;
@@ -1439,7 +1439,7 @@ void Signage::Draw()
 				if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 				{
 					iBoxes[102].Create((char *) "Weather Condition Fader - Right", (char *) "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8,
-							tScrollTex[0].width(), pTHeight, tScrollTex[0].width(), pTHeight, 255, 1, 1, (char *) "null", false, false, (char *) "",
+							tScrollTex[0].width(), 32, tScrollTex[0].width(), pTHeight, 255, 1, 1, (char *) "null", false, false, (char *) "",
 							(char *) "", debugLevel);
 				}
 
@@ -1453,7 +1453,7 @@ void Signage::Draw()
 						if (!iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 						{
 							iBoxes[103].Create((char *) "Weather Condition Fader - Left", (char *) "", 0, tScrollTex[1].gltex(), 4, tPXX, 8,
-									tScrollTex[1].width(), 64, tScrollTex[1].width(), 64, 255, 1, 1, (char *) "null", false, false, (char *) "", (char *) "",
+									tScrollTex[1].width(), 32, tScrollTex[1].width(), 64, 255, 1, 1, (char *) "null", false, false, (char *) "", (char *) "",
 									debugLevel);
 						}
 						else
