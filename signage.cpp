@@ -190,7 +190,11 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	if (fullscreen)
 	{
 		/* We're running full screen on the target, so use full screen */
-		screen = SDL_SetVideoMode(width, height, bpp, SDL_ASYNCBLIT | SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+		screen = SDL_SetVideoMode(0, 0, 0, SDL_ASYNCBLIT | SDL_FULLSCREEN | SDL_HWSURFACE | SDL_OPENGL);
+		const SDL_VideoInfo* tinfo = SDL_GetVideoInfo();
+		width = tinfo->current_w;
+		height = tinfo->current_h;
+		bpp = tinfo->vfmt->BitsPerPixel;
 		SDL_ShowCursor(SDL_DISABLE);
 	}
 	else
@@ -209,9 +213,6 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blue);
 	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alpha);
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &doublebuf);
-	if (debugLevel > 0)
-		printf("Video Initialisation Results\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", red, green, blue, alpha,
-				(doublebuf == 1 ? "Yes" : "No"));
 
 	//print video card memory
 	const SDL_VideoInfo* info = SDL_GetVideoInfo();
@@ -226,6 +227,10 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 			printf("Video Memory (in MB): %d\n", info->video_mem);
 		}
 	}
+
+	if (debugLevel > 0)
+		printf("Video Initialisation Results\nScreen Res:\t%ix%i-%i\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", info->current_w, info->current_h, info->vfmt->BitsPerPixel, red, green, blue, alpha,
+				(doublebuf == 1 ? "Yes" : "No"));
 
 	if (screen == NULL)
 	{
