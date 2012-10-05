@@ -701,7 +701,7 @@ void Signage::Update()
 							iBoxes[102].Destroy();
 						if (iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 							iBoxes[103].Destroy();
-						if (wCurDisp >= 6)
+						if (wCurDisp >= 7)
 							wCurDisp = 0;
 					}
 					if (wFadeV[0] > 255)
@@ -1409,16 +1409,20 @@ void Signage::Draw()
 				;
 				break;
 			case 3:
-				// Air Pressure //
-				sprintf(tWString, "Air Pressure: %i mb", tPressure);
+				// Precipitation //
+				sprintf(tWString, "Precipitation: %smm", tPrecipitation);
 				;
 				break;
 			case 4:
+				// Air Pressure //
+				sprintf(tWString, "Air Pressure: %i mb", tPressure);
+				;
+			case 5:
 				// Cloud Cover //
 				sprintf(tWString, "Cloud Cover: %i%%", tCloudCover);
 				;
 				break;
-			case 5:
+			case 6:
 				// Visibility //
 				sprintf(tWString, "Visibility: %ikm", tVisibility);
 				;
@@ -1434,7 +1438,7 @@ void Signage::Draw()
 			if (drawText(tWString, fntCGothic[32], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
 			{
 				/* We're either Scrolling or Scrolled. */
-				/* Draw End Fader (obviously) */
+				/* Draw End Fader (obviously) */;
 
 				if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 				{
@@ -1501,7 +1505,8 @@ void Signage::Draw()
 		}
 		else
 		{
-			drawText("Weather Currently Unavailable", fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0);
+			/* Don't draw Unavailable message any more (tidy up)
+			drawText("Weather Currently Unavailable", fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0); */
 			if (iBoxes[101].isCreated())
 				iBoxes[101].Destroy();
 		}
@@ -2063,6 +2068,15 @@ void Signage::parseWeather(xmlNode * a_node)
 					tHumidity = atoi(tTempI);
 				if (debugLevel > 1)
 					printf("\tItem: %s \t\tData: %i\n", cur_node->name, tHumidity);
+			}
+
+			// Precipitation //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "precipMM")) && (trPrecipitation == 0))
+			{
+				sprintf(tPrecipitation, "%s", xmlNodeGetContent(cur_node));
+				trPrecipitation = 1;
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %s\n", cur_node->name, tPrecipitation);
 			}
 
 			// Air Pressure //

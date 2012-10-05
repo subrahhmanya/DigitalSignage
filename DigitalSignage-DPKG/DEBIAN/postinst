@@ -11,8 +11,9 @@ fi
 echo "Adding XSession Configuration..."
 su screen -c "echo /opt/digitalsignage/runcheck.sh > /dev/null 2>&1 > /home/screen/.xsession"
 
-echo "Setting Plymouth Theme..."
+echo "Configuring Plymouth Theme..."
 update-alternatives --install /lib/plymouth/themes/default.plymouth default.plymouth /lib/plymouth/themes/digitalsignage-text/digitalsignage-text.plymouth 100
+update-alternatives --install /lib/plymouth/themes/text.plymouth text.plymouth /lib/plymouth/themes/digitalsignage-text/digitalsignage-text.plymouth 100
 
 echo "Launching..."
 # Static Variables

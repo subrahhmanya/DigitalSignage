@@ -67,7 +67,7 @@ private:
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[49];
 	int pTWidth, pTHeight, tC1, tSrS, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure,
-			trCloudCover, trVisibility, trConditionDesc;
+			trCloudCover, trVisibility, trConditionDesc, trPrecipitation;
 
 	/* BEGIN Weather Vars */
 
@@ -80,6 +80,7 @@ private:
 	int tPressure;
 	int tCloudCover;
 	int tVisibility;
+	char tPrecipitation[8];
 	int tSBoot, tSBSec, tSBMin, tSBHrs;
 	char tConditionDesc[64];
 
