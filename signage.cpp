@@ -1233,7 +1233,7 @@ void Signage::Update()
 								else if (strcmp(mBoard[cB].cBoard[mBoard[cB].curBoard].Type, "mplayer") == 0)
 								{
 									sprintf(bdID, "/opt/digitalsignage/textures/iplayer/%s.png", mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
-									sprintf(mpSC, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
+									sprintf(mpSC, "/screen/boards/%s/videos/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
 								}
 								else
 									sprintf(bdID, "/screen/boards/%s/boards/%s", mBoard[cB].Folder, mBoard[cB].cBoard[mBoard[cB].curBoard].Src);
@@ -1438,7 +1438,7 @@ void Signage::Draw()
 			if (drawText(tWString, fntCGothic[32], 1, 255, 255, 255, wFadeV[0], 0, tPXX, 8, tPXM, tScrolling[0]) > 0)
 			{
 				/* We're either Scrolling or Scrolled. */
-				/* Draw End Fader (obviously) */;
+				/* Draw End Fader (obviously) */
 
 				if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 				{
