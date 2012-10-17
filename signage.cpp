@@ -102,7 +102,7 @@ Signage::Signage()
 {
 	/* Preset variables */
 	wLastCheckH = 99;
-	wLastCheckM = 99;
+	wLastCheckM = -99;
 	wUpdateTimer[0] = 0;
 	wUpdateTimer[1] = 0;
 	wUpdateTimer[2] = 0;
@@ -329,6 +329,11 @@ void Signage::HandleEvents(Signage* signage)
 				signage->Quit();
 				break;
 
+			case SDLK_w:
+				/* Set Weather as Bad */
+				wOK = false;
+				break;
+
 			case SDLK_d:
 				/* Reset Debug Timer */
 				dTimeEvent = cTime;
@@ -411,7 +416,7 @@ void Signage::Update()
 			/* Do Weather Check (update once every 15 minutes) */
 			if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
 			{
-				if (wLastCheckM != ltm->tm_min)
+				if (wLastCheckM <= (ltm->tm_min - 5))
 				{
 					/* Update last check interval */
 					wLastCheckM = ltm->tm_min;
@@ -478,6 +483,7 @@ void Signage::Update()
 						if (debugLevel > 1)
 							printf("NO DATA/NET CONNECTION\n");
 						wLastCheckH = -5;
+						wLastCheckM = ltm->tm_min;
 						wOK = false;
 					}
 					/* Calculate Weather */
@@ -710,6 +716,17 @@ void Signage::Update()
 						wFadeA[0] = 0;
 					}
 				}
+			} else {
+				if (iBoxes[101].isCreated() && iBoxes[101].stype() != -1)
+					iBoxes[101].Destroy();
+				if (iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
+					iBoxes[102].Destroy();
+				if (iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
+					iBoxes[103].Destroy();
+				if (iBoxes[104].isCreated() && iBoxes[104].stype() != -1)
+					iBoxes[104].Destroy();
+				if (iBoxes[105].isCreated() && iBoxes[105].stype() != -1)
+					iBoxes[105].Destroy();
 			}
 
 			if (cTime > (wUpdateTimer[2] + 10))
