@@ -126,6 +126,7 @@ Signage::Signage()
 	trPressure = 0;
 
 	tSrS = 0;
+	tOSrS = 0;
 	bV1 = false;
 	wOK = false;
 	pTWidth = 0;
@@ -155,6 +156,9 @@ Signage::Signage()
 	tCloudCover = 0;
 	cTime = 0;
 	tWeatherCode = 0;
+
+	sprintf(tSunSet, "");
+	sprintf(tSunRise, "");
 
 	sInitDisp = false;
 }
@@ -229,8 +233,8 @@ void Signage::Init(const char* title, int width, int height, int bpp, bool fulls
 	}
 
 	if (debugLevel > 0)
-		printf("Video Initialisation Results\nScreen Res:\t%ix%i-%i\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n", info->current_w, info->current_h, info->vfmt->BitsPerPixel, red, green, blue, alpha,
-				(doublebuf == 1 ? "Yes" : "No"));
+		printf("Video Initialisation Results\nScreen Res:\t%ix%i-%i\nRed Size:\t%d\nGreen Size:\t%d\nBlue Size:\t%d\nAlpha Size:\t%d\nDouble Buffered? %s\n",
+				info->current_w, info->current_h, info->vfmt->BitsPerPixel, red, green, blue, alpha, (doublebuf == 1 ? "Yes" : "No"));
 
 	if (screen == NULL)
 	{
@@ -522,127 +526,158 @@ void Signage::Update()
 					//	wFadeA[1] = 0;
 				}
 
-				if (cTime > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle */
+				char tBuff[64] = "";
+
+				if (cTime > (wUpdateTimer[0] + 15)) /* Weather Condition Cycle and Sunrise/Sunset Calculation */
 				{
 					wUpdateTimer[0] = cTime;
 					wFadeA[0] = 1;
-				}
 
-				/* Calculate Sunrise/Sunset */
-				double tzone = 0.0;
-				double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
-				double lambda = FNsun(d);
-				double obliq = 23.439 * rads - .0000004 * rads * d;
-				double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
-				double delta = asin(sin(obliq) * sin(lambda));
+					/* Calculate Sunrise/Sunset */
+					double tzone = 0.0;
+					double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
+					double lambda = FNsun(d);
+					double obliq = 23.439 * rads - .0000004 * rads * d;
+					double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
+					double delta = asin(sin(obliq) * sin(lambda));
 
-				double LL = L - alpha;
-				if (L < pi)
-					LL += tpi;
-				double equation = 1440.0 * (1.0 - LL / tpi);
-				double latit = 52.8943;
-				double longit = -2.2158;
-				double ha = f0(latit, delta);
+					double LL = L - alpha;
+					if (L < pi)
+						LL += tpi;
+					double equation = 1440.0 * (1.0 - LL / tpi);
+					double latit = 52.8943;
+					double longit = -2.2158;
+					double ha = f0(latit, delta);
 
-				double hb = f1(latit, delta);
-				double twx = hb - ha; // length of twilight in radians
-				twx = 12.0 * twx / pi; // length of twilight in degrees
+					double hb = f1(latit, delta);
+					double twx = hb - ha; // length of twilight in radians
+					twx = 12.0 * twx / pi; // length of twilight in degrees
 
-				// Conversion of angle to hours and minutes //
-				daylen = degs * ha / 7.5;
-				if (daylen < 0.0001)
-				{
-					daylen = 0.0;
-				}
-				// arctic winter   //
-
-				double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-				double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-				//double noont = riset + 12.0 * ha / pi;
-				double altmax = 90.0 + delta * degs - latit;
-				/* Express as degrees from the N horizon */
-
-				if (delta * degs > latit)
-					altmax = 90.0 + latit - delta * degs;
-
-				if (riset > 24.0)
-					riset -= 24.0;
-				if (settm > 24.0)
-					settm -= 24.0;
-				int rhr, rmn, shr, smn;
-				rhr = (int) riset;
-				rmn = (riset - (double) rhr) * 60;
-				shr = (int) settm;
-				smn = (settm - (double) shr) * 60;
-
-				char tBuff[64] = "";
-
-				if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
-				{
-					/* We are in Day */
-					if (ltm->tm_hour == rhr)
+					// Conversion of angle to hours and minutes //
+					daylen = degs * ha / 7.5;
+					if (daylen < 0.0001)
 					{
-						/* We are at first hour */
-						if (ltm->tm_min >= rmn)
-						{
-							if (tSrS != 1)
-							{
-								/* Set Day */
-								tSrS = 1;
-								tOIcon = -1;
-							}
-						}
+						daylen = 0.0;
+					}
+					// arctic winter   //
+
+					double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+					double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+					//double noont = riset + 12.0 * ha / pi;
+					double altmax = 90.0 + delta * degs - latit;
+					/* Express as degrees from the N horizon */
+
+					if (delta * degs > latit)
+						altmax = 90.0 + latit - delta * degs;
+
+					if (riset > 24.0)
+						riset -= 24.0;
+					if (settm > 24.0)
+						settm -= 24.0;
+					int rhr, rmn, shr, smn;
+					rhr = (int) riset;
+					rmn = (riset - (double) rhr) * 60;
+					shr = (int) settm;
+					smn = (settm - (double) shr) * 60;
+
+					int trmn = 0;
+					int tsmn = 0;
+
+					if (rmn <= 9)
+						if (rhr <= 9)
+							sprintf(tSunRise, "Sunrise at 0%i:0%i", rhr, rmn);
 						else
-						{
-							if (tSrS != 2)
-							{
-								/* Set Night */
-								tSrS = 2;
-								tOIcon = -1;
-							}
-						}
-					}
-					else if (ltm->tm_hour == shr)
-					{
-						/* We are at last hour */
-						if (ltm->tm_min < smn)
-						{
-							if (tSrS != 1)
-							{
-								/* Set Day */
-								tSrS = 1;
-								tOIcon = -1;
-							}
-						}
+							sprintf(tSunRise, "Sunrise at %i:0%i", rhr, rmn);
+					else
+						if (rhr <= 9)
+							sprintf(tSunRise, "Sunrise at 0%i:%i", rhr, rmn);
 						else
+							sprintf(tSunRise, "Sunrise at %i:%i", rhr, rmn);
+
+					if (smn < 10)
+						if (shr <= 9)
+							sprintf(tSunSet, "Sunset at 0%i:0%i", shr, smn);
+						else
+							sprintf(tSunSet, "Sunset at %i:0%i", shr, smn);
+					else
+						if (shr <= 9)
+							sprintf(tSunSet, "Sunset at 0%i:%i", shr, smn);
+						else
+							sprintf(tSunSet, "Sunset at %i:%i", shr, smn);
+
+					if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
+					{
+						/* We are in Day */
+						if (ltm->tm_hour == rhr)
 						{
-							if (tSrS != 2)
+							/* We are at first hour */
+							if (ltm->tm_min >= rmn)
 							{
-								/* Set Night */
-								tSrS = 2;
-								tOIcon = -1;
+								if (tSrS != 1)
+								{
+									/* Set Day */
+									tSrS = 1;
+									tOIcon = -1;
+								}
+							}
+							else
+							{
+								if (tSrS != 2)
+								{
+									/* Set Night */
+									tSrS = 2;
+									tOIcon = -1;
+								}
+							}
+						}
+						else if (ltm->tm_hour == shr)
+						{
+							/* We are at last hour */
+							if (ltm->tm_min < smn)
+							{
+								if (tSrS != 1)
+								{
+									/* Set Day */
+									tSrS = 1;
+									tOIcon = -1;
+								}
+							}
+							else
+							{
+								if (tSrS != 2)
+								{
+									/* Set Night */
+									tSrS = 2;
+									tOIcon = -1;
+								}
 							}
 						}
 					}
-				}
-				else
-				{
-					/* Obvious Night */
-					if (tSrS != 2)
+					else
 					{
-						/* Set Night */
-						tSrS = 2;
-						tOIcon = -1;
+						/* Obvious Night */
+						if (tSrS != 2)
+						{
+							/* Set Night */
+							tSrS = 2;
+							tOIcon = -1;
+						}
+					}
+
+					if (tSrS == 2)
+						sprintf(tBuff, "/opt/digitalsignage/textures/weather/night");
+					else
+						sprintf(tBuff, "/opt/digitalsignage/textures/weather/day");
+
+					if (tOSrS != tSrS)
+					{
+						tOIcon = -99;
+						tOSrS = tSrS;
 					}
 				}
-
-				if (tSrS == 2)
-					sprintf(tBuff, "/opt/digitalsignage/textures/weather/night");
-				else
-					sprintf(tBuff, "/opt/digitalsignage/textures/weather/day");
 
 				/* Weather Icon Fading Transition */
-				if ((tIcon != tOIcon) && (wFadeA[1] == 0))
+				if (((tIcon != tOIcon) || (tOSrS != tSrS)) && (wFadeA[1] == 0))
 				{
 					wUpdateTimer[1] = cTime;
 					wFadeA[1] = 1;
@@ -707,7 +742,7 @@ void Signage::Update()
 							iBoxes[102].Destroy();
 						if (iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 							iBoxes[103].Destroy();
-						if (wCurDisp >= 7)
+						if (wCurDisp >= 9)
 							wCurDisp = 0;
 					}
 					if (wFadeV[0] > 255)
@@ -716,7 +751,9 @@ void Signage::Update()
 						wFadeA[0] = 0;
 					}
 				}
-			} else {
+			}
+			else
+			{
 				if (iBoxes[101].isCreated() && iBoxes[101].stype() != -1)
 					iBoxes[101].Destroy();
 				if (iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
@@ -1414,7 +1451,6 @@ void Signage::Draw()
 			case 0:
 				// Weather Condition //
 				sprintf(tWString, "%s", tConditionDesc);
-				;
 				break;
 			case 1:
 				// Wind Speed //
@@ -1423,26 +1459,30 @@ void Signage::Draw()
 			case 2:
 				// Humidity //
 				sprintf(tWString, "Humidity: %i%%", tHumidity);
-				;
 				break;
 			case 3:
 				// Precipitation //
 				sprintf(tWString, "Precipitation: %smm", tPrecipitation);
-				;
 				break;
 			case 4:
 				// Air Pressure //
 				sprintf(tWString, "Air Pressure: %i mb", tPressure);
-				;
+				break;
 			case 5:
 				// Cloud Cover //
 				sprintf(tWString, "Cloud Cover: %i%%", tCloudCover);
-				;
 				break;
 			case 6:
 				// Visibility //
 				sprintf(tWString, "Visibility: %ikm", tVisibility);
-				;
+				break;
+			case 7:
+				// Sun Rise //
+				sprintf(tWString, "%s", tSunRise);
+				break;
+			case 8:
+				// Sun Set //
+				sprintf(tWString, "%s", tSunSet);
 				break;
 			}
 
@@ -1460,8 +1500,8 @@ void Signage::Draw()
 				if (!iBoxes[102].isCreated() && iBoxes[102].stype() != -1)
 				{
 					iBoxes[102].Create((char *) "Weather Condition Fader - Right", (char *) "", 0, tScrollTex[0].gltex(), 4, plPX - 32, 8,
-							tScrollTex[0].width(), 32, tScrollTex[0].width(), pTHeight, 255, 1, 1, (char *) "null", false, false, (char *) "",
-							(char *) "", debugLevel);
+							tScrollTex[0].width(), 32, tScrollTex[0].width(), pTHeight, 255, 1, 1, (char *) "null", false, false, (char *) "", (char *) "",
+							debugLevel);
 				}
 
 				tScrollSFader[0] = 0;
@@ -1523,7 +1563,7 @@ void Signage::Draw()
 		else
 		{
 			/* Don't draw Unavailable message any more (tidy up)
-			drawText("Weather Currently Unavailable", fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0); */
+			 drawText("Weather Currently Unavailable", fntCGothic[32], 1, 255, 255, 255, 255, 0, 16, 8, 0, 0); */
 			if (iBoxes[101].isCreated())
 				iBoxes[101].Destroy();
 		}

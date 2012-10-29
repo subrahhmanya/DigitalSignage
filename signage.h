@@ -66,7 +66,7 @@ private:
 	Texture tScrollTex[2];
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[49];
-	int pTWidth, pTHeight, tC1, tSrS, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure,
+	int pTWidth, pTHeight, tC1, tSrS, tOSrS, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure,
 			trCloudCover, trVisibility, trConditionDesc, trPrecipitation;
 
 	/* BEGIN Weather Vars */
@@ -83,6 +83,8 @@ private:
 	char tPrecipitation[8];
 	int tSBoot, tSBSec, tSBMin, tSBHrs;
 	char tConditionDesc[64];
+	char tSunRise[64];
+	char tSunSet[64];
 
 	/* END Weather Vars */
 
