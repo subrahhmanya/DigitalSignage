@@ -420,10 +420,10 @@ void Signage::Update()
 			/* Do Weather Check (update once every 15 minutes) */
 			if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
 			{
-				if (wLastCheckM <= (ltm->tm_min - 5))
+				if (wLastCheckM <= (time(0) - 300))
 				{
 					/* Update last check interval */
-					wLastCheckM = ltm->tm_min;
+					wLastCheckM = time(0);
 
 					if (debugLevel > 1)
 					{
@@ -487,7 +487,7 @@ void Signage::Update()
 						if (debugLevel > 1)
 							printf("NO DATA/NET CONNECTION\n");
 						wLastCheckH = -5;
-						wLastCheckM = ltm->tm_min;
+						wLastCheckM = time(0);
 						wOK = false;
 					}
 					/* Calculate Weather */
@@ -588,22 +588,20 @@ void Signage::Update()
 							sprintf(tSunRise, "Sunrise at 0%i:0%i", rhr, rmn);
 						else
 							sprintf(tSunRise, "Sunrise at %i:0%i", rhr, rmn);
+					else if (rhr <= 9)
+						sprintf(tSunRise, "Sunrise at 0%i:%i", rhr, rmn);
 					else
-						if (rhr <= 9)
-							sprintf(tSunRise, "Sunrise at 0%i:%i", rhr, rmn);
-						else
-							sprintf(tSunRise, "Sunrise at %i:%i", rhr, rmn);
+						sprintf(tSunRise, "Sunrise at %i:%i", rhr, rmn);
 
 					if (smn < 10)
 						if (shr <= 9)
 							sprintf(tSunSet, "Sunset at 0%i:0%i", shr, smn);
 						else
 							sprintf(tSunSet, "Sunset at %i:0%i", shr, smn);
+					else if (shr <= 9)
+						sprintf(tSunSet, "Sunset at 0%i:%i", shr, smn);
 					else
-						if (shr <= 9)
-							sprintf(tSunSet, "Sunset at 0%i:%i", shr, smn);
-						else
-							sprintf(tSunSet, "Sunset at %i:%i", shr, smn);
+						sprintf(tSunSet, "Sunset at %i:%i", shr, smn);
 
 					if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
 					{
