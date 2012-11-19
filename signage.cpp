@@ -159,7 +159,7 @@ Signage::Signage()
 
 	sprintf(tSunSet, "");
 	sprintf(tSunRise, "");
-	sprintf(tWIconPath, ""):
+	sprintf(tWIconPath, "");
 
 	sInitDisp = false;
 }
