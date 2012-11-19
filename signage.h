@@ -85,6 +85,7 @@ private:
 	char tConditionDesc[64];
 	char tSunRise[64];
 	char tSunSet[64];
+	char tWIconPath[64];
 
 	/* END Weather Vars */
 

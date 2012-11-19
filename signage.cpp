@@ -159,6 +159,7 @@ Signage::Signage()
 
 	sprintf(tSunSet, "");
 	sprintf(tSunRise, "");
+	sprintf(tWIconPath, ""):
 
 	sInitDisp = false;
 }
@@ -418,7 +419,8 @@ void Signage::Update()
 
 			/* Process Weather Information */
 			/* Do Weather Check (update once every 15 minutes) */
-			if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0))
+			if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0)
+					|| (wLastCheckM <= (time(0) - 300)))
 			{
 				if (wLastCheckM <= (time(0) - 300))
 				{
@@ -477,7 +479,155 @@ void Signage::Update()
 						xmlCleanupParser(); // Free globals
 						/* Update last check interval */
 						if (wOK)
+						{
 							wLastCheckH = ltm->tm_hour;
+							/* Calculate Temperature */
+							wCelcius = floorf(((5.0 / 9.0) * (tTemp - 32.0)) * 10 + 0.5) / 10;
+							sprintf(wTemp, "%.1fºC", wCelcius);
+
+							/* Calculate Sunrise/Sunset */
+							double tzone = 0.0;
+							double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
+							double lambda = FNsun(d);
+							double obliq = 23.439 * rads - .0000004 * rads * d;
+							double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
+							double delta = asin(sin(obliq) * sin(lambda));
+
+							double LL = L - alpha;
+							if (L < pi)
+								LL += tpi;
+							double equation = 1440.0 * (1.0 - LL / tpi);
+							double latit = 52.8943;
+							double longit = -2.2158;
+							double ha = f0(latit, delta);
+
+							double hb = f1(latit, delta);
+							double twx = hb - ha; // length of twilight in radians
+							twx = 12.0 * twx / pi; // length of twilight in degrees
+
+							// Conversion of angle to hours and minutes //
+							daylen = degs * ha / 7.5;
+							if (daylen < 0.0001)
+							{
+								daylen = 0.0;
+							}
+							// arctic winter   //
+
+							double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+							double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
+							//double noont = riset + 12.0 * ha / pi;
+							double altmax = 90.0 + delta * degs - latit;
+							/* Express as degrees from the N horizon */
+
+							if (delta * degs > latit)
+								altmax = 90.0 + latit - delta * degs;
+
+							if (riset > 24.0)
+								riset -= 24.0;
+							if (settm > 24.0)
+								settm -= 24.0;
+							int rhr, rmn, shr, smn;
+							rhr = (int) riset;
+							rmn = (riset - (double) rhr) * 60;
+							shr = (int) settm;
+							smn = (settm - (double) shr) * 60;
+
+							int trmn = 0;
+							int tsmn = 0;
+
+							if (rmn <= 9)
+								if (rhr <= 9)
+									sprintf(tSunRise, "Sunrise at 0%i:0%i", rhr, rmn);
+								else
+									sprintf(tSunRise, "Sunrise at %i:0%i", rhr, rmn);
+							else if (rhr <= 9)
+								sprintf(tSunRise, "Sunrise at 0%i:%i", rhr, rmn);
+							else
+								sprintf(tSunRise, "Sunrise at %i:%i", rhr, rmn);
+
+							if (smn < 10)
+								if (shr <= 9)
+									sprintf(tSunSet, "Sunset at 0%i:0%i", shr, smn);
+								else
+									sprintf(tSunSet, "Sunset at %i:0%i", shr, smn);
+							else if (shr <= 9)
+								sprintf(tSunSet, "Sunset at 0%i:%i", shr, smn);
+							else
+								sprintf(tSunSet, "Sunset at %i:%i", shr, smn);
+
+							if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
+							{
+								/* We are in Day */
+								if (ltm->tm_hour == rhr)
+								{
+									/* We are at first hour */
+									if (ltm->tm_min >= rmn)
+									{
+										if (tSrS != 1)
+										{
+											/* Set Day */
+											tSrS = 1;
+											tOIcon = -1;
+										}
+									}
+									else
+									{
+										if (tSrS != 2)
+										{
+											/* Set Night */
+											tSrS = 2;
+											tOIcon = -1;
+										}
+									}
+								}
+								else if (ltm->tm_hour == shr)
+								{
+									/* We are at last hour */
+									if (ltm->tm_min < smn)
+									{
+										if (tSrS != 1)
+										{
+											/* Set Day */
+											tSrS = 1;
+											tOIcon = -1;
+										}
+									}
+									else
+									{
+										if (tSrS != 2)
+										{
+											/* Set Night */
+											tSrS = 2;
+											tOIcon = -1;
+										}
+									}
+								}
+							}
+							else
+							{
+								/* Obvious Night */
+								if (tSrS != 2)
+								{
+									/* Set Night */
+									tSrS = 2;
+									tOIcon = -1;
+								}
+							}
+
+							if (tSrS == 2)
+								sprintf(tWIconPath, "/opt/digitalsignage/textures/weather/night");
+							else
+								sprintf(tWIconPath, "/opt/digitalsignage/textures/weather/day");
+
+							if (tOSrS != tSrS)
+							{
+								tOIcon = -99;
+								tOSrS = tSrS;
+							}
+
+							if (debugLevel > 1)
+								printf("Weather Check Completed [OK]\n");
+						}
 						else
 							wLastCheckH = -5;
 					}
@@ -490,9 +640,6 @@ void Signage::Update()
 						wLastCheckM = time(0);
 						wOK = false;
 					}
-					/* Calculate Weather */
-					wCelcius = floorf(((5.0 / 9.0) * (tTemp - 32.0)) * 10 + 0.5) / 10;
-					sprintf(wTemp, "%.1fºC", wCelcius);
 				}
 			}
 			if (wOK)
@@ -522,8 +669,8 @@ void Signage::Update()
 						else if (iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
 							iBoxes[105].Destroy();
 					}
-					//else
-					//	wFadeA[1] = 0;
+					else if (iBoxes[105].isCreated() && iBoxes[104].stype() != -1)
+						iBoxes[105].Destroy();
 				}
 
 				char tBuff[64] = "";
@@ -532,146 +679,6 @@ void Signage::Update()
 				{
 					wUpdateTimer[0] = cTime;
 					wFadeA[0] = 1;
-
-					/* Calculate Sunrise/Sunset */
-					double tzone = 0.0;
-					double d = FNday(ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, 12);
-					double lambda = FNsun(d);
-					double obliq = 23.439 * rads - .0000004 * rads * d;
-					double alpha = atan2(cos(obliq) * sin(lambda), cos(lambda));
-					double delta = asin(sin(obliq) * sin(lambda));
-
-					double LL = L - alpha;
-					if (L < pi)
-						LL += tpi;
-					double equation = 1440.0 * (1.0 - LL / tpi);
-					double latit = 52.8943;
-					double longit = -2.2158;
-					double ha = f0(latit, delta);
-
-					double hb = f1(latit, delta);
-					double twx = hb - ha; // length of twilight in radians
-					twx = 12.0 * twx / pi; // length of twilight in degrees
-
-					// Conversion of angle to hours and minutes //
-					daylen = degs * ha / 7.5;
-					if (daylen < 0.0001)
-					{
-						daylen = 0.0;
-					}
-					// arctic winter   //
-
-					double riset = 12.0 - 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-					double settm = 12.0 + 12.0 * ha / pi + tzone - longit / 15.0 + equation / 60.0;
-					//double noont = riset + 12.0 * ha / pi;
-					double altmax = 90.0 + delta * degs - latit;
-					/* Express as degrees from the N horizon */
-
-					if (delta * degs > latit)
-						altmax = 90.0 + latit - delta * degs;
-
-					if (riset > 24.0)
-						riset -= 24.0;
-					if (settm > 24.0)
-						settm -= 24.0;
-					int rhr, rmn, shr, smn;
-					rhr = (int) riset;
-					rmn = (riset - (double) rhr) * 60;
-					shr = (int) settm;
-					smn = (settm - (double) shr) * 60;
-
-					int trmn = 0;
-					int tsmn = 0;
-
-					if (rmn <= 9)
-						if (rhr <= 9)
-							sprintf(tSunRise, "Sunrise at 0%i:0%i", rhr, rmn);
-						else
-							sprintf(tSunRise, "Sunrise at %i:0%i", rhr, rmn);
-					else if (rhr <= 9)
-						sprintf(tSunRise, "Sunrise at 0%i:%i", rhr, rmn);
-					else
-						sprintf(tSunRise, "Sunrise at %i:%i", rhr, rmn);
-
-					if (smn < 10)
-						if (shr <= 9)
-							sprintf(tSunSet, "Sunset at 0%i:0%i", shr, smn);
-						else
-							sprintf(tSunSet, "Sunset at %i:0%i", shr, smn);
-					else if (shr <= 9)
-						sprintf(tSunSet, "Sunset at 0%i:%i", shr, smn);
-					else
-						sprintf(tSunSet, "Sunset at %i:%i", shr, smn);
-
-					if (((rhr <= ltm->tm_hour) && (shr >= ltm->tm_hour)))
-					{
-						/* We are in Day */
-						if (ltm->tm_hour == rhr)
-						{
-							/* We are at first hour */
-							if (ltm->tm_min >= rmn)
-							{
-								if (tSrS != 1)
-								{
-									/* Set Day */
-									tSrS = 1;
-									tOIcon = -1;
-								}
-							}
-							else
-							{
-								if (tSrS != 2)
-								{
-									/* Set Night */
-									tSrS = 2;
-									tOIcon = -1;
-								}
-							}
-						}
-						else if (ltm->tm_hour == shr)
-						{
-							/* We are at last hour */
-							if (ltm->tm_min < smn)
-							{
-								if (tSrS != 1)
-								{
-									/* Set Day */
-									tSrS = 1;
-									tOIcon = -1;
-								}
-							}
-							else
-							{
-								if (tSrS != 2)
-								{
-									/* Set Night */
-									tSrS = 2;
-									tOIcon = -1;
-								}
-							}
-						}
-					}
-					else
-					{
-						/* Obvious Night */
-						if (tSrS != 2)
-						{
-							/* Set Night */
-							tSrS = 2;
-							tOIcon = -1;
-						}
-					}
-
-					if (tSrS == 2)
-						sprintf(tBuff, "/opt/digitalsignage/textures/weather/night");
-					else
-						sprintf(tBuff, "/opt/digitalsignage/textures/weather/day");
-
-					if (tOSrS != tSrS)
-					{
-						tOIcon = -99;
-						tOSrS = tSrS;
-					}
 				}
 
 				/* Weather Icon Fading Transition */
@@ -697,8 +704,7 @@ void Signage::Update()
 					{
 						wFadeA[1] = 2;
 						wFadeV[1] = 0;
-						sprintf(tBuff, "%s/%i.png", tBuff, tIcon);
-
+						sprintf(tBuff, "%s/%i.png", tWIconPath, tIcon);
 						weather[0].Load(tBuff, debugLevel);
 						iBoxes[101].Create((char *) "Weather Condition", (char *) "", 0, weather[0].gltex(), 4, 0, 0, weather[0].width() / 2,
 								weather[0].height() / 2, weather[0].width() / 2, weather[0].height() / 2, 255, 1, 1, (char *) "null", false, false, (char *) "",
