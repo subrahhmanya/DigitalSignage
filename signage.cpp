@@ -124,6 +124,7 @@ Signage::Signage()
 	trWindDir = 0;
 	trHumidity = 0;
 	trPressure = 0;
+	trPrecipitation = 0;
 
 	tSrS = 0;
 	tOSrS = 0;
@@ -420,7 +421,7 @@ void Signage::Update()
 			/* Process Weather Information */
 			/* Do Weather Check (update once every 15 minutes) */
 			if ((wLastCheckH != ltm->tm_hour) || (ltm->tm_min == 15) || (ltm->tm_min == 30) || (ltm->tm_min == 45) || (ltm->tm_min == 0)
-					|| (wLastCheckM <= (time(0) - 300)))
+					|| ((wOK == false) && (wLastCheckM <= (time(0) - 300))))
 			{
 				if (wLastCheckM <= (time(0) - 300))
 				{
@@ -531,9 +532,6 @@ void Signage::Update()
 							rmn = (riset - (double) rhr) * 60;
 							shr = (int) settm;
 							smn = (settm - (double) shr) * 60;
-
-							int trmn = 0;
-							int tsmn = 0;
 
 							if (rmn <= 9)
 								if (rhr <= 9)
