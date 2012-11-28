@@ -67,7 +67,7 @@ private:
 	Box iBoxes[128];
 	TTF_Font *fntCGothic[49];
 	int pTWidth, pTHeight, tC1, tSrS, tOSrS, tIcon, tOIcon, trObservationTime, trTemp, trWeatherCode, trWindSpeedMPH, trWindDir, trHumidity, trPressure,
-			trCloudCover, trVisibility, trConditionDesc, trPrecipitation;
+			trCloudCover, trVisibility, trConditionDesc, trPrecipitation, trQueryLoc;
 
 	/* BEGIN Weather Vars */
 
@@ -76,6 +76,7 @@ private:
 	int tWeatherCode;
 	int tWindSpeedMPH;
 	char tWindDir[8];
+	char tQueryLoc[256];
 	int tHumidity;
 	int tPressure;
 	int tCloudCover;
@@ -93,7 +94,7 @@ private:
 	bool bV1, wOK, sInitDisp;
 	char nthsInWord[8], dateString[32];
 	char wIcon[64];
-	int wFadeA[5], wFadeV[5], wCurDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32], tScrolling[64], tScrollCycle[64], tScrollingTimer[64], tScrollSFader[64],
+	int wFadeA[5], wFadeV[5], wCurDisp, wCurLocDisp, wLastCheckH, wLastCheckM, wUpdateTimer[32], tScrolling[64], tScrollCycle[64], tScrollingTimer[64], tScrollSFader[64],
 			tScrollEFader[64], dTimeEvent, debugLevel;
 	float wCelcius;
 	char wTemp[32];

@@ -108,6 +108,7 @@ Signage::Signage()
 	wUpdateTimer[2] = 0;
 	wUpdateTimer[3] = 0;
 	wUpdateTimer[4] = 0;
+	wUpdateTimer[5] = 0;
 	wCurDisp = 99;
 
 	tSBoot = 0;
@@ -679,6 +680,12 @@ void Signage::Update()
 					wFadeA[0] = 1;
 				}
 
+				if (cTime > (wUpdateTimer[5] + 7)) /* Weather Location / Update Time Cycle */
+				{
+					wUpdateTimer[5] = cTime;
+					wFadeA[2] = 1;
+				}
+
 				/* Weather Icon Fading Transition */
 				if (((tIcon != tOIcon) || (tOSrS != tSrS)) && (wFadeA[1] == 0))
 				{
@@ -744,13 +751,42 @@ void Signage::Update()
 							iBoxes[102].Destroy();
 						if (iBoxes[103].isCreated() && iBoxes[103].stype() != -1)
 							iBoxes[103].Destroy();
-						if (wCurDisp >= 9)
+						if (wCurDisp > 8)
 							wCurDisp = 0;
 					}
 					if (wFadeV[0] > 255)
 					{
 						wFadeV[0] = 255;
 						wFadeA[0] = 0;
+					}
+				}
+
+				/* Process Fading Weather Location */
+				if ((wFadeA[2] == 1) || (wFadeA[2] == 2))
+				{
+					switch (wFadeA[2])
+					{
+					case 1:
+						wFadeV[2] = wFadeV[2] - 15;
+						;
+						break;
+					case 2:
+						wFadeV[2] = wFadeV[2] + 15;
+						;
+						break;
+					}
+					if (wFadeV[2] < 0)
+					{
+						wFadeA[2] = 2;
+						wFadeV[2] = 0;
+						wCurLocDisp++;
+						if (wCurLocDisp > 1)
+							wCurLocDisp = 0;
+					}
+					if (wFadeV[2] > 255)
+					{
+						wFadeV[2] = 255;
+						wFadeA[2] = 0;
 					}
 				}
 			}
@@ -1592,8 +1628,18 @@ void Signage::Draw()
 		if (wOK)
 		{
 			char tWOB[64];
-			sprintf(tWOB, "Weather Observed at %s", tObservationTime);
-			drawText(tWOB, fntCGothic[16], 1, 255, 255, 255, 255, 0, tPXX, 40, 0, 0);
+			switch (wCurLocDisp)
+			{
+			case 0:
+				// Weather Condition //
+				sprintf(tWOB, "Weather Observed at %s", tObservationTime);
+				break;
+			case 1:
+				// Wind Speed //
+				sprintf(tWOB, "%s", tQueryLoc);
+				break;
+			}
+			drawText(tWOB, fntCGothic[16], 1, 255, 255, 255, wFadeV[2], 0, tPXX, 40, 0, 0);
 		}
 
 		/* Limit FPS */
@@ -2047,6 +2093,15 @@ void Signage::parseWeather(xmlNode * a_node)
 			 * 		visibility
 			 */
 
+			// Wind Direction //
+			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "query")) && (trQueryLoc == 0))
+			{
+				sprintf(tQueryLoc, "%s", xmlNodeGetContent(cur_node));
+				trQueryLoc = 1;
+				if (debugLevel > 1)
+					printf("\tItem: %s \tData: %s\n", cur_node->name, tQueryLoc);
+			}
+
 			// Observation Time //
 			if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "observation_time")) && (trObservationTime == 0))
 			{
@@ -2197,6 +2252,9 @@ void Signage::parseWeather(xmlNode * a_node)
 		}
 
 		// Ensure we only parse data from Current Condition section.
+		if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "data")) || (!xmlStrcmp(cur_node->name, (const xmlChar *) "request")))
+			parseWeather(cur_node->children);
+
 		if ((!xmlStrcmp(cur_node->name, (const xmlChar *) "data")) || (!xmlStrcmp(cur_node->name, (const xmlChar *) "current_condition")))
 			parseWeather(cur_node->children);
 	}
